@@ -1,4 +1,4 @@
-// package lex
+package lex
 
 // import (
 // 	"fmt"

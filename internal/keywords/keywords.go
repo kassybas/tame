@@ -1,11 +1,15 @@
 package keywords
 
 var (
-	Arg    = "args"
-	Opts   = "opts"
-	Script = "script"
+	Arg    = ".args"
+	Opts   = ".opts"
+	Exec   = ".exec"
+	OutVar = ".out"
+	ErrVar = ".err"
+	RcVar  = ".rc"
 
-	PrefixReference = "$"
+	PrefixReference   = "$"
+	PrefixTameKeyword = "."
 
 	OptsSeparator = " "
 	OptSilent     = "silent"
@@ -18,7 +22,6 @@ var (
 
 	OptsNotSet = "not-set"
 
-
 	OptsDefaultValues = []string{OptStdRc, OptStderr, OptStdout}
 
 	PossibleOpts = []string{
@@ -29,6 +32,6 @@ var (
 	PrefixErr = "err_"
 	PrefixRc  = "rc_"
 
-	CliArgSeparator = "="
+	CliArgSeparator        = "="
 	GlobalDefaultVarSuffix = "?"
 )

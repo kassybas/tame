@@ -1,0 +1,16 @@
+
+
+targets:
+
+  build:
+    .opts: silent
+    .args: { foo: "world", nope }
+    .body:
+      - say-hello:
+          msg: "hello"
+        .opts: silent
+        .out: myVar
+        .err: myErrvar
+        .rc: myRcvar
+      - .exec: |
+          echo hello

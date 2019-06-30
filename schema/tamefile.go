@@ -1,4 +1,4 @@
-package scheme
+package schema
 
 type Tamefile struct {
 	TameVersion string                     `yaml:"tame-version,omitempty"`
@@ -13,14 +13,15 @@ type Tamefile struct {
 }
 
 type TargetContainer struct {
-	ArgContainer    map[string]interface{} `yaml:"args,omitempty"`
-	BodyContainer   []interface{}          `yaml:"body,omitempty"`
-	ReturnContainer []string               `yaml:"return,omitempty"`
+	ArgContainer    map[string]interface{}   `yaml:".args,omitempty"`
+	BodyContainer   []map[string]interface{} `yaml:".body,omitempty"`
+	ReturnContainer []string                 `yaml:".return,omitempty"`
+	OptsContainer   string                   `yaml:".opts,omitempty"`
 }
 
 type SetConfig struct {
-	ShellContainer       string `yaml:"shell,omitempty"`
-	InitContainer        string `yaml:"init,omitempty"`
-	DefaultOptsContainer string `yaml:"opts,omitempty"`
-	ShieldEnvContainer   bool   `yaml:"shield-env,omitempty"`
+	Shell       string `yaml:"shell,omitempty"`
+	Init        string `yaml:"init,omitempty"`
+	DefaultOpts string `yaml:"opts,omitempty"`
+	ShieldEnv   bool   `yaml:"shield-env,omitempty"`
 }

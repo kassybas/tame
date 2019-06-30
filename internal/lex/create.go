@@ -1,4 +1,4 @@
-// package lex
+package lex
 
 // import (
 // 	"github.com/kassybas/mate/internal/dependency"

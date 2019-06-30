@@ -1,4 +1,10 @@
-// package lex
+package lex
+
+import (
+	"github.com/kassybas/mate/internal/loader"
+	"github.com/kassybas/mate/internal/parse"
+	"github.com/kassybas/mate/types/step"
+)
 
 // import (
 // 	"os"
@@ -9,18 +15,20 @@
 // 	"github.com/kassybas/mate/internal/parser"
 // )
 
-// // Analyse creates the internal representation
-// func Analyse(filePath string, targetName string, targetArgs []string) (dependency.Dependency, error) {
+// Analyse creates the internal representation
+func Analyse(filePath string, targetName string, targetArgs []string) (step.Step, error) {
 
-// 	tf, err := loader.Load(filePath)
-// 	if err != nil {
-// 		return dependency.Dependency{}, err
-// 	}
+	tf, err := loader.Load(filePath)
+	if err != nil {
+		return step.Step{}, err
+	}
 
-// 	parsedTargets, err := parser.ParseTeafile(tf)
-// 	if err != nil {
-// 		return dependency.Dependency{}, err
-// 	}
+	_, err = parse.ParseTeafile(tf)
+	if err != nil {
+		return step.Step{}, err
+	}
+	return step.Step{}, err
+}
 
 // 	if targetName == "" {
 // 		helpers.PrintTeafileDescription(parsedTargets)
