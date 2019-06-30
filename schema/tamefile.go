@@ -17,6 +17,7 @@ type TargetContainer struct {
 	BodyContainer   []map[string]interface{} `yaml:".body,omitempty"`
 	ReturnContainer []string                 `yaml:".return,omitempty"`
 	OptsContainer   string                   `yaml:".opts,omitempty"`
+	Summary         string                   `yaml:".summary,omitempty"`
 }
 
 type SetConfig struct {

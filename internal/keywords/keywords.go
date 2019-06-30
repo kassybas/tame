@@ -1,12 +1,13 @@
 package keywords
 
 var (
-	Arg    = ".args"
-	Opts   = ".opts"
-	Exec   = ".exec"
-	OutVar = ".out"
-	ErrVar = ".err"
-	RcVar  = ".rc"
+	Arg     = ".args"
+	Opts    = ".opts"
+	Exec    = ".exec"
+	OutVar  = ".out"
+	ErrVar  = ".err"
+	RcVar   = ".rc"
+	Summary = ".summary"
 
 	PrefixReference   = "$"
 	PrefixTameKeyword = "."

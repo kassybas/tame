@@ -1,7 +1,6 @@
 package parse
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/sirupsen/logrus"
@@ -10,7 +9,6 @@ import (
 	"github.com/kassybas/mate/schema"
 	"github.com/kassybas/mate/types/opts"
 	"github.com/kassybas/mate/types/step"
-	"github.com/kassybas/mate/types/target"
 )
 
 // func buildSettings(tfs schema.SetConfig) (settings.Settings, error) {
@@ -26,11 +24,11 @@ import (
 // 	return settings, nil
 // }
 
-func buildParameters(paramDefs map[string]interface{}) ([]target.ParamConfig, error) {
-	params := []target.ParamConfig{}
+func buildParameters(paramDefs map[string]interface{}) ([]step.ParamConfig, error) {
+	params := []step.ParamConfig{}
 
 	for paramKey, paramValue := range paramDefs {
-		newParam := target.ParamConfig{
+		newParam := step.ParamConfig{
 			Name: paramKey,
 		}
 		switch paramValue.(type) {
@@ -47,9 +45,9 @@ func buildParameters(paramDefs map[string]interface{}) ([]target.ParamConfig, er
 	}
 	return params, nil
 }
-func ParseTeafile(tf schema.Tamefile) (map[string]target.Target, error) {
+func ParseTeafile(tf schema.Tamefile) (map[string]step.Target, error) {
 
-	targets := make(map[string]target.Target)
+	targets := make(map[string]step.Target)
 	for targetKey, targetValue := range tf.Targets {
 		trg, err := buildTarget(targetKey, targetValue)
 		if err != nil {
@@ -70,8 +68,17 @@ func buildOptsFromString(optsStr string) (opts.ExecutionOpts, error) {
 	return opts, nil
 }
 
-func buildArguments(interface{}) {
-	// TODO: continue here
+func buildArguments(argDefs interface{}) ([]step.Argument, error) {
+	argMap := argDefs.(map[interface{}]interface{})
+	args := []step.Argument{}
+	for argKey, argValue := range argMap {
+		newArg := step.Argument{
+			Name:  argKey.(string),
+			Value: argValue.(string),
+		}
+		args = append(args, newArg)
+	}
+	return args, nil
 }
 
 func buildStep(stepDef map[string]interface{}) (step.Step, error) {
@@ -81,7 +88,7 @@ func buildStep(stepDef map[string]interface{}) (step.Step, error) {
 	for stepKey, stepValue := range stepDef {
 		if !strings.HasPrefix(stepKey, keywords.PrefixTameKeyword) {
 			if newStep.Kind == step.Unset {
-				newStep.Name = stepKey
+				newStep.CalledTargetName = stepKey
 				newStep.Kind = step.Call
 				newStep.Arguments, err = buildArguments(stepValue)
 				if err != nil {
@@ -134,9 +141,9 @@ func buildSteps(stepDefs []map[string]interface{}) ([]step.Step, error) {
 	return steps, nil
 }
 
-func buildTarget(targetKey string, targetContainer schema.TargetContainer) (target.Target, error) {
+func buildTarget(targetKey string, targetContainer schema.TargetContainer) (step.Target, error) {
 	var err error
-	newTarget := target.Target{
+	newTarget := step.Target{
 		Name: targetKey,
 	}
 
@@ -148,15 +155,8 @@ func buildTarget(targetKey string, targetContainer schema.TargetContainer) (targ
 	if err != nil {
 		logrus.Error("Error when parsing targets", err)
 	}
-	fmt.Printf("%+v", newTarget.Steps)
-	panic("OK")
+	newTarget.Summary = targetContainer.Summary
 
-	// for _, depValue := range targetContainer.StepContainer {
-	// 	dep, err := buildDependencyDefinition(depValue)
-	// 	if err != nil {
-	// 		return newTarget, err
-	// 	}
-	// 	newTarget.Deps = append(newTarget.Deps, dep)
-	// }
+	newTarget.Return = targetContainer.ReturnContainer
 	return newTarget, err
 }

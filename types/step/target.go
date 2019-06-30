@@ -1,9 +1,8 @@
-package target
+package step
 
 import (
 	"github.com/kassybas/mate/types/opts"
 	"github.com/kassybas/mate/types/settings"
-	"github.com/kassybas/mate/types/step"
 )
 
 type ParamConfig struct {
@@ -15,12 +14,12 @@ type Target struct {
 	GlobalSettings *settings.Settings
 
 	Name      string
-	Body      string
 	Return    []string
-	Steps     []step.Step
+	Steps     []Step
 	Params    []ParamConfig
 	Opts      opts.ExecutionOpts
 	Variables []Variable
+	Summary   string
 }
 type Variable struct {
 	Name string

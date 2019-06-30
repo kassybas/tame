@@ -4,6 +4,7 @@ targets:
 
   build:
     .opts: silent
+    .summary: "Builds something"
     .args: { foo: "world", nope }
     .body:
       - say-hello:

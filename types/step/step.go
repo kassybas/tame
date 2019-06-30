@@ -20,6 +20,7 @@ type Step struct {
 	HasResult        bool
 	ResultVars       Result
 	CalledTargetName string
+	CalledTarget     Target
 	Script           string
 }
 
