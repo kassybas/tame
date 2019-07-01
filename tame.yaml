@@ -9,9 +9,18 @@ targets:
     .body:
       - say-hello:
           msg: "hello"
-        .opts: silent
-        .out: myVar
-        .err: myErrvar
-        .rc: myRcvar
+      - say-hello:
+          msg: "nothing"
+      - say-hello: {}
+
       - .exec: |
-          echo hello
+          echo hello my dear ${foo}
+        .out: hello
+
+  say-hello:
+    .args: {msg: ok}
+    .body:
+      - .exec: echo say "$msg"
+        .out: myVar
+      - .exec: |
+          echo "again: ${myVar}"

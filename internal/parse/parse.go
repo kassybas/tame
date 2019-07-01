@@ -24,11 +24,11 @@ import (
 // 	return settings, nil
 // }
 
-func buildParameters(paramDefs map[string]interface{}) ([]step.ParamConfig, error) {
-	params := []step.ParamConfig{}
+func buildParameters(paramDefs map[string]interface{}) ([]step.Param, error) {
+	params := []step.Param{}
 
 	for paramKey, paramValue := range paramDefs {
-		newParam := step.ParamConfig{
+		newParam := step.Param{
 			Name: paramKey,
 		}
 		switch paramValue.(type) {
@@ -68,11 +68,11 @@ func buildOptsFromString(optsStr string) (opts.ExecutionOpts, error) {
 	return opts, nil
 }
 
-func buildArguments(argDefs interface{}) ([]step.Argument, error) {
+func buildArguments(argDefs interface{}) ([]step.Variable, error) {
 	argMap := argDefs.(map[interface{}]interface{})
-	args := []step.Argument{}
+	args := []step.Variable{}
 	for argKey, argValue := range argMap {
-		newArg := step.Argument{
+		newArg := step.Variable{
 			Name:  argKey.(string),
 			Value: argValue.(string),
 		}
@@ -94,7 +94,6 @@ func buildStep(stepDef map[string]interface{}) (step.Step, error) {
 				if err != nil {
 					return newStep, err
 				}
-				continue
 			} else {
 				logrus.Warn("Ignoring called target because step has different kind set (.exec?)")
 			}
@@ -109,15 +108,15 @@ func buildStep(stepDef map[string]interface{}) (step.Step, error) {
 			}
 		case keywords.OutVar:
 			{
-				newStep.ResultVars.StdoutVar = stepValue.(string)
+				newStep.Results.StdoutVar = stepValue.(string)
 			}
 		case keywords.ErrVar:
 			{
-				newStep.ResultVars.StderrVar = stepValue.(string)
+				newStep.Results.StderrVar = stepValue.(string)
 			}
 		case keywords.RcVar:
 			{
-				newStep.ResultVars.StdrcVar = stepValue.(string)
+				newStep.Results.StdrcVar = stepValue.(string)
 			}
 		case keywords.Exec:
 			{
@@ -152,6 +151,7 @@ func buildTarget(targetKey string, targetContainer schema.TargetContainer) (step
 
 	// Steps
 	newTarget.Steps, err = buildSteps(targetContainer.BodyContainer)
+
 	if err != nil {
 		logrus.Error("Error when parsing targets", err)
 	}

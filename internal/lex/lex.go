@@ -1,7 +1,6 @@
 package lex
 
 import (
-	"fmt"
 	"os"
 
 	"github.com/kassybas/mate/internal/helpers"
@@ -10,14 +9,14 @@ import (
 	"github.com/kassybas/mate/types/step"
 )
 
-func parseCLITargetArgs(targetArgs []string) ([]step.Argument, error) {
-	var args []step.Argument
+func parseCLITargetArgs(targetArgs []string) ([]step.Variable, error) {
+	var args []step.Variable
 	for _, argStr := range targetArgs {
 		k, v, err := helpers.GetKeyValueFromEnvString(argStr)
 		if err != nil {
 			return nil, err
 		}
-		newArg := step.Argument{
+		newArg := step.Variable{
 			Name:  k,
 			Value: v,
 		}
@@ -29,33 +28,34 @@ func parseCLITargetArgs(targetArgs []string) ([]step.Argument, error) {
 func createDependencyGraph(targets map[string]step.Target, targetName string, cliVarArgs []string) (step.Step, error) {
 	var root step.Step
 	var err error
+	root.Name = "root"
+	root.CalledTargetName = targetName
 	root.Arguments, err = parseCLITargetArgs(cliVarArgs)
 	if err != nil {
 		return root, err
 	}
-	root.CalledTarget, err = findCalledTarget(targetName, targets)
+	root.CalledTarget, err = findCalledTarget(targetName, "cli root", targets)
 	if err != nil {
 		return root, err
 	}
 
 	err = populateSteps(&root.CalledTarget, targets)
 	// TODO: continue here
-	fmt.Printf("%+v", root)
 
 	return root, err
 }
 
 // Analyse creates the internal representation
-func Analyse(filePath string, targetName string, cliVarArgs []string) (step.Step, error) {
+func Analyse(filePath string, targetName string, cliVarArgs []string) (step.Step, map[string]string, error) {
 
 	tf, err := loader.Load(filePath)
 	if err != nil {
-		return step.Step{}, err
+		return step.Step{}, nil, err
 	}
 
 	parsedTargets, err := parse.ParseTeafile(tf)
 	if err != nil {
-		return step.Step{}, err
+		return step.Step{}, nil, err
 	}
 
 	if targetName == "" {
@@ -66,11 +66,11 @@ func Analyse(filePath string, targetName string, cliVarArgs []string) (step.Step
 	// TODO: Load external files if referred
 
 	// build the dependency graph with the called target
-	var head step.Step
-	head, err = createDependencyGraph(parsedTargets, targetName, cliVarArgs)
+	var root step.Step
+	root, err = createDependencyGraph(parsedTargets, targetName, cliVarArgs)
 	if err != nil {
-		return step.Step{}, err
+		return root, nil, err
 	}
 
-	return head, nil
+	return root, tf.Globals, nil
 }

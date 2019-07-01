@@ -5,7 +5,7 @@ import (
 	"github.com/kassybas/mate/types/settings"
 )
 
-type ParamConfig struct {
+type Param struct {
 	Name         string
 	HasDefault   bool
 	DefaultValue string
@@ -16,7 +16,7 @@ type Target struct {
 	Name      string
 	Return    []string
 	Steps     []Step
-	Params    []ParamConfig
+	Params    []Param
 	Opts      opts.ExecutionOpts
 	Variables []Variable
 	Summary   string

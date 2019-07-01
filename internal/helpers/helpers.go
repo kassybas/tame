@@ -38,3 +38,12 @@ func GetKeyValueFromEnvString(envStr string) (string, string, error) {
 	v := sps[1]
 	return k, v, nil
 }
+
+func FormatEnvVars(vars map[string]step.Variable) []string {
+	formattedVars := []string{}
+	for _, v := range vars {
+		newVar := v.Name + "=" + v.Value
+		formattedVars = append(formattedVars, newVar)
+	}
+	return formattedVars
+}

@@ -15,22 +15,20 @@ const (
 type Step struct {
 	Name             string
 	Kind             Steptype
-	Arguments        []Argument
+	Arguments        []Variable
 	Opts             opts.ExecutionOpts
 	HasResult        bool
-	ResultVars       Result
+	Results          Result
 	CalledTargetName string
 	CalledTarget     Target
 	Script           string
 }
 
-type Argument struct {
-	Name  string
-	Value string
-}
-
 type Result struct {
-	StdoutVar string
-	StderrVar string
-	StdrcVar  string
+	StdoutVar   string
+	StdoutValue string
+	StderrVar   string
+	StderrValue string
+	StdrcVar    string
+	StdrcValue  int
 }
