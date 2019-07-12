@@ -1,26 +1,15 @@
 
 
 targets:
-
   build:
-    .opts: silent
-    .summary: "Builds something"
-    .args: { foo: "world", nope }
-    .body:
-      - say-hello:
-          msg: "hello"
-      - say-hello:
-          msg: "nothing"
-      - say-hello: {}
+    args: {imageName: "myimg", tag: "latest"}
+    body:
+      - shell: echo docker build ${imageName}
+        out: my_docker_output
+      - call:
+          echo: {msg: "WOKRS"}
 
-      - .exec: |
-          echo hello my dear ${foo}
-        .out: hello
-
-  say-hello:
-    .args: {msg: ok}
-    .body:
-      - .exec: echo say "$msg"
-        .out: myVar
-      - .exec: |
-          echo "again: ${myVar}"
+  echo:
+    args: {msg: hello }
+    body:
+    - shell: "echo MSG: ${msg}"

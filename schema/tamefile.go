@@ -13,11 +13,21 @@ type Tamefile struct {
 }
 
 type TargetContainer struct {
-	ArgContainer    map[string]interface{}   `yaml:".args,omitempty"`
-	BodyContainer   []map[string]interface{} `yaml:".body,omitempty"`
-	ReturnContainer []string                 `yaml:".return,omitempty"`
-	OptsContainer   string                   `yaml:".opts,omitempty"`
-	Summary         string                   `yaml:".summary,omitempty"`
+	ArgContainer    map[string]interface{} `yaml:"args,omitempty"`
+	BodyContainer   []StepContainer        `yaml:"body,omitempty"`
+	ReturnContainer []string               `yaml:"return,omitempty"`
+	OptsContainer   []string               `yaml:"opts,omitempty"`
+	Summary         string                 `yaml:"summary,omitempty"`
+}
+
+type StepContainer struct {
+	Shell  string                       `yaml:"shell,omitempty"`
+	Call   map[string]map[string]string `yaml:"call,omitempty"`
+	Result []string                     `yaml:"res,omitempty"`
+	Opts   []string                     `yaml:"opts,omitempty"`
+	Out    string                       `yaml:"out,omitempty"`
+	Err    string                       `yaml:"err,omitempty"`
+	Rc     string                       `yaml:"rc,omitempty"`
 }
 
 type SetConfig struct {

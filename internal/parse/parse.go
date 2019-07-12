@@ -1,7 +1,7 @@
 package parse
 
 import (
-	"strings"
+	"fmt"
 
 	"github.com/sirupsen/logrus"
 
@@ -57,78 +57,88 @@ func ParseTeafile(tf schema.Tamefile) (map[string]step.Target, error) {
 	}
 	return targets, nil
 }
-func buildOptsFromString(optsStr string) (opts.ExecutionOpts, error) {
-	optsList := strings.Split(optsStr, keywords.OptsSeparator)
-
+func buildOpts(optsDef []string) (opts.ExecutionOpts, error) {
 	opts := opts.ExecutionOpts{}
-	for _, optStr := range optsList {
-		opts.Silent = optStr == keywords.OptSilent
+	for _, opt := range optsDef {
+		if opt == keywords.OptSilent {
+			opts.Silent = true
+		}
 		// TODOb: handle all opts
 	}
 	return opts, nil
 }
 
-func buildArguments(argDefs interface{}) ([]step.Variable, error) {
-	argMap := argDefs.(map[interface{}]interface{})
+func buildArguments(argDefs map[string]string) ([]step.Variable, error) {
 	args := []step.Variable{}
-	for argKey, argValue := range argMap {
+	for argKey, argValue := range argDefs {
 		newArg := step.Variable{
-			Name:  argKey.(string),
-			Value: argValue.(string),
+			Name:  argKey,
+			Value: argValue,
 		}
 		args = append(args, newArg)
 	}
 	return args, nil
 }
 
-func buildStep(stepDef map[string]interface{}) (step.Step, error) {
+func populateCallStep(newStep *step.Step, stepDef schema.StepContainer) error {
+	var err error
+	var keys []string
+	for key := range stepDef.Call {
+		keys = append(keys, key)
+	}
+	if len(keys) != 1 {
+		return fmt.Errorf("multiple calls defined in single step: %s", keys)
+	}
+	newStep.Kind = step.Call
+	newStep.CalledTargetName = keys[0]
+	newStep.Results.ResultVars = stepDef.Result
+	newStep.Arguments, err = buildArguments(stepDef.Call[newStep.CalledTargetName])
+	return err
+}
+
+func populateShellStep(newStep *step.Step, stepDef schema.StepContainer) error {
+	var err error
+	if newStep.Kind != step.Unset {
+		return fmt.Errorf("invalid step configuration: no call or shell defined")
+	}
+	newStep.Kind = step.Exec
+	newStep.Script = stepDef.Shell
+	if stepDef.Out != "" {
+		newStep.Results.StdoutVar = stepDef.Out
+	}
+	if stepDef.Out != "" {
+		newStep.Results.StderrVar = stepDef.Err
+	}
+	if stepDef.Rc != "" {
+		newStep.Results.StderrVar = stepDef.Rc
+	}
+	return err
+}
+
+func buildStep(stepDef schema.StepContainer) (step.Step, error) {
 	var newStep step.Step
 	var err error
 
-	for stepKey, stepValue := range stepDef {
-		if !strings.HasPrefix(stepKey, keywords.PrefixTameKeyword) {
-			if newStep.Kind == step.Unset {
-				newStep.CalledTargetName = stepKey
-				newStep.Kind = step.Call
-				newStep.Arguments, err = buildArguments(stepValue)
-				if err != nil {
-					return newStep, err
-				}
-			} else {
-				logrus.Warn("Ignoring called target because step has different kind set (.exec?)")
-			}
-		}
-		switch stepKey {
-		case keywords.Opts:
-			{
-				newStep.Opts, err = buildOptsFromString(stepValue.(string))
-				if err != nil {
-					return newStep, err
-				}
-			}
-		case keywords.OutVar:
-			{
-				newStep.Results.StdoutVar = stepValue.(string)
-			}
-		case keywords.ErrVar:
-			{
-				newStep.Results.StderrVar = stepValue.(string)
-			}
-		case keywords.RcVar:
-			{
-				newStep.Results.StdrcVar = stepValue.(string)
-			}
-		case keywords.Exec:
-			{
-				newStep.Kind = step.Exec
-				newStep.Script = stepValue.(string)
-			}
+	if stepDef.Call == nil && stepDef.Shell == "" {
+		return newStep, fmt.Errorf("invalid step configuration: no call or shell defined")
+	}
+	if stepDef.Call != nil {
+		err = populateCallStep(&newStep, stepDef)
+		if err != nil {
+			return newStep, err
 		}
 	}
+	if stepDef.Shell != "" {
+		err = populateShellStep(&newStep, stepDef)
+		if err != nil {
+			return newStep, err
+		}
+	}
+	newStep.Opts, err = buildOpts(stepDef.Opts)
 	return newStep, err
 }
 
-func buildSteps(stepDefs []map[string]interface{}) ([]step.Step, error) {
+func buildSteps(stepDefs []schema.StepContainer) ([]step.Step, error) {
 	steps := []step.Step{}
 	for _, stepDef := range stepDefs {
 		newStep, err := buildStep(stepDef)
@@ -153,7 +163,7 @@ func buildTarget(targetKey string, targetContainer schema.TargetContainer) (step
 	newTarget.Steps, err = buildSteps(targetContainer.BodyContainer)
 
 	if err != nil {
-		logrus.Error("Error when parsing targets", err)
+		logrus.Error("failed to parse steps for '%s'\n%s", targetKey, err)
 	}
 	newTarget.Summary = targetContainer.Summary
 

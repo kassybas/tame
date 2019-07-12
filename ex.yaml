@@ -2,20 +2,7 @@
 
 targets:
   build:
-    .args: {imageName: "myimg", tag: "latest"}
-    .body:
-      - .exec: |
-          echo docker build ${imageName}
-        .out: $my_docker_output
-
-      - log: {msg: "hello"}
-        .result: $res
-      - .exec: |
-          echo ${res}
-
-  log:
-    .arg: {msg}
-    .body:
-      - .exec: |
-          echo "logging my dear ${msg}"
-    .return: ["OK"]
+    args: {imageName: "myimg", tag: "latest"}
+    body:
+      - shell: echo docker build ${imageName}
+        out: my_docker_output

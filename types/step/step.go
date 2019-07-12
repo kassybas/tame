@@ -25,10 +25,12 @@ type Step struct {
 }
 
 type Result struct {
-	StdoutVar   string
-	StdoutValue string
-	StderrVar   string
-	StderrValue string
-	StdrcVar    string
-	StdrcValue  int
+	StdoutVar    string
+	StdoutValue  string
+	StderrVar    string
+	StderrValue  string
+	StdrcVar     string
+	StdrcValue   int
+	ResultVars   []string
+	ResultValues []string
 }
