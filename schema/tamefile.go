@@ -23,7 +23,7 @@ type TargetContainer struct {
 type StepContainer struct {
 	Shell  string                       `yaml:"shell,omitempty"`
 	Call   map[string]map[string]string `yaml:"call,omitempty"`
-	Result []string                     `yaml:"res,omitempty"`
+	Result []string                     `yaml:"result,omitempty"`
 	Opts   []string                     `yaml:"opts,omitempty"`
 	Out    string                       `yaml:"out,omitempty"`
 	Err    string                       `yaml:"err,omitempty"`

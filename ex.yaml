@@ -6,3 +6,10 @@ targets:
     body:
       - shell: echo docker build ${imageName}
         out: my_docker_output
+      - call:
+          log: {$msg: "my message"}
+
+  log:
+    args: {$msg}
+    body:
+      - shell: "logging: $msg"

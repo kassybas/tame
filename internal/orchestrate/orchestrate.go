@@ -29,11 +29,11 @@ func Make(path, targetName string, targetArgs []string) {
 	globals, err := EvaluateGlobals(globalDefs)
 	ctx, err := CreateContext(globals, settings.Settings{})
 	if err != nil {
-		logrus.Fatal("Execution error:", err.Error())
+		logrus.Fatal("error during execuition", err.Error())
 	}
 
-	err = ctx.Exec(root.CalledTarget, root.Arguments)
+	_, err = ctx.Run(root.CalledTarget, root.Arguments)
 	if err != nil {
-		logrus.Fatal("Execution error:", err.Error())
+		logrus.Fatal("error during execution: ", err.Error())
 	}
 }

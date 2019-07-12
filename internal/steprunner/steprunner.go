@@ -1,7 +1,11 @@
 package steprunner
 
 import (
+	"fmt"
 	"strconv"
+	"strings"
+
+	"github.com/kassybas/mate/internal/keywords"
 
 	"github.com/kassybas/mate/internal/helpers"
 	"github.com/kassybas/mate/types/step"
@@ -9,7 +13,6 @@ import (
 )
 
 func CreateVariables(globals []step.Variable, args []step.Variable, params []step.Param) (map[string]step.Variable, error) {
-	// Should we resolve here?
 	variables := make(map[string]step.Variable)
 
 	for _, g := range globals {
@@ -49,28 +52,75 @@ func UpdateResultVariables(variables map[string]step.Variable, s step.Step) map[
 	if s.Results.StdrcVar != "" {
 		variables[s.Results.StdrcVar] = step.Variable{Name: s.Results.StdrcVar, Value: strconv.Itoa(s.Results.StdrcValue)}
 	}
+	for i, v := range s.Results.ResultVars {
+		variables[v] = step.Variable{Name: v, Value: s.Results.ResultValues[i]}
+	}
 	return variables
 }
 
-func (c Context) Exec(target step.Target, args []step.Variable) error {
+func resolveArgs(argDefs []step.Variable, variables map[string]step.Variable) ([]step.Variable, error) {
+	for i, arg := range argDefs {
+		if strings.HasPrefix(arg.Value, keywords.PrefixReference) {
+			_, exists := variables[arg.Value]
+			if !exists {
+				return nil, fmt.Errorf("variable does not exist in context: '%s:%s'", arg.Name, arg.Value)
+			}
+			argDefs[i].Value = variables[arg.Name].Value
+		}
+	}
+	return argDefs, nil
+}
+
+func (c Context) Run(target step.Target, args []step.Variable) ([]string, error) {
 	variables, err := CreateVariables(c.Globals, args, target.Params)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	for _, s := range target.Steps {
 		if s.Kind == step.Exec {
 			s.Results, err = ExecuteScript(s, variables)
 			if err != nil {
-				return err
+				return nil, err
 			}
 			variables = UpdateResultVariables(variables, s)
 		}
 		if s.Kind == step.Call {
-			err = c.Exec(s.CalledTarget, s.Arguments)
+			stepArgs, err := resolveArgs(s.Arguments, variables)
 			if err != nil {
-				return err
+				return nil, err
+			}
+			returnedValues, err := c.Run(s.CalledTarget, stepArgs)
+			if err != nil {
+				return nil, err
+			}
+
+			if s.Results.ResultVars != nil {
+				if len(returnedValues) != len(s.Results.ResultVars) {
+					return nil, fmt.Errorf("mismatched number of return and result variables:\n\treturn: %d, result: %d\n\tin target: %s, calling: %s", len(returnedValues), len(s.Results.ResultVars), target.Name, s.CalledTargetName)
+				}
+
+				s.Results.ResultValues = make([]string, len(returnedValues))
+				for i := range returnedValues {
+					s.Results.ResultValues[i] = returnedValues[i]
+				}
+				variables = UpdateResultVariables(variables, s)
 			}
 		}
 	}
-	return nil
+
+	returnValues := make([]string, len(target.Return))
+
+	for i, retDef := range target.Return {
+		if !strings.HasPrefix(retDef, keywords.PrefixReference) {
+			// constant values
+			returnValues[i] = retDef
+			continue
+		}
+		_, exists := variables[retDef]
+		if !exists {
+			return nil, fmt.Errorf("return variable does not exist: '%s'\n\tin target: '%s'", retDef, target.Name)
+		}
+		returnValues[i] = variables[retDef].Value
+	}
+	return returnValues, nil
 }
