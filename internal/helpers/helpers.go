@@ -42,7 +42,9 @@ func GetKeyValueFromEnvString(envStr string) (string, string, error) {
 func FormatEnvVars(vars map[string]step.Variable) []string {
 	formattedVars := []string{}
 	for _, v := range vars {
-		newVar := v.Name + "=" + v.Value
+		// Remove $ for shell env format
+		trimmedName := strings.TrimPrefix(v.Name, keywords.PrefixReference)
+		newVar := trimmedName + "=" + v.Value
 		formattedVars = append(formattedVars, newVar)
 	}
 	return formattedVars

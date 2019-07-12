@@ -31,7 +31,9 @@ func CreateVariables(globals []step.Variable, args []step.Variable, params []ste
 
 func ExecuteScript(s step.Step, vars map[string]step.Variable) (step.Result, error) {
 	var err error
-	opts := exec.Options{}
+	opts := exec.Options{
+		Silent: s.Opts.Silent,
+	}
 	envVars := helpers.FormatEnvVars(vars)
 	s.Results.StdoutValue, s.Results.StderrValue, s.Results.StdrcValue, err = exec.ShellExec(s.Script, envVars, opts)
 	return s.Results, err

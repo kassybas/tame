@@ -3,11 +3,7 @@ package parse
 import (
 	"fmt"
 
-	"github.com/sirupsen/logrus"
-
-	"github.com/kassybas/mate/internal/keywords"
 	"github.com/kassybas/mate/schema"
-	"github.com/kassybas/mate/types/opts"
 	"github.com/kassybas/mate/types/step"
 )
 
@@ -24,27 +20,6 @@ import (
 // 	return settings, nil
 // }
 
-func buildParameters(paramDefs map[string]interface{}) ([]step.Param, error) {
-	params := []step.Param{}
-
-	for paramKey, paramValue := range paramDefs {
-		newParam := step.Param{
-			Name: paramKey,
-		}
-		switch paramValue.(type) {
-		case string:
-			{
-				newParam.HasDefault = true
-				newParam.DefaultValue = paramValue.(string)
-			}
-		default:
-			// nil or unknown type
-			newParam.HasDefault = false
-		}
-		params = append(params, newParam)
-	}
-	return params, nil
-}
 func ParseTeafile(tf schema.Tamefile) (map[string]step.Target, error) {
 
 	targets := make(map[string]step.Target)
@@ -57,64 +32,6 @@ func ParseTeafile(tf schema.Tamefile) (map[string]step.Target, error) {
 	}
 	return targets, nil
 }
-func buildOpts(optsDef []string) (opts.ExecutionOpts, error) {
-	opts := opts.ExecutionOpts{}
-	for _, opt := range optsDef {
-		if opt == keywords.OptSilent {
-			opts.Silent = true
-		}
-		// TODOb: handle all opts
-	}
-	return opts, nil
-}
-
-func buildArguments(argDefs map[string]string) ([]step.Variable, error) {
-	args := []step.Variable{}
-	for argKey, argValue := range argDefs {
-		newArg := step.Variable{
-			Name:  argKey,
-			Value: argValue,
-		}
-		args = append(args, newArg)
-	}
-	return args, nil
-}
-
-func populateCallStep(newStep *step.Step, stepDef schema.StepContainer) error {
-	var err error
-	var keys []string
-	for key := range stepDef.Call {
-		keys = append(keys, key)
-	}
-	if len(keys) != 1 {
-		return fmt.Errorf("multiple calls defined in single step: %s", keys)
-	}
-	newStep.Kind = step.Call
-	newStep.CalledTargetName = keys[0]
-	newStep.Results.ResultVars = stepDef.Result
-	newStep.Arguments, err = buildArguments(stepDef.Call[newStep.CalledTargetName])
-	return err
-}
-
-func populateShellStep(newStep *step.Step, stepDef schema.StepContainer) error {
-	var err error
-	if newStep.Kind != step.Unset {
-		return fmt.Errorf("invalid step configuration: no call or shell defined")
-	}
-	newStep.Kind = step.Exec
-	newStep.Script = stepDef.Shell
-	if stepDef.Out != "" {
-		newStep.Results.StdoutVar = stepDef.Out
-	}
-	if stepDef.Out != "" {
-		newStep.Results.StderrVar = stepDef.Err
-	}
-	if stepDef.Rc != "" {
-		newStep.Results.StderrVar = stepDef.Rc
-	}
-	return err
-}
-
 func buildStep(stepDef schema.StepContainer) (step.Step, error) {
 	var newStep step.Step
 	var err error
@@ -158,13 +75,17 @@ func buildTarget(targetKey string, targetContainer schema.TargetContainer) (step
 
 	// Parameters
 	newTarget.Params, err = buildParameters(targetContainer.ArgContainer)
+	if err != nil {
+
+		return newTarget, fmt.Errorf("failed to parse steps for '%s'\n\t%s", targetKey, err)
+	}
 
 	// Steps
 	newTarget.Steps, err = buildSteps(targetContainer.BodyContainer)
-
 	if err != nil {
-		logrus.Error("failed to parse steps for '%s'\n%s", targetKey, err)
+		return newTarget, fmt.Errorf("failed to parse steps for '%s'\n\t%s", targetKey, err)
 	}
+
 	newTarget.Summary = targetContainer.Summary
 
 	newTarget.Return = targetContainer.ReturnContainer
