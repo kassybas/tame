@@ -4,7 +4,7 @@ type Tamefile struct {
 	TameVersion string                     `yaml:"tame-version,omitempty"`
 	Includes    []string                   `yaml:"include,omitempty"`
 	Loads       []string                   `yaml:"load,omitempty"`
-	Sets        SetConfig                  `yaml:"set,omitempty"`
+	Sets        SetConfig                  `yaml:"settings,omitempty"`
 	Globals     map[string]string          `yaml:"globals,omitempty"`
 	Targets     map[string]TargetContainer `yaml:"targets,omitempty"`
 
@@ -31,8 +31,7 @@ type StepContainer struct {
 }
 
 type SetConfig struct {
-	Shell       string `yaml:"shell,omitempty"`
-	Init        string `yaml:"init,omitempty"`
-	DefaultOpts string `yaml:"opts,omitempty"`
-	ShieldEnv   bool   `yaml:"shield-env,omitempty"`
+	Shell      string   `yaml:"shell,omitempty"`
+	Init       string   `yaml:"init,omitempty"`
+	GlobalOpts []string `yaml:"opts,omitempty"`
 }

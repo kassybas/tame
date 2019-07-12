@@ -1,52 +1,7 @@
 
 
 targets:
-  build:
-    args: {$imageName: "myimg", $tag: "latest"}
-    body:
-      - call: {time}
-        # result: [$time]
-      - shell: echo "starting up"
-      - call:
-          log: {$msg: hello}
-      - call: {date }
-        result: [$yolo]
-      - shell: echo "hmmm? $yolo"
-
-  log:
-    args: {$msg}
-    body:
-      - shell: "echo logging: $msg"
-
-  printMyTime:
-    body:
-      - call: {dateTime}
-        result: [$date, $time]
-      - shell: |
-          echo "Today is: ${date}  Exactly: ${time}"
-
-  dateTime:
-    body:
-      - call: {date}
-        result: [$date]
-      - call: {time}
-        result: [$time]
-    return: [$date, $time]
-
-  date:
-    args: {$format: '+%Y-%m-%d'}
+  today:
+    args: {$format: "+%D"}
     body:
       - shell: date ${format}
-        opts: [silent]
-        out: $curDate
-      - shell: echo the current date is ${curDate}
-    return: [$curDate]
-
-  time:
-    args: {$format: "+%X"}
-    body:
-      - call:
-          date: {$format: $format}
-        result: [$curTime]
-      - shell: echo time is $curTime
-    return: [$curTime]

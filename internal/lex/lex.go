@@ -3,8 +3,9 @@ package lex
 import (
 	"os"
 
+	"github.com/kassybas/mate/schema"
+
 	"github.com/kassybas/mate/internal/helpers"
-	"github.com/kassybas/mate/internal/loader"
 	"github.com/kassybas/mate/internal/parse"
 	"github.com/kassybas/mate/types/step"
 )
@@ -46,12 +47,7 @@ func createDependencyGraph(targets map[string]step.Target, targetName string, cl
 }
 
 // Analyse creates the internal representation
-func Analyse(filePath string, targetName string, cliVarArgs []string) (step.Step, map[string]string, error) {
-
-	tf, err := loader.Load(filePath)
-	if err != nil {
-		return step.Step{}, nil, err
-	}
+func Analyse(tf schema.Tamefile, targetName string, cliVarArgs []string) (step.Step, map[string]string, error) {
 
 	parsedTargets, err := parse.ParseTeafile(tf)
 	if err != nil {

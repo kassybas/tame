@@ -5,7 +5,6 @@ import (
 	"strings"
 
 	"github.com/kassybas/mate/internal/keywords"
-	"github.com/kassybas/mate/types/opts"
 	"github.com/kassybas/mate/types/step"
 )
 
@@ -47,15 +46,4 @@ func buildArguments(argDefs map[string]string) ([]step.Variable, error) {
 		args = append(args, newArg)
 	}
 	return args, nil
-}
-
-func buildOpts(optsDef []string) (opts.ExecutionOpts, error) {
-	opts := opts.ExecutionOpts{}
-	for _, opt := range optsDef {
-		if opt == keywords.OptSilent {
-			opts.Silent = true
-		}
-		// TODOb: handle all opts
-	}
-	return opts, nil
 }

@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/kassybas/mate/internal/keywords"
+	"github.com/kassybas/mate/types/opts"
 	"github.com/kassybas/mate/types/step"
 )
 
@@ -48,4 +49,21 @@ func FormatEnvVars(vars map[string]step.Variable) []string {
 		formattedVars = append(formattedVars, newVar)
 	}
 	return formattedVars
+}
+
+func BuildOpts(optsDef []string) (opts.ExecutionOpts, error) {
+	opts := opts.ExecutionOpts{}
+	for _, opt := range optsDef {
+		switch opt {
+		case keywords.OptSilent:
+			{
+				opts.Silent = true
+			}
+		default:
+			{
+				return opts, fmt.Errorf("unknown option: %s", opt)
+			}
+		}
+	}
+	return opts, nil
 }

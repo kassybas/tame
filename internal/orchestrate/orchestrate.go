@@ -1,7 +1,10 @@
 package orchestrate
 
 import (
+	"os"
+
 	"github.com/kassybas/mate/internal/lex"
+	"github.com/kassybas/mate/internal/loader"
 	"github.com/kassybas/mate/internal/steprunner"
 	"github.com/kassybas/mate/types/settings"
 	"github.com/kassybas/mate/types/step"
@@ -22,18 +25,30 @@ func CreateContext(globals []step.Variable, sts settings.Settings) (steprunner.C
 }
 
 func Make(path, targetName string, targetArgs []string) {
-	root, globalDefs, err := lex.Analyse(path, targetName, targetArgs)
+	tf, err := loader.Load(path)
+	if err != nil {
+		logrus.Fatalf("error loading tamefile: %s\n%s", path, err.Error())
+	}
+	root, globalDefs, err := lex.Analyse(tf, targetName, targetArgs)
 	if err != nil {
 		logrus.Fatal(err)
 	}
 	globals, err := EvaluateGlobals(globalDefs)
-	ctx, err := CreateContext(globals, settings.Settings{})
 	if err != nil {
-		logrus.Fatal("error during execuition", err.Error())
+		logrus.Fatal("error while evaluating global variables", err.Error())
 	}
-
-	_, err = ctx.Run(root.CalledTarget, root.Arguments)
+	stgs, err := lex.BuildSettings(tf.Sets)
+	if err != nil {
+		logrus.Fatal("error while evaluating settings", err.Error())
+	}
+	ctx, err := CreateContext(globals, stgs)
+	if err != nil {
+		logrus.Fatal("error while creating context", err.Error())
+	}
+	_, rc, err := ctx.Run(root.CalledTarget, root.Arguments)
 	if err != nil {
 		logrus.Fatal("error during execution: ", err.Error())
 	}
+	// pass through the status code
+	os.Exit(rc)
 }

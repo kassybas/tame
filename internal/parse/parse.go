@@ -3,22 +3,10 @@ package parse
 import (
 	"fmt"
 
+	"github.com/kassybas/mate/internal/helpers"
 	"github.com/kassybas/mate/schema"
 	"github.com/kassybas/mate/types/step"
 )
-
-// func buildSettings(tfs schema.SetConfig) (settings.Settings, error) {
-// 	var settings settings.Settings
-// 	settings.UsedShell = tfs.Shell
-// 	settings.InitScript = tfs.Init
-// 	settings.ShieldEnv = tfs.ShieldEnv
-// 	if tfs.DefaultOpts == keywords.OptsNotSet {
-// 		settings.DefaultOpts = keywords.OptsDefaultValues
-// 	} else {
-// 		settings.DefaultOpts = strings.Split(tfs.DefaultOpts, keywords.OptsSeparator)
-// 	}
-// 	return settings, nil
-// }
 
 func ParseTeafile(tf schema.Tamefile) (map[string]step.Target, error) {
 
@@ -51,7 +39,7 @@ func buildStep(stepDef schema.StepContainer) (step.Step, error) {
 			return newStep, err
 		}
 	}
-	newStep.Opts, err = buildOpts(stepDef.Opts)
+	newStep.Opts, err = helpers.BuildOpts(stepDef.Opts)
 	return newStep, err
 }
 
@@ -71,6 +59,11 @@ func buildTarget(targetKey string, targetContainer schema.TargetContainer) (step
 	var err error
 	newTarget := step.Target{
 		Name: targetKey,
+	}
+
+	newTarget.Opts, err = helpers.BuildOpts(targetContainer.OptsContainer)
+	if err != nil {
+		return newTarget, fmt.Errorf("failed to parse opts for '%s'\n\t%s", targetKey, err)
 	}
 
 	// Parameters

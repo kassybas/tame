@@ -6,8 +6,10 @@ import (
 	"strings"
 
 	"github.com/kassybas/mate/internal/keywords"
+	"github.com/sirupsen/logrus"
 
 	"github.com/kassybas/mate/internal/helpers"
+	"github.com/kassybas/mate/types/opts"
 	"github.com/kassybas/mate/types/step"
 	"github.com/kassybas/shell-exec/exec"
 )
@@ -32,13 +34,15 @@ func CreateVariables(globals []step.Variable, args []step.Variable, params []ste
 	return variables, nil
 }
 
-func ExecuteScript(s step.Step, vars map[string]step.Variable) (step.Result, error) {
+func ExecuteScript(ctx Context, s step.Step, vars map[string]step.Variable) (step.Result, error) {
 	var err error
 	opts := exec.Options{
-		Silent: s.Opts.Silent,
+		Silent:    s.Opts.Silent,
+		ShellPath: ctx.Settings.UsedShell,
 	}
 	envVars := helpers.FormatEnvVars(vars)
-	s.Results.StdoutValue, s.Results.StderrValue, s.Results.StdrcValue, err = exec.ShellExec(s.Script, envVars, opts)
+	prefixedScript := ctx.Settings.InitScript + "\n" + s.Script
+	s.Results.StdoutValue, s.Results.StderrValue, s.Results.StdrcValue, err = exec.ShellExec(prefixedScript, envVars, opts)
 	return s.Results, err
 }
 
@@ -71,32 +75,53 @@ func resolveArgs(argDefs []step.Variable, variables map[string]step.Variable) ([
 	return argDefs, nil
 }
 
-func (c Context) Run(target step.Target, args []step.Variable) ([]string, error) {
+func mergeOpts(globalOpts, targetOpts, stepOpts opts.ExecutionOpts) opts.ExecutionOpts {
+	return opts.ExecutionOpts{
+		Silent:  globalOpts.Silent || targetOpts.Silent || stepOpts.Silent,
+		CanFail: globalOpts.CanFail || targetOpts.CanFail || stepOpts.CanFail,
+	}
+}
+
+func (c Context) Run(target step.Target, args []step.Variable) ([]string, int, error) {
 	variables, err := CreateVariables(c.Globals, args, target.Params)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 	for _, s := range target.Steps {
+		// TODO: fix this
+		c.Settings.GlobalOpts = mergeOpts(c.Settings.GlobalOpts, target.Opts, s.Opts)
+		s.Opts = mergeOpts(c.Settings.GlobalOpts, target.Opts, s.Opts)
 		if s.Kind == step.Exec {
-			s.Results, err = ExecuteScript(s, variables)
+			s.Results, err = ExecuteScript(c, s, variables)
 			if err != nil {
-				return nil, err
+				return nil, 0, err
+			}
+			if s.Opts.CanFail == false {
+				if s.Results.StdrcValue != 0 {
+					logrus.Errorf("execution failed: status %d\n\tin target:%s", s.Results.StdrcValue, target.Name)
+					return nil, s.Results.StdrcValue, nil
+				}
 			}
 			variables = UpdateResultVariables(variables, s)
 		}
 		if s.Kind == step.Call {
 			stepArgs, err := resolveArgs(s.Arguments, variables)
 			if err != nil {
-				return nil, err
+				return nil, 0, err
 			}
-			returnedValues, err := c.Run(s.CalledTarget, stepArgs)
+			returnedValues, rc, err := c.Run(s.CalledTarget, stepArgs)
+			if s.Opts.CanFail == false {
+				if s.Results.StdrcValue != 0 {
+					return nil, rc, nil
+				}
+			}
 			if err != nil {
-				return nil, err
+				return nil, 0, err
 			}
 
 			if s.Results.ResultVars != nil {
 				if len(returnedValues) != len(s.Results.ResultVars) {
-					return nil, fmt.Errorf("mismatched number of return and result variables:\n\treturn: %d, result: %d\n\tin target: %s, calling: %s", len(returnedValues), len(s.Results.ResultVars), target.Name, s.CalledTargetName)
+					return nil, 0, fmt.Errorf("mismatched number of return and result variables:\n\treturn: %d, result: %d\n\tin target: %s, calling: %s", len(returnedValues), len(s.Results.ResultVars), target.Name, s.CalledTargetName)
 				}
 
 				s.Results.ResultValues = make([]string, len(returnedValues))
@@ -107,10 +132,15 @@ func (c Context) Run(target step.Target, args []step.Variable) ([]string, error)
 			}
 		}
 	}
+	returnValues, err := createReturnValues(variables, target.Return, target.Name)
 
-	returnValues := make([]string, len(target.Return))
+	return returnValues, 0, err
+}
 
-	for i, retDef := range target.Return {
+func createReturnValues(variables map[string]step.Variable, returnVars []string, targetName string) ([]string, error) {
+	returnValues := make([]string, len(returnVars))
+
+	for i, retDef := range returnVars {
 		if !strings.HasPrefix(retDef, keywords.PrefixReference) {
 			// constant values
 			returnValues[i] = retDef
@@ -118,7 +148,7 @@ func (c Context) Run(target step.Target, args []step.Variable) ([]string, error)
 		}
 		_, exists := variables[retDef]
 		if !exists {
-			return nil, fmt.Errorf("return variable does not exist: '%s'\n\tin target: '%s'", retDef, target.Name)
+			return nil, fmt.Errorf("return variable does not exist: '%s'\n\tin target: '%s'", retDef, targetName)
 		}
 		returnValues[i] = variables[retDef].Value
 	}
