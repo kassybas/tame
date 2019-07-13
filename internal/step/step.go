@@ -21,17 +21,6 @@ type StepI interface {
 	SetCalledTarget(Target)
 }
 
-type Step struct {
-	Name             string
-	Kind             steptype.Steptype
-	Arguments        []tvar.Variable
-	Opts             opts.ExecutionOpts
-	Results          Result
-	CalledTargetName string
-	CalledTarget     Target
-	Script           string
-}
-
 type Result struct {
 	StdoutVar    string
 	StdoutValue  string
