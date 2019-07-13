@@ -5,7 +5,8 @@ import (
 	"strings"
 
 	"github.com/kassybas/mate/internal/keywords"
-	"github.com/kassybas/mate/types/step"
+	"github.com/kassybas/mate/internal/step"
+	"github.com/kassybas/mate/internal/tvar"
 )
 
 func buildParameters(paramDefs map[string]interface{}) ([]step.Param, error) {
@@ -33,13 +34,13 @@ func buildParameters(paramDefs map[string]interface{}) ([]step.Param, error) {
 	return params, nil
 }
 
-func buildArguments(argDefs map[string]string) ([]step.Variable, error) {
-	args := []step.Variable{}
+func buildArguments(argDefs map[string]string) ([]tvar.Variable, error) {
+	args := []tvar.Variable{}
 	for argKey, argValue := range argDefs {
 		if !strings.HasPrefix(argKey, keywords.PrefixReference) {
 			return args, fmt.Errorf("arguments must start with '$' symbol: %s (correct: %s%s)", argKey, keywords.PrefixReference, argKey)
 		}
-		newArg := step.Variable{
+		newArg := tvar.Variable{
 			Name:  argKey,
 			Value: argValue,
 		}

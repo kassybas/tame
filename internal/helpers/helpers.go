@@ -5,8 +5,8 @@ import (
 	"strings"
 
 	"github.com/kassybas/mate/internal/keywords"
+	"github.com/kassybas/mate/internal/step"
 	"github.com/kassybas/mate/types/opts"
-	"github.com/kassybas/mate/types/step"
 )
 
 func PrintTeafileDescription(targets map[string]step.Target) {
@@ -38,17 +38,6 @@ func GetKeyValueFromEnvString(envStr string) (string, string, error) {
 	k := sps[0]
 	v := sps[1]
 	return k, v, nil
-}
-
-func FormatEnvVars(vars map[string]step.Variable) []string {
-	formattedVars := []string{}
-	for _, v := range vars {
-		// Remove $ for shell env format
-		trimmedName := strings.TrimPrefix(v.Name, keywords.PrefixReference)
-		newVar := trimmedName + "=" + v.Value
-		formattedVars = append(formattedVars, newVar)
-	}
-	return formattedVars
 }
 
 func BuildOpts(optsDef []string) (opts.ExecutionOpts, error) {

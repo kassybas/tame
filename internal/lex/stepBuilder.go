@@ -3,7 +3,8 @@ package lex
 import (
 	"fmt"
 
-	"github.com/kassybas/mate/types/step"
+	"github.com/kassybas/mate/internal/step"
+	"github.com/kassybas/mate/types/steptype"
 )
 
 func findCalledTarget(name, caller string, targets map[string]step.Target) (step.Target, error) {
@@ -17,7 +18,7 @@ func findCalledTarget(name, caller string, targets map[string]step.Target) (step
 func populateSteps(trg *step.Target, targets map[string]step.Target) error {
 	var err error
 	for i := range trg.Steps {
-		if trg.Steps[i].Kind == step.Call {
+		if trg.Steps[i].Kind == steptype.Call {
 			trg.Steps[i].CalledTarget, err = findCalledTarget(trg.Steps[i].CalledTargetName, trg.Name, targets)
 			if err != nil {
 				return err

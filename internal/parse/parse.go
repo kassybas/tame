@@ -5,7 +5,7 @@ import (
 
 	"github.com/kassybas/mate/internal/helpers"
 	"github.com/kassybas/mate/schema"
-	"github.com/kassybas/mate/types/step"
+	"github.com/kassybas/mate/internal/step"
 )
 
 func ParseTeafile(tf schema.Tamefile) (map[string]step.Target, error) {

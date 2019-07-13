@@ -7,17 +7,18 @@ import (
 
 	"github.com/kassybas/mate/internal/helpers"
 	"github.com/kassybas/mate/internal/parse"
-	"github.com/kassybas/mate/types/step"
+	"github.com/kassybas/mate/internal/step"
+	"github.com/kassybas/mate/internal/tvar"
 )
 
-func parseCLITargetArgs(targetArgs []string) ([]step.Variable, error) {
-	var args []step.Variable
+func parseCLITargetArgs(targetArgs []string) ([]tvar.Variable, error) {
+	var args []tvar.Variable
 	for _, argStr := range targetArgs {
 		k, v, err := helpers.GetKeyValueFromEnvString(argStr)
 		if err != nil {
 			return nil, err
 		}
-		newArg := step.Variable{
+		newArg := tvar.Variable{
 			Name:  k,
 			Value: v,
 		}

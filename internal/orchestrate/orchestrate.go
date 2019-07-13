@@ -6,19 +6,20 @@ import (
 	"github.com/kassybas/mate/internal/lex"
 	"github.com/kassybas/mate/internal/loader"
 	"github.com/kassybas/mate/internal/steprunner"
+	"github.com/kassybas/mate/internal/tcontext"
+	"github.com/kassybas/mate/internal/tvar"
 	"github.com/kassybas/mate/types/settings"
-	"github.com/kassybas/mate/types/step"
 	"github.com/sirupsen/logrus"
 )
 
-func EvaluateGlobals(globalDefs map[string]string) ([]step.Variable, error) {
+func EvaluateGlobals(globalDefs map[string]string) ([]tvar.Variable, error) {
 	// TODO
 	return nil, nil
 }
 
-func CreateContext(globals []step.Variable, sts settings.Settings) (steprunner.Context, error) {
+func CreateContext(globals []tvar.Variable, sts settings.Settings) (tcontext.Context, error) {
 	// TODO
-	return steprunner.Context{
+	return tcontext.Context{
 		Globals:  globals,
 		Settings: sts,
 	}, nil
@@ -45,7 +46,7 @@ func Make(path, targetName string, targetArgs []string) {
 	if err != nil {
 		logrus.Fatal("error while creating context", err.Error())
 	}
-	_, rc, err := ctx.Run(root.CalledTarget, root.Arguments)
+	_, rc, err := steprunner.Run(ctx, root.CalledTarget, root.Arguments)
 	if err != nil {
 		logrus.Fatal("error during execution: ", err.Error())
 	}

@@ -1,6 +1,7 @@
 package step
 
 import (
+	"github.com/kassybas/mate/internal/tvar"
 	"github.com/kassybas/mate/types/opts"
 	"github.com/kassybas/mate/types/settings"
 )
@@ -18,11 +19,6 @@ type Target struct {
 	Steps     []Step
 	Params    []Param
 	Opts      opts.ExecutionOpts
-	Variables []Variable
+	Variables []tvar.Variable
 	Summary   string
-}
-type Variable struct {
-	Name string
-	// TODO: interface
-	Value string
 }

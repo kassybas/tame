@@ -6,16 +6,18 @@ import (
 	"strings"
 
 	"github.com/kassybas/mate/internal/keywords"
+	"github.com/kassybas/mate/internal/step"
+	"github.com/kassybas/mate/internal/tcontext"
+	"github.com/kassybas/mate/internal/tvar"
 	"github.com/sirupsen/logrus"
 
-	"github.com/kassybas/mate/internal/helpers"
 	"github.com/kassybas/mate/types/opts"
-	"github.com/kassybas/mate/types/step"
+	"github.com/kassybas/mate/types/steptype"
 	"github.com/kassybas/shell-exec/exec"
 )
 
-func CreateVariables(globals []step.Variable, args []step.Variable, params []step.Param) (map[string]step.Variable, error) {
-	variables := make(map[string]step.Variable)
+func CreateVariables(globals []tvar.Variable, args []tvar.Variable, params []step.Param) (map[string]tvar.Variable, error) {
+	variables := make(map[string]tvar.Variable)
 
 	for _, g := range globals {
 		variables[g.Name] = g
@@ -23,7 +25,7 @@ func CreateVariables(globals []step.Variable, args []step.Variable, params []ste
 
 	for _, p := range params {
 		if p.HasDefault {
-			variables[p.Name] = step.Variable{Name: p.Name, Value: p.DefaultValue}
+			variables[p.Name] = tvar.Variable{Name: p.Name, Value: p.DefaultValue}
 		}
 	}
 	for _, a := range args {
@@ -34,7 +36,7 @@ func CreateVariables(globals []step.Variable, args []step.Variable, params []ste
 	return variables, nil
 }
 
-func ExecuteScript(ctx Context, s step.Step, vars map[string]step.Variable) (step.Result, error) {
+func ExecuteScript(ctx tcontext.Context, s step.Step, vars map[string]tvar.Variable) (step.Result, error) {
 	var err error
 	// ignore result if neither stdout variable and stderr variable is defined
 	ignoreResult := s.Results.StderrVar == "" && s.Results.StdoutVar == ""
@@ -43,29 +45,29 @@ func ExecuteScript(ctx Context, s step.Step, vars map[string]step.Variable) (ste
 		ShellPath:    ctx.Settings.UsedShell,
 		IgnoreResult: ignoreResult,
 	}
-	envVars := helpers.FormatEnvVars(vars)
+	envVars := step.FormatEnvVars(vars)
 	prefixedScript := ctx.Settings.InitScript + "\n" + s.Script
 	s.Results.StdoutValue, s.Results.StderrValue, s.Results.StdrcValue, err = exec.ShellExec(prefixedScript, envVars, opts)
 	return s.Results, err
 }
 
-func UpdateResultVariables(variables map[string]step.Variable, s step.Step) map[string]step.Variable {
+func UpdateResultVariables(variables map[string]tvar.Variable, s step.Step) map[string]tvar.Variable {
 	if s.Results.StdoutVar != "" {
-		variables[s.Results.StdoutVar] = step.Variable{Name: s.Results.StdoutVar, Value: s.Results.StdoutValue}
+		variables[s.Results.StdoutVar] = tvar.Variable{Name: s.Results.StdoutVar, Value: s.Results.StdoutValue}
 	}
 	if s.Results.StderrVar != "" {
-		variables[s.Results.StderrVar] = step.Variable{Name: s.Results.StderrVar, Value: s.Results.StderrValue}
+		variables[s.Results.StderrVar] = tvar.Variable{Name: s.Results.StderrVar, Value: s.Results.StderrValue}
 	}
 	if s.Results.StdrcVar != "" {
-		variables[s.Results.StdrcVar] = step.Variable{Name: s.Results.StdrcVar, Value: strconv.Itoa(s.Results.StdrcValue)}
+		variables[s.Results.StdrcVar] = tvar.Variable{Name: s.Results.StdrcVar, Value: strconv.Itoa(s.Results.StdrcValue)}
 	}
 	for i, v := range s.Results.ResultVars {
-		variables[v] = step.Variable{Name: v, Value: s.Results.ResultValues[i]}
+		variables[v] = tvar.Variable{Name: v, Value: s.Results.ResultValues[i]}
 	}
 	return variables
 }
 
-func resolveArgs(argDefs []step.Variable, variables map[string]step.Variable) ([]step.Variable, error) {
+func resolveArgs(argDefs []tvar.Variable, variables map[string]tvar.Variable) ([]tvar.Variable, error) {
 	for i, arg := range argDefs {
 		if strings.HasPrefix(arg.Value, keywords.PrefixReference) {
 			_, exists := variables[arg.Value]
@@ -85,7 +87,7 @@ func mergeOpts(globalOpts, targetOpts, stepOpts opts.ExecutionOpts) opts.Executi
 	}
 }
 
-func (c Context) Run(target step.Target, args []step.Variable) ([]string, int, error) {
+func Run(c tcontext.Context, target step.Target, args []tvar.Variable) ([]string, int, error) {
 	variables, err := CreateVariables(c.Globals, args, target.Params)
 	if err != nil {
 		return nil, 0, err
@@ -94,7 +96,7 @@ func (c Context) Run(target step.Target, args []step.Variable) ([]string, int, e
 		// TODO: fix this
 		c.Settings.GlobalOpts = mergeOpts(c.Settings.GlobalOpts, target.Opts, s.Opts)
 		s.Opts = mergeOpts(c.Settings.GlobalOpts, target.Opts, s.Opts)
-		if s.Kind == step.Exec {
+		if s.Kind == steptype.Shell {
 			s.Results, err = ExecuteScript(c, s, variables)
 			if err != nil {
 				return nil, 0, err
@@ -107,12 +109,12 @@ func (c Context) Run(target step.Target, args []step.Variable) ([]string, int, e
 			}
 			variables = UpdateResultVariables(variables, s)
 		}
-		if s.Kind == step.Call {
+		if s.Kind == steptype.Call {
 			stepArgs, err := resolveArgs(s.Arguments, variables)
 			if err != nil {
 				return nil, 0, err
 			}
-			returnedValues, rc, err := c.Run(s.CalledTarget, stepArgs)
+			returnedValues, rc, err := Run(c, s.CalledTarget, stepArgs)
 			if s.Opts.CanFail == false {
 				if s.Results.StdrcValue != 0 {
 					return nil, rc, nil
@@ -140,7 +142,7 @@ func (c Context) Run(target step.Target, args []step.Variable) ([]string, int, e
 	return returnValues, 0, err
 }
 
-func createReturnValues(variables map[string]step.Variable, returnVars []string, targetName string) ([]string, error) {
+func createReturnValues(variables map[string]tvar.Variable, returnVars []string, targetName string) ([]string, error) {
 	returnValues := make([]string, len(returnVars))
 
 	for i, retDef := range returnVars {
