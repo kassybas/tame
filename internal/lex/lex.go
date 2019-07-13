@@ -27,32 +27,32 @@ func parseCLITargetArgs(targetArgs []string) ([]tvar.Variable, error) {
 	return args, nil
 }
 
-func createDependencyGraph(targets map[string]step.Target, targetName string, cliVarArgs []string) (step.Step, error) {
-	var root step.Step
+func createDependencyGraph(targets map[string]step.Target, targetName string, cliVarArgs []string) (step.StepI, error) {
+	var root step.CallStep
 	var err error
+	// TODO: Remove parse CLI args from this
 	root.Name = "root"
 	root.CalledTargetName = targetName
 	root.Arguments, err = parseCLITargetArgs(cliVarArgs)
 	if err != nil {
-		return root, err
+		return &root, err
 	}
 	root.CalledTarget, err = findCalledTarget(targetName, "cli root", targets)
 	if err != nil {
-		return root, err
+		return &root, err
 	}
 
 	err = populateSteps(&root.CalledTarget, targets)
-	// TODO: continue here
 
-	return root, err
+	return &root, err
 }
 
 // Analyse creates the internal representation
-func Analyse(tf schema.Tamefile, targetName string, cliVarArgs []string) (step.Step, map[string]string, error) {
+func Analyse(tf schema.Tamefile, targetName string, cliVarArgs []string) (step.StepI, map[string]string, error) {
 
 	parsedTargets, err := parse.ParseTeafile(tf)
 	if err != nil {
-		return step.Step{}, nil, err
+		return nil, nil, err
 	}
 
 	if targetName == "" {
@@ -63,7 +63,7 @@ func Analyse(tf schema.Tamefile, targetName string, cliVarArgs []string) (step.S
 	// TODO: Load external files if referred
 
 	// build the dependency graph with the called target
-	var root step.Step
+	var root step.StepI
 	root, err = createDependencyGraph(parsedTargets, targetName, cliVarArgs)
 	if err != nil {
 		return root, nil, err

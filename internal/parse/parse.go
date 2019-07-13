@@ -4,8 +4,8 @@ import (
 	"fmt"
 
 	"github.com/kassybas/mate/internal/helpers"
-	"github.com/kassybas/mate/schema"
 	"github.com/kassybas/mate/internal/step"
+	"github.com/kassybas/mate/schema"
 )
 
 func ParseTeafile(tf schema.Tamefile) (map[string]step.Target, error) {
@@ -20,31 +20,38 @@ func ParseTeafile(tf schema.Tamefile) (map[string]step.Target, error) {
 	}
 	return targets, nil
 }
-func buildStep(stepDef schema.StepContainer) (step.Step, error) {
-	var newStep step.Step
+func buildStep(stepDef schema.StepContainer) (step.StepI, error) {
 	var err error
+	var newStep step.StepI
 
 	if stepDef.Call == nil && stepDef.Shell == "" {
-		return newStep, fmt.Errorf("invalid step configuration: no call or shell defined")
+		return nil, fmt.Errorf("invalid step configuration: no call or shell defined")
 	}
+	// Call
 	if stepDef.Call != nil {
-		err = populateCallStep(&newStep, stepDef)
+		var newCallStep step.CallStep
+		err = populateCallStep(&newCallStep, stepDef)
 		if err != nil {
-			return newStep, err
+			return &newCallStep, err
 		}
+		newCallStep.Opts, err = helpers.BuildOpts(stepDef.Opts)
+		newStep = &newCallStep
 	}
+	// Shell
 	if stepDef.Shell != "" {
-		err = populateShellStep(&newStep, stepDef)
+		var newShellStep step.ShellStep
+		err = populateShellStep(&newShellStep, stepDef)
 		if err != nil {
-			return newStep, err
+			return &newShellStep, err
 		}
+		newShellStep.Opts, err = helpers.BuildOpts(stepDef.Opts)
+		newStep = &newShellStep
 	}
-	newStep.Opts, err = helpers.BuildOpts(stepDef.Opts)
 	return newStep, err
 }
 
-func buildSteps(stepDefs []schema.StepContainer) ([]step.Step, error) {
-	steps := []step.Step{}
+func buildSteps(stepDefs []schema.StepContainer) ([]step.StepI, error) {
+	steps := []step.StepI{}
 	for _, stepDef := range stepDefs {
 		newStep, err := buildStep(stepDef)
 		if err != nil {
@@ -69,8 +76,7 @@ func buildTarget(targetKey string, targetContainer schema.TargetContainer) (step
 	// Parameters
 	newTarget.Params, err = buildParameters(targetContainer.ArgContainer)
 	if err != nil {
-
-		return newTarget, fmt.Errorf("failed to parse steps for '%s'\n\t%s", targetKey, err)
+		return newTarget, fmt.Errorf("failed to parse parameters for '%s'\n\t%s", targetKey, err)
 	}
 
 	// Steps

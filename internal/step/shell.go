@@ -8,29 +8,42 @@ import (
 	"github.com/kassybas/shell-exec/exec"
 )
 
-type Shell struct {
+type ShellStep struct {
 	Name    string
 	Opts    opts.ExecutionOpts
 	Results Result
 	Script  string
 }
 
-func (s *Shell) GetName() string {
+func (s *ShellStep) GetOpts() opts.ExecutionOpts {
+	return s.Opts
+}
+
+func (s *ShellStep) GetName() string {
 	return ""
 }
 
-func (s *Shell) Kind() steptype.Steptype {
+func (s *ShellStep) Kind() steptype.Steptype {
 	return steptype.Shell
 }
 
-func (s *Shell) SetOpts(o opts.ExecutionOpts) {
+func (s *ShellStep) SetOpts(o opts.ExecutionOpts) {
 	s.Opts = o
 }
 
-func (s *Shell) GetResult() Result {
+func (s *ShellStep) GetCalledTargetName() string {
+	return "shell"
+}
+
+func (s *ShellStep) GetResult() Result {
 	return s.Results
 }
-func (s *Shell) RunStep(ctx tcontext.Context, vars map[string]tvar.Variable) ([]string, Result, error) {
+
+func (s *ShellStep) SetCalledTarget(t Target) {
+	panic("calling target in shell")
+}
+
+func (s *ShellStep) RunStep(ctx tcontext.Context, vars map[string]tvar.Variable) ([]string, Result, error) {
 	var err error
 	// ignore result if neither stdout variable and stderr variable is defined
 	ignoreResult := s.Results.StderrVar == "" && s.Results.StdoutVar == ""
@@ -42,5 +55,6 @@ func (s *Shell) RunStep(ctx tcontext.Context, vars map[string]tvar.Variable) ([]
 	envVars := FormatEnvVars(vars)
 	prefixedScript := ctx.Settings.InitScript + "\n" + s.Script
 	s.Results.StdoutValue, s.Results.StderrValue, s.Results.StdrcValue, err = exec.ShellExec(prefixedScript, envVars, opts)
+
 	return nil, s.Results, err
 }

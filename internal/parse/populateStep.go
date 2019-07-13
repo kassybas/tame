@@ -7,10 +7,9 @@ import (
 	"github.com/kassybas/mate/internal/keywords"
 	"github.com/kassybas/mate/internal/step"
 	"github.com/kassybas/mate/schema"
-	"github.com/kassybas/mate/types/steptype"
 )
 
-func populateCallStep(newStep *step.Step, stepDef schema.StepContainer) error {
+func populateCallStep(newStep *step.CallStep, stepDef schema.StepContainer) error {
 	var err error
 	var keys []string
 	for key := range stepDef.Call {
@@ -19,19 +18,14 @@ func populateCallStep(newStep *step.Step, stepDef schema.StepContainer) error {
 	if len(keys) != 1 {
 		return fmt.Errorf("multiple calls defined in single step: %s", keys)
 	}
-	newStep.Kind = steptype.Call
 	newStep.CalledTargetName = keys[0]
 	newStep.Results.ResultVars = stepDef.Result
 	newStep.Arguments, err = buildArguments(stepDef.Call[newStep.CalledTargetName])
 	return err
 }
 
-func populateShellStep(newStep *step.Step, stepDef schema.StepContainer) error {
+func populateShellStep(newStep *step.ShellStep, stepDef schema.StepContainer) error {
 	var err error
-	if newStep.Kind != steptype.Unset {
-		return fmt.Errorf("invalid step configuration: no call or shell defined")
-	}
-	newStep.Kind = steptype.Shell
 	newStep.Script = stepDef.Shell
 	if stepDef.Out != "" {
 		if !strings.HasPrefix(stepDef.Out, keywords.PrefixReference) {

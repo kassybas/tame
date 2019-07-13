@@ -4,6 +4,7 @@ import (
 	"strings"
 
 	"github.com/kassybas/mate/internal/keywords"
+	"github.com/kassybas/mate/internal/tcontext"
 	"github.com/kassybas/mate/internal/tvar"
 	"github.com/kassybas/mate/types/opts"
 	"github.com/kassybas/mate/types/steptype"
@@ -13,7 +14,11 @@ type StepI interface {
 	GetName() string
 	Kind() steptype.Steptype
 	GetResult() Result
-	Run() ([]string, int, error)
+	GetOpts() opts.ExecutionOpts
+	SetOpts(opts.ExecutionOpts)
+	RunStep(tcontext.Context, map[string]tvar.Variable) ([]string, Result, error)
+	GetCalledTargetName() string
+	SetCalledTarget(Target)
 }
 
 type Step struct {

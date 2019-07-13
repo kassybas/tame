@@ -5,7 +5,6 @@ import (
 
 	"github.com/kassybas/mate/internal/lex"
 	"github.com/kassybas/mate/internal/loader"
-	"github.com/kassybas/mate/internal/steprunner"
 	"github.com/kassybas/mate/internal/tcontext"
 	"github.com/kassybas/mate/internal/tvar"
 	"github.com/kassybas/mate/types/settings"
@@ -46,10 +45,11 @@ func Make(path, targetName string, targetArgs []string) {
 	if err != nil {
 		logrus.Fatal("error while creating context", err.Error())
 	}
-	_, rc, err := steprunner.Run(ctx, root.CalledTarget, root.Arguments)
+
+	_, res, err := root.RunStep(ctx, nil)
 	if err != nil {
 		logrus.Fatal("error during execution: ", err.Error())
 	}
 	// pass through the status code
-	os.Exit(rc)
+	os.Exit(res.StdrcValue)
 }
