@@ -36,9 +36,12 @@ func CreateVariables(globals []step.Variable, args []step.Variable, params []ste
 
 func ExecuteScript(ctx Context, s step.Step, vars map[string]step.Variable) (step.Result, error) {
 	var err error
+	// ignore result if neither stdout variable and stderr variable is defined
+	ignoreResult := s.Results.StderrVar == "" && s.Results.StdoutVar == ""
 	opts := exec.Options{
-		Silent:    s.Opts.Silent,
-		ShellPath: ctx.Settings.UsedShell,
+		Silent:       s.Opts.Silent,
+		ShellPath:    ctx.Settings.UsedShell,
+		IgnoreResult: ignoreResult,
 	}
 	envVars := helpers.FormatEnvVars(vars)
 	prefixedScript := ctx.Settings.InitScript + "\n" + s.Script

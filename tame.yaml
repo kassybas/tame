@@ -5,3 +5,11 @@ targets:
     args: {$format: "+%D"}
     body:
       - shell: date ${format}
+      - shell: sleep 1000000
+
+  loop-me:
+    body:
+      - shell: |
+          while true; do
+            echo "About 90.200.000 results (0,59 seconds)"
+          done
