@@ -1,4 +1,6 @@
 
+settings:
+  init: "set -eu"
 
 targets:
   today:
@@ -12,7 +14,20 @@ targets:
         opts: [silent]
       - call: {full-date}
         result: [ $fd ]
-      - shell: echo yo $fd
+      - shell: echo yoyoyo $fd
+
+  hello:
+    body:
+      - shell: echo "hello"
+        out: $y
+      - shell: echo $y
+    return: [ $y ]
+
+  ok:
+    body:
+    - call: {hello}
+      result: [ $my ]
+    - shell: echo wutwuth $my ---- $ok
 
   full-date:
     body:

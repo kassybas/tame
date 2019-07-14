@@ -1,12 +1,9 @@
 package step
 
 import (
-	"fmt"
-	"strings"
-
-	"github.com/kassybas/mate/internal/keywords"
 	"github.com/kassybas/mate/internal/tcontext"
 	"github.com/kassybas/mate/internal/tvar"
+	"github.com/kassybas/mate/internal/vartable"
 	"github.com/kassybas/mate/types/opts"
 	"github.com/kassybas/mate/types/steptype"
 )
@@ -35,27 +32,26 @@ func (s *CallStep) SetOpts(o opts.ExecutionOpts) {
 func (s *CallStep) GetResult() Result {
 	return s.Results
 }
-func (s *CallStep) RunStep(ctx tcontext.Context, vars map[string]tvar.Variable) error {
+func (s *CallStep) RunStep(ctx tcontext.Context, vt vartable.VarTable) error {
 	// TODOb: resolve global variables too
-	args, err := resolveArgs(s.Arguments, vars)
+	args, err := createArgsVartable(s.Arguments, vt)
 	if err != nil {
 		return err
 	}
 	s.Results.ResultValues, s.Results.StdrcValue, err = s.CalledTarget.Run(ctx, args)
-	return nil
+	return err
 }
 
-func resolveArgs(argDefs []tvar.Variable, variables map[string]tvar.Variable) ([]tvar.Variable, error) {
-	for i, arg := range argDefs {
-		if strings.HasPrefix(arg.Value, keywords.PrefixReference) {
-			_, exists := variables[arg.Value]
-			if !exists {
-				return nil, fmt.Errorf("variable does not exist in context: '%s:%s'", arg.Name, arg.Value)
-			}
-			argDefs[i].Value = variables[arg.Name].Value
+func createArgsVartable(argDefs []tvar.Variable, vt vartable.VarTable) (vartable.VarTable, error) {
+	argsVarTable := vartable.NewVarTable()
+	for _, arg := range argDefs {
+		argVar, err := vt.ResolveVar(arg)
+		if err != nil {
+			return argsVarTable, err
 		}
+		argsVarTable.AddVar(argVar)
 	}
-	return argDefs, nil
+	return argsVarTable, nil
 }
 
 func (s *CallStep) GetCalledTargetName() string {

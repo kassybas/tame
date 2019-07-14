@@ -3,6 +3,8 @@ package orchestrate
 import (
 	"os"
 
+	"github.com/kassybas/mate/internal/vartable"
+
 	"github.com/kassybas/mate/internal/lex"
 	"github.com/kassybas/mate/internal/loader"
 	"github.com/kassybas/mate/internal/tcontext"
@@ -46,7 +48,8 @@ func Make(path, targetName string, targetArgs []string) {
 		logrus.Fatal("error while creating context", err.Error())
 	}
 
-	err = root.RunStep(ctx, nil)
+	// TODO: put cli args in here
+	err = root.RunStep(ctx, vartable.NewVarTable())
 	if err != nil {
 		logrus.Fatal("error during execution: ", err.Error())
 	}

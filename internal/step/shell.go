@@ -2,7 +2,7 @@ package step
 
 import (
 	"github.com/kassybas/mate/internal/tcontext"
-	"github.com/kassybas/mate/internal/tvar"
+	"github.com/kassybas/mate/internal/vartable"
 	"github.com/kassybas/mate/types/opts"
 	"github.com/kassybas/mate/types/steptype"
 	"github.com/kassybas/shell-exec/exec"
@@ -43,7 +43,7 @@ func (s *ShellStep) SetCalledTarget(t Target) {
 	panic("calling target in shell")
 }
 
-func (s *ShellStep) RunStep(ctx tcontext.Context, vars map[string]tvar.Variable) error {
+func (s *ShellStep) RunStep(ctx tcontext.Context, vt vartable.VarTable) error {
 	var err error
 	// ignore result if neither stdout variable and stderr variable is defined
 	ignoreResult := s.Results.StderrVar == "" && s.Results.StdoutVar == ""
@@ -52,7 +52,7 @@ func (s *ShellStep) RunStep(ctx tcontext.Context, vars map[string]tvar.Variable)
 		ShellPath:    ctx.Settings.UsedShell,
 		IgnoreResult: ignoreResult,
 	}
-	envVars := FormatEnvVars(vars)
+	envVars := vt.GetAllEnvVars()
 	prefixedScript := ctx.Settings.InitScript + "\n" + s.Script
 	s.Results.StdoutValue, s.Results.StderrValue, s.Results.StdrcValue, err = exec.ShellExec(prefixedScript, envVars, opts)
 

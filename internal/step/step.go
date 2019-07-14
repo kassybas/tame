@@ -3,6 +3,8 @@ package step
 import (
 	"strings"
 
+	"github.com/kassybas/mate/internal/vartable"
+
 	"github.com/kassybas/mate/internal/keywords"
 	"github.com/kassybas/mate/internal/tcontext"
 	"github.com/kassybas/mate/internal/tvar"
@@ -16,7 +18,7 @@ type StepI interface {
 	GetResult() Result
 	GetOpts() opts.ExecutionOpts
 	SetOpts(opts.ExecutionOpts)
-	RunStep(tcontext.Context, map[string]tvar.Variable) error
+	RunStep(tcontext.Context, vartable.VarTable) error
 	GetCalledTargetName() string
 	SetCalledTarget(Target)
 }
