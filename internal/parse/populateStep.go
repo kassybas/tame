@@ -9,7 +9,7 @@ import (
 	"github.com/kassybas/mate/schema"
 )
 
-func populateCallStep(newStep *step.CallStep, stepDef schema.StepContainer) error {
+func populateCallStep(newStep *step.CallStep, stepDef schema.StepDefinition) error {
 	var err error
 	var keys []string
 	for key := range stepDef.Call {
@@ -24,7 +24,7 @@ func populateCallStep(newStep *step.CallStep, stepDef schema.StepContainer) erro
 	return err
 }
 
-func populateShellStep(newStep *step.ShellStep, stepDef schema.StepContainer) error {
+func populateShellStep(newStep *step.ShellStep, stepDef schema.StepDefinition) error {
 	var err error
 	newStep.Script = stepDef.Shell
 	if stepDef.Out != "" {

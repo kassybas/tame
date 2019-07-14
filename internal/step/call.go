@@ -35,15 +35,14 @@ func (s *CallStep) SetOpts(o opts.ExecutionOpts) {
 func (s *CallStep) GetResult() Result {
 	return s.Results
 }
-func (s *CallStep) RunStep(ctx tcontext.Context, vars map[string]tvar.Variable) ([]string, Result, error) {
+func (s *CallStep) RunStep(ctx tcontext.Context, vars map[string]tvar.Variable) error {
 	// TODOb: resolve global variables too
 	args, err := resolveArgs(s.Arguments, vars)
 	if err != nil {
-		return nil, Result{}, err
+		return err
 	}
-	returnedValues, rc, err := s.CalledTarget.Run(ctx, args)
-	s.Results.StdrcValue = rc
-	return returnedValues, Result{}, nil
+	s.Results.ResultValues, s.Results.StdrcValue, err = s.CalledTarget.Run(ctx, args)
+	return nil
 }
 
 func resolveArgs(argDefs []tvar.Variable, variables map[string]tvar.Variable) ([]tvar.Variable, error) {

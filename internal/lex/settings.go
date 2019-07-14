@@ -6,7 +6,7 @@ import (
 	"github.com/kassybas/mate/types/settings"
 )
 
-func BuildSettings(tfs schema.SetConfig) (settings.Settings, error) {
+func BuildSettings(tfs schema.SettingsDefintion) (settings.Settings, error) {
 	opts, err := helpers.BuildOpts(tfs.GlobalOpts)
 	if err != nil {
 		return settings.Settings{}, err

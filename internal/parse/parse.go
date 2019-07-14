@@ -20,7 +20,7 @@ func ParseTeafile(tf schema.Tamefile) (map[string]step.Target, error) {
 	}
 	return targets, nil
 }
-func buildStep(stepDef schema.StepContainer) (step.StepI, error) {
+func buildStep(stepDef schema.StepDefinition) (step.StepI, error) {
 	var err error
 	var newStep step.StepI
 
@@ -50,7 +50,7 @@ func buildStep(stepDef schema.StepContainer) (step.StepI, error) {
 	return newStep, err
 }
 
-func buildSteps(stepDefs []schema.StepContainer) ([]step.StepI, error) {
+func buildSteps(stepDefs []schema.StepDefinition) ([]step.StepI, error) {
 	steps := []step.StepI{}
 	for _, stepDef := range stepDefs {
 		newStep, err := buildStep(stepDef)
@@ -62,7 +62,7 @@ func buildSteps(stepDefs []schema.StepContainer) ([]step.StepI, error) {
 	return steps, nil
 }
 
-func buildTarget(targetKey string, targetContainer schema.TargetContainer) (step.Target, error) {
+func buildTarget(targetKey string, targetContainer schema.TargetDefinition) (step.Target, error) {
 	var err error
 	newTarget := step.Target{
 		Name: targetKey,

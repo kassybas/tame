@@ -46,10 +46,10 @@ func Make(path, targetName string, targetArgs []string) {
 		logrus.Fatal("error while creating context", err.Error())
 	}
 
-	_, res, err := root.RunStep(ctx, nil)
+	err = root.RunStep(ctx, nil)
 	if err != nil {
 		logrus.Fatal("error during execution: ", err.Error())
 	}
 	// pass through the status code
-	os.Exit(res.StdrcValue)
+	os.Exit(root.GetResult().StdrcValue)
 }

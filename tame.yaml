@@ -5,16 +5,20 @@ targets:
     args: {$format: "+%D"}
     body:
       - shell: date ${format}
-      - shell: date ${format}
-      - shell: date ${format}
-      - shell: date ${format}
-      - shell: date ${format}
-      - shell: date ${format}
-      - shell: date ${format}
-      - shell: date ${format}
-      - shell: date ${format}
-      - shell: date ${format}
-      - shell: date ${format}
+
+  main:
+    body:
+      - call: {today}
+        opts: [silent]
+      - call: {full-date}
+        result: [ $fd ]
+      - shell: echo yo $fd
+
+  full-date:
+    body:
+      - shell: date
+        out: $date
+    return: [$date]
 
   loop-me:
     body:

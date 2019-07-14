@@ -43,7 +43,7 @@ func (s *ShellStep) SetCalledTarget(t Target) {
 	panic("calling target in shell")
 }
 
-func (s *ShellStep) RunStep(ctx tcontext.Context, vars map[string]tvar.Variable) ([]string, Result, error) {
+func (s *ShellStep) RunStep(ctx tcontext.Context, vars map[string]tvar.Variable) error {
 	var err error
 	// ignore result if neither stdout variable and stderr variable is defined
 	ignoreResult := s.Results.StderrVar == "" && s.Results.StdoutVar == ""
@@ -56,5 +56,5 @@ func (s *ShellStep) RunStep(ctx tcontext.Context, vars map[string]tvar.Variable)
 	prefixedScript := ctx.Settings.InitScript + "\n" + s.Script
 	s.Results.StdoutValue, s.Results.StderrValue, s.Results.StdrcValue, err = exec.ShellExec(prefixedScript, envVars, opts)
 
-	return nil, s.Results, err
+	return err
 }

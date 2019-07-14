@@ -16,7 +16,7 @@ type StepI interface {
 	GetResult() Result
 	GetOpts() opts.ExecutionOpts
 	SetOpts(opts.ExecutionOpts)
-	RunStep(tcontext.Context, map[string]tvar.Variable) ([]string, Result, error)
+	RunStep(tcontext.Context, map[string]tvar.Variable) error
 	GetCalledTargetName() string
 	SetCalledTarget(Target)
 }

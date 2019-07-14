@@ -48,30 +48,24 @@ func (t Target) Run(ctx tcontext.Context, args []tvar.Variable) ([]string, int, 
 		newCtx.Settings.GlobalOpts = s.GetOpts()
 
 		// Run
-		returnedValues, res, err := s.RunStep(newCtx, variables)
+		err = s.RunStep(newCtx, variables)
 		if err != nil {
 			return nil, 0, fmt.Errorf("%s\n\tin target: %s, calling: %s", err.Error(), t.Name, s.GetCalledTargetName())
 		}
 		// Check result status
 		if s.GetOpts().CanFail == false {
-			if res.StdrcValue != 0 {
-				logrus.Errorf("execution failed: status %d\n\tin target:%s", res.StdrcValue, t.Name)
-				return nil, res.StdrcValue, nil
+			if s.GetResult().StdrcValue != 0 {
+				logrus.Errorf("execution failed: status %d\n\tin target:%s", s.GetResult().StdrcValue, t.Name)
+				return nil, s.GetResult().StdrcValue, nil
 			}
 		}
 		// Save result variables
 		if s.GetResult().ResultVars != nil {
-			if len(returnedValues) != len(s.GetResult().ResultVars) {
-				return nil, 0, fmt.Errorf("mismatched number of return and result variables:\n\treturn: %d, result: %d", len(returnedValues), len(s.GetResult().ResultVars))
-			}
-			resultVars := make([]string, len(returnedValues))
-			for i := range returnedValues {
-				// Variable.Set(resultVar[i], returnedValue[i])
-				resultVars[i] = returnedValues[i]
+			if len(s.GetResult().ResultValues) != len(s.GetResult().ResultVars) {
+				return nil, 0, fmt.Errorf("mismatched number of return and result variables:\n\treturn: %d, result: %d", len(s.GetResult().ResultValues), len(s.GetResult().ResultVars))
 			}
 		}
-		variables = UpdateResultVariables(variables, res)
-
+		variables = UpdateResultVariables(variables, s.GetResult())
 	}
 
 	returnValues, err := createReturnValues(variables, t.Return, t.Name)
