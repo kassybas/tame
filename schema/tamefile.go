@@ -13,11 +13,11 @@ type Tamefile struct {
 }
 
 type TargetDefinition struct {
-	ArgContainer    map[string]interface{} `yaml:"args,omitempty"`
-	BodyContainer   []StepDefinition       `yaml:"body,omitempty"`
-	ReturnContainer []string               `yaml:"return,omitempty"`
-	OptsContainer   []string               `yaml:"opts,omitempty"`
-	Summary         string                 `yaml:"summary,omitempty"`
+	ArgDefinition    map[string]interface{} `yaml:"args,omitempty"`
+	BodyDefinition   []StepDefinition       `yaml:"body,omitempty"`
+	ReturnDefinition []string               `yaml:"return,omitempty"`
+	OptsDefinition   []string               `yaml:"opts,omitempty"`
+	Summary          string                 `yaml:"summary,omitempty"`
 }
 
 type StepDefinition struct {

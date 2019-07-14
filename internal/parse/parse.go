@@ -68,25 +68,25 @@ func buildTarget(targetKey string, targetContainer schema.TargetDefinition) (ste
 		Name: targetKey,
 	}
 
-	newTarget.Opts, err = helpers.BuildOpts(targetContainer.OptsContainer)
+	newTarget.Opts, err = helpers.BuildOpts(targetContainer.OptsDefinition)
 	if err != nil {
 		return newTarget, fmt.Errorf("failed to parse opts for '%s'\n\t%s", targetKey, err)
 	}
 
 	// Parameters
-	newTarget.Params, err = buildParameters(targetContainer.ArgContainer)
+	newTarget.Params, err = buildParameters(targetContainer.ArgDefinition)
 	if err != nil {
 		return newTarget, fmt.Errorf("failed to parse parameters for '%s'\n\t%s", targetKey, err)
 	}
 
 	// Steps
-	newTarget.Steps, err = buildSteps(targetContainer.BodyContainer)
+	newTarget.Steps, err = buildSteps(targetContainer.BodyDefinition)
 	if err != nil {
 		return newTarget, fmt.Errorf("failed to parse steps for '%s'\n\t%s", targetKey, err)
 	}
 
 	newTarget.Summary = targetContainer.Summary
 
-	newTarget.Return = targetContainer.ReturnContainer
+	newTarget.Return = targetContainer.ReturnDefinition
 	return newTarget, err
 }

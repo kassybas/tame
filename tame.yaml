@@ -3,18 +3,12 @@ settings:
   init: "set -eu"
 
 targets:
-  today:
-    args: {$format: "+%D"}
-    body:
-      - shell: date ${format}
 
-  main:
+  int-me:
+    args: { $count: 1 }
     body:
-      - call: {today}
-        opts: [silent]
-      - call: {full-date}
-        result: [ $fd ]
-      - shell: echo yoyoyo $fd
+      - shell: |
+          echo count is $count
 
   hello:
     body:
@@ -28,16 +22,3 @@ targets:
     - call: {hello}
       result: [ $my ]
     - shell: echo wutwuth $my ---- $ok
-
-  full-date:
-    body:
-      - shell: date
-        out: $date
-    return: [$date]
-
-  loop-me:
-    body:
-      - shell: |
-          while true; do
-            echo "About 90.200.000 results (0,59 seconds)"
-          done
