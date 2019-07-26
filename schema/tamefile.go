@@ -15,7 +15,7 @@ type Tamefile struct {
 type TargetDefinition struct {
 	ArgDefinition    map[string]interface{} `yaml:"args,omitempty"`
 	BodyDefinition   []StepDefinition       `yaml:"body,omitempty"`
-	ReturnDefinition []string               `yaml:"return,omitempty"`
+	ReturnDefinition string                 `yaml:"return,omitempty"`
 	OptsDefinition   []string               `yaml:"opts,omitempty"`
 	Summary          string                 `yaml:"summary,omitempty"`
 }
@@ -23,7 +23,7 @@ type TargetDefinition struct {
 type StepDefinition struct {
 	Shell  string                       `yaml:"shell,omitempty"`
 	Call   map[string]map[string]string `yaml:"call,omitempty"`
-	Result []string                     `yaml:"result,omitempty"`
+	Result string                       `yaml:"result,omitempty"`
 	Opts   []string                     `yaml:"opts,omitempty"`
 	Out    string                       `yaml:"out,omitempty"`
 	Err    string                       `yaml:"err,omitempty"`

@@ -1,6 +1,8 @@
 package step
 
 import (
+	"fmt"
+
 	"github.com/kassybas/mate/internal/tcontext"
 	"github.com/kassybas/mate/internal/tvar"
 	"github.com/kassybas/mate/internal/vartable"
@@ -10,7 +12,7 @@ import (
 
 type CallStep struct {
 	Name             string
-	Arguments        []tvar.Variable
+	Arguments        []tvar.VariableI
 	Opts             opts.ExecutionOpts
 	Results          Result
 	CalledTargetName string
@@ -38,11 +40,14 @@ func (s *CallStep) RunStep(ctx tcontext.Context, vt vartable.VarTable) error {
 	if err != nil {
 		return err
 	}
-	s.Results.ResultValues, s.Results.StdrcValue, err = s.CalledTarget.Run(ctx, args)
+	s.Results.ResultValue, s.Results.StdrcValue, err = s.CalledTarget.Run(ctx, args)
+	if err != nil {
+		err = fmt.Errorf("error during step: %s\n\t%s", s.Name, err.Error())
+	}
 	return err
 }
 
-func createArgsVartable(argDefs []tvar.Variable, vt vartable.VarTable) (vartable.VarTable, error) {
+func createArgsVartable(argDefs []tvar.VariableI, vt vartable.VarTable) (vartable.VarTable, error) {
 	argsVarTable := vartable.NewVarTable()
 	for _, arg := range argDefs {
 		argVar, err := vt.ResolveVar(arg)

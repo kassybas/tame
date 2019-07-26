@@ -34,16 +34,13 @@ func buildParameters(paramDefs map[string]interface{}) ([]step.Param, error) {
 	return params, nil
 }
 
-func buildArguments(argDefs map[string]string) ([]tvar.Variable, error) {
-	args := []tvar.Variable{}
+func buildArguments(argDefs map[string]string) ([]tvar.VariableI, error) {
+	args := []tvar.VariableI{}
 	for argKey, argValue := range argDefs {
 		if !strings.HasPrefix(argKey, keywords.PrefixReference) {
 			return args, fmt.Errorf("arguments must start with '$' symbol: %s (correct: %s%s)", argKey, keywords.PrefixReference, argKey)
 		}
-		newArg := tvar.Variable{
-			Name:  argKey,
-			Value: argValue,
-		}
+		newArg := tvar.CreateVariable(argKey, argValue)
 		args = append(args, newArg)
 	}
 	return args, nil

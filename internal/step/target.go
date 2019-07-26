@@ -22,11 +22,11 @@ type Target struct {
 	GlobalSettings *settings.Settings
 
 	Name      string
-	Return    []string
-	Steps     []StepI
+	Return    string
+	Steps     []Step
 	Params    []Param
 	Opts      opts.ExecutionOpts
-	Variables []tvar.Variable
+	Variables []tvar.VariableI
 	Summary   string
 }
 
@@ -37,12 +37,11 @@ func mergeOpts(globalOpts, targetOpts, stepOpts opts.ExecutionOpts) opts.Executi
 	}
 }
 
-func (t Target) Run(ctx tcontext.Context, vt vartable.VarTable) ([]string, int, error) {
-	// TODOb: contonies here
+func (t Target) Run(ctx tcontext.Context, vt vartable.VarTable) (tvar.VariableI, int, error) {
 	vt.AddVariables(ctx.Globals)
 	vt, err := resolveParams(vt, t.Params)
 	if err != nil {
-		return nil, 0, err
+		return nil, 0, fmt.Errorf("could not resolve parameters in target: %s\n\t%s", t.Name, err)
 	}
 	for _, s := range t.Steps {
 		// Opts
@@ -64,12 +63,11 @@ func (t Target) Run(ctx tcontext.Context, vt vartable.VarTable) ([]string, int, 
 			}
 		}
 		// Save result variables
-		if s.GetResult().ResultVars != nil {
-			if len(s.GetResult().ResultValues) != len(s.GetResult().ResultVars) {
-				fmt.Println("OKOKOK")
-				return nil, 0, fmt.Errorf("mismatched number of return and result variables:\n\treturn: %d, result: %d", len(s.GetResult().ResultValues), len(s.GetResult().ResultVars))
-			}
-		}
+		// if s.GetResult().ResultVars != nil {
+		// 	if len(s.GetResult().ResultValues) != len(s.GetResult().ResultVars) {
+		// 		return nil, 0, fmt.Errorf("mismatched number of return and result variables:\n\treturn: %d, result: %d", len(s.GetResult().ResultValues), len(s.GetResult().ResultVars))
+		// 	}
+		// }
 		vt = updateResultVariables(vt, s.GetResult())
 	}
 
@@ -92,32 +90,30 @@ func updateResultVariables(vt vartable.VarTable, r Result) vartable.VarTable {
 	if r.StdrcVar != "" {
 		vt.Add(r.StdrcVar, strconv.Itoa(r.StdrcValue))
 	}
-	for i, v := range r.ResultVars {
-		vt.Add(v, r.ResultValues[i])
-	}
+	vt.Add(r.ResultVars, r.ResultValue)
 	return vt
 }
 
 func resolveParams(vt vartable.VarTable, params []Param) (vartable.VarTable, error) {
 	for _, p := range params {
+		if vt.Exists(p.Name) {
+			val, err := vt.GetVar(p.Name)
+			if err != nil {
+				return vt, err
+			}
+			vt.Add(p.Name, val.Value())
+			continue
+		}
 		if p.HasDefault {
 			vt.Add(p.Name, p.DefaultValue)
+			continue
 		}
+		return vt, fmt.Errorf("parameter without value or default value: %s", p.Name)
 	}
-	// TODO: check to correct matching of arguments and parameters
-	// TODO: check for argument nil values
 	return vt, nil
 }
 
-func createReturnValues(vt vartable.VarTable, returnVars []string) ([]string, error) {
-	returnValues := make([]string, len(returnVars))
-
-	for i, retDef := range returnVars {
-		rv, err := vt.ResolveValue(retDef)
-		if err != nil {
-			return nil, err
-		}
-		returnValues[i] = rv
-	}
-	return returnValues, nil
+func createReturnValues(vt vartable.VarTable, returnDefinition string) (tvar.VariableI, error) {
+	rv, err := vt.ResolveValue(returnDefinition)
+	return rv, err
 }

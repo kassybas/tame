@@ -20,9 +20,9 @@ func ParseTeafile(tf schema.Tamefile) (map[string]step.Target, error) {
 	}
 	return targets, nil
 }
-func buildStep(stepDef schema.StepDefinition) (step.StepI, error) {
+func buildStep(stepDef schema.StepDefinition) (step.Step, error) {
 	var err error
-	var newStep step.StepI
+	var newStep step.Step
 
 	if stepDef.Call == nil && stepDef.Shell == "" {
 		return nil, fmt.Errorf("invalid step configuration: no call or shell defined")
@@ -50,8 +50,8 @@ func buildStep(stepDef schema.StepDefinition) (step.StepI, error) {
 	return newStep, err
 }
 
-func buildSteps(stepDefs []schema.StepDefinition) ([]step.StepI, error) {
-	steps := []step.StepI{}
+func buildSteps(stepDefs []schema.StepDefinition) ([]step.Step, error) {
+	steps := []step.Step{}
 	for _, stepDef := range stepDefs {
 		newStep, err := buildStep(stepDef)
 		if err != nil {

@@ -11,23 +11,20 @@ import (
 	"github.com/kassybas/mate/internal/tvar"
 )
 
-func parseCLITargetArgs(targetArgs []string) ([]tvar.Variable, error) {
-	var args []tvar.Variable
+func parseCLITargetArgs(targetArgs []string) ([]tvar.VariableI, error) {
+	var args []tvar.VariableI
 	for _, argStr := range targetArgs {
 		k, v, err := helpers.GetKeyValueFromEnvString(argStr)
 		if err != nil {
 			return nil, err
 		}
-		newArg := tvar.Variable{
-			Name:  k,
-			Value: v,
-		}
+		newArg := tvar.CreateVariable(k, v)
 		args = append(args, newArg)
 	}
 	return args, nil
 }
 
-func createDependencyGraph(targets map[string]step.Target, targetName string, cliVarArgs []string) (step.StepI, error) {
+func createDependencyGraph(targets map[string]step.Target, targetName string, cliVarArgs []string) (step.Step, error) {
 	var root step.CallStep
 	var err error
 	// TODO: Remove parse CLI args from this
@@ -48,7 +45,7 @@ func createDependencyGraph(targets map[string]step.Target, targetName string, cl
 }
 
 // Analyse creates the internal representation
-func Analyse(tf schema.Tamefile, targetName string, cliVarArgs []string) (step.StepI, map[string]string, error) {
+func Analyse(tf schema.Tamefile, targetName string, cliVarArgs []string) (step.Step, map[string]string, error) {
 
 	parsedTargets, err := parse.ParseTeafile(tf)
 	if err != nil {
@@ -63,7 +60,7 @@ func Analyse(tf schema.Tamefile, targetName string, cliVarArgs []string) (step.S
 	// TODO: Load external files if referred
 
 	// build the dependency graph with the called target
-	var root step.StepI
+	var root step.Step
 	root, err = createDependencyGraph(parsedTargets, targetName, cliVarArgs)
 	if err != nil {
 		return root, nil, err

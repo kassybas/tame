@@ -13,12 +13,12 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func EvaluateGlobals(globalDefs map[string]string) ([]tvar.Variable, error) {
+func EvaluateGlobals(globalDefs map[string]string) ([]tvar.VariableI, error) {
 	// TODO
 	return nil, nil
 }
 
-func CreateContext(globals []tvar.Variable, sts settings.Settings) (tcontext.Context, error) {
+func CreateContext(globals []tvar.VariableI, sts settings.Settings) (tcontext.Context, error) {
 	// TODO
 	return tcontext.Context{
 		Globals:  globals,

@@ -4,21 +4,12 @@ settings:
 
 targets:
 
-  int-me:
-    args: { $count: 1 }
+  echo:
+    args: {$msg: ~}
     body:
-      - shell: |
-          echo count is $count
+      - shell: echo $msg
 
-  hello:
+  name:
     body:
-      - shell: echo "hello"
-        out: $y
-      - shell: echo $y
-    return: [ $y ]
-
-  ok:
-    body:
-    - call: {hello}
-      result: [ $my ]
-    - shell: echo wutwuth $my ---- $ok
+      - call:
+          echo: {$msg: barna}
