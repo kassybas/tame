@@ -90,7 +90,9 @@ func updateResultVariables(vt vartable.VarTable, r Result) vartable.VarTable {
 	if r.StdrcVar != "" {
 		vt.Add(r.StdrcVar, strconv.Itoa(r.StdrcValue))
 	}
-	vt.Add(r.ResultVars, r.ResultValue)
+	if r.ResultValue != nil {
+		vt.Add(r.ResultVars, r.ResultValue)
+	}
 	return vt
 }
 

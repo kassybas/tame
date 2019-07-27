@@ -26,6 +26,14 @@ func CreateVariable(name string, value interface{}) VariableI {
 				value: value.(string),
 			}
 		}
+	case TString:
+		{
+			ts := value.(TString)
+			return TString{
+				name:  name,
+				value: ts.value,
+			}
+		}
 	}
 	// }
 	// case int:

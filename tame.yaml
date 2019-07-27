@@ -7,9 +7,19 @@ targets:
   echo:
     args: {$msg: ~}
     body:
-      - shell: echo $msg
+      - shell: echo my msg $msg
+        out: $res
+    return: $res
 
   name:
     body:
       - call:
           echo: {$msg: barna}
+        result: $echores
+    return: "$echores"
+
+  yolo:
+    body:
+      - call: { name }
+        result: $yooo
+      - shell: echo variable is ${yooo}

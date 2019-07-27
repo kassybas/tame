@@ -49,10 +49,11 @@ func (vt *VarTable) GetAllEnvVars() []string {
 	formattedVars := []string{}
 	for _, v := range vt.vars {
 		// Remove $ for shell env format
-		formattedVars = append(formattedVars, v.ToEnvVars()...)
+		if v != nil {
+			formattedVars = append(formattedVars, v.ToEnvVars()...)
+		}
 	}
 	return formattedVars
-
 }
 
 func (vt VarTable) ResolveVar(v tvar.VariableI) (tvar.VariableI, error) {
@@ -60,12 +61,10 @@ func (vt VarTable) ResolveVar(v tvar.VariableI) (tvar.VariableI, error) {
 		// No resolution needed for constant value
 		return v, nil
 	}
-
 	resolvedVar, err := vt.GetVar(v.ToStr())
 	if err != nil {
 		return nil, err
 	}
-
 	return tvar.CreateVariable(v.Name(), resolvedVar.Value()), nil
 }
 
@@ -75,7 +74,6 @@ func (vt VarTable) ResolveValue(refStr string) (tvar.VariableI, error) {
 		// No resolution needed for constant value
 		return tvar.CreateVariable("", refStr), nil
 	}
-
 	resolvedVar, err := vt.GetVar(refStr)
 	return resolvedVar, err
 }
