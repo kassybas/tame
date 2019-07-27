@@ -20,6 +20,10 @@ targets:
 
   yolo:
     body:
-      - call: { name }
-        result: $yooo
-      - shell: echo variable is ${yooo}
+      - var:
+          $myvar: "lovelyday"
+          $other: "notso good"
+          $and: "aaaand"
+      - shell: echo variable is $myvar
+      - shell: echo and is $other
+      - shell: echo $and

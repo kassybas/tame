@@ -23,6 +23,7 @@ type TargetDefinition struct {
 type StepDefinition struct {
 	Shell  string                       `yaml:"shell,omitempty"`
 	Call   map[string]map[string]string `yaml:"call,omitempty"`
+	Var    map[string]interface{}       `yaml:"var,omitempty"`
 	Result string                       `yaml:"result,omitempty"`
 	Opts   []string                     `yaml:"opts,omitempty"`
 	Out    string                       `yaml:"out,omitempty"`

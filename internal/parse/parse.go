@@ -24,8 +24,8 @@ func buildStep(stepDef schema.StepDefinition) (step.Step, error) {
 	var err error
 	var newStep step.Step
 
-	if stepDef.Call == nil && stepDef.Shell == "" {
-		return nil, fmt.Errorf("invalid step configuration: no call or shell defined")
+	if stepDef.Call == nil && stepDef.Shell == "" && stepDef.Var == nil {
+		return nil, fmt.Errorf("invalid step configuration: step type must be (shell|call|var)")
 	}
 	// Call
 	if stepDef.Call != nil {
@@ -46,6 +46,15 @@ func buildStep(stepDef schema.StepDefinition) (step.Step, error) {
 		}
 		newShellStep.Opts, err = helpers.BuildOpts(stepDef.Opts)
 		newStep = &newShellStep
+	}
+	if stepDef.Var != nil {
+		var newVarStep step.VarStep
+		err := populateVarStep(&newVarStep, stepDef)
+		if err != nil {
+			return &newVarStep, err
+		}
+		newVarStep.Opts, err = helpers.BuildOpts(stepDef.Opts)
+		newStep = &newVarStep
 	}
 	return newStep, err
 }

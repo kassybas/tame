@@ -37,7 +37,7 @@ func mergeOpts(globalOpts, targetOpts, stepOpts opts.ExecutionOpts) opts.Executi
 	}
 }
 
-func (t Target) Run(ctx tcontext.Context, vt vartable.VarTable) (tvar.VariableI, int, error) {
+func (t Target) Run(ctx tcontext.Context, vt vartable.VarTable) ([]tvar.VariableI, int, error) {
 	vt.AddVariables(ctx.Globals)
 	vt, err := resolveParams(vt, t.Params)
 	if err != nil {
@@ -91,7 +91,7 @@ func updateResultVariables(vt vartable.VarTable, r Result) vartable.VarTable {
 		vt.Add(r.StdrcVar, strconv.Itoa(r.StdrcValue))
 	}
 	if r.ResultValue != nil {
-		vt.Add(r.ResultVars, r.ResultValue)
+		vt.Append(r.ResultVars, r.ResultValue)
 	}
 	return vt
 }
@@ -115,7 +115,8 @@ func resolveParams(vt vartable.VarTable, params []Param) (vartable.VarTable, err
 	return vt, nil
 }
 
-func createReturnValues(vt vartable.VarTable, returnDefinition string) (tvar.VariableI, error) {
+func createReturnValues(vt vartable.VarTable, returnDefinition string) ([]tvar.VariableI, error) {
 	rv, err := vt.ResolveValue(returnDefinition)
-	return rv, err
+	rvs := []tvar.VariableI{rv}
+	return rvs, err
 }

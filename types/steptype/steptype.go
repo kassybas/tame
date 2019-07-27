@@ -6,4 +6,5 @@ const (
 	Unset Steptype = iota
 	Call
 	Shell
+	Var
 )

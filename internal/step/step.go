@@ -28,6 +28,6 @@ type Result struct {
 	StderrValue string
 	StdrcVar    string
 	StdrcValue  int
-	ResultVars  string
-	ResultValue tvar.VariableI
+	ResultVars  []string
+	ResultValue []tvar.VariableI
 }

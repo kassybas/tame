@@ -35,6 +35,12 @@ func (vt *VarTable) Add(name string, value interface{}) {
 	vt.vars[name] = tvar.CreateVariable(name, value)
 }
 
+func (vt *VarTable) Append(names []string, values []tvar.VariableI) {
+	for i := range names {
+		vt.Add(names[i], values[i])
+	}
+}
+
 func (vt *VarTable) AddVar(newVar tvar.VariableI) {
 	vt.vars[newVar.Name()] = newVar
 }

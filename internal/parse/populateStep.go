@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/kassybas/mate/internal/tvar"
+
 	"github.com/kassybas/mate/internal/keywords"
 	"github.com/kassybas/mate/internal/step"
 	"github.com/kassybas/mate/schema"
@@ -19,7 +21,7 @@ func populateCallStep(newStep *step.CallStep, stepDef schema.StepDefinition) err
 		return fmt.Errorf("multiple calls defined in single step: %s", keys)
 	}
 	newStep.CalledTargetName = keys[0]
-	newStep.Results.ResultVars = stepDef.Result
+	newStep.Results.ResultVars = []string{stepDef.Result}
 	newStep.Arguments, err = buildArguments(stepDef.Call[newStep.CalledTargetName])
 	return err
 }
@@ -46,4 +48,12 @@ func populateShellStep(newStep *step.ShellStep, stepDef schema.StepDefinition) e
 		}
 	}
 	return err
+}
+
+func populateVarStep(newStep *step.VarStep, stepDef schema.StepDefinition) error {
+	newStep.Definitions = make(map[string]tvar.VariableI)
+	for k, v := range stepDef.Var {
+		newStep.Definitions[k] = tvar.CreateVariable(k, v)
+	}
+	return nil
 }
