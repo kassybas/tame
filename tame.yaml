@@ -4,26 +4,34 @@ settings:
 
 targets:
 
-  echo:
-    args: {$msg: ~}
-    body:
-      - shell: echo my msg $msg
-        out: $res
-    return: $res
+  # echo:
+  #   args: {$msg: ~}
+  #   body:
+  #     - shell: echo my msg $msg
+  #       out: $res
+  #   return: $res
 
-  name:
-    body:
-      - call:
-          echo: {$msg: barna}
-        result: $echores
-    return: "$echores"
+  # name:
+  #   body:
+  #     - call:
+  #         echo: {$msg: barna}
+  #       result: $echores
+  #   return: "$echores"
 
-  yolo:
+  mapme:
     body:
       - var:
-          $myvar: "lovelyday"
-          $other: "notso good"
-          $and: "aaaand"
-      - shell: echo variable is $myvar
-      - shell: echo and is $other
-      - shell: echo $and
+          $my:
+            lovely: "value"
+      - shell: echo $my_lovely
+
+
+  # yolo:
+  #   body:
+  #     - var:
+  #         $myvar: "lovelyday"
+  #         $other: "notso good"
+  #         $and: "aaaand"
+  #     - shell: echo variable is $myvar
+  #     - shell: echo and is $other
+  #     - shell: echo $and
