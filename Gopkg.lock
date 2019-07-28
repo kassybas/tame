@@ -10,24 +10,20 @@
   version = "v1.0.4"
 
 [[projects]]
-  digest = "1:5751ecca59a71194ce9efa4ef68b33011b02c75c5fbe38e0be41b49edacb3b77"
-  name = "github.com/kassybas/tame"
-  packages = [
-    "cmd",
-    "internal/dependency",
-    "internal/executor",
-    "internal/helpers",
-    "internal/keywords",
-    "internal/lex",
-    "internal/loader",
-    "internal/orchestrate",
-    "internal/parser",
-    "internal/tamefile",
-    "internal/target",
-  ]
+  branch = "master"
+  digest = "1:288453580cfb900f3aa91faf60a5ba879e08f6cdb48eb0238258a939f9ca51e9"
+  name = "github.com/jeremywohl/flatten"
+  packages = ["."]
   pruneopts = "UT"
-  revision = "785cb113005dc0e535d6371d53b0e8e3f39bf59f"
-  version = "0.1.4"
+  revision = "588fe0d4c603f5dc8b3854ff3f7f16e570618ef7"
+
+[[projects]]
+  branch = "master"
+  digest = "1:f6ac2717450734afcc4e759d2df591e50cbd0920e84037d6c7ff0c4d53503153"
+  name = "github.com/kassybas/shell-exec"
+  packages = ["exec"]
+  pruneopts = "UT"
+  revision = "2817118f94262bf5239d705a107182c061c52a82"
 
 [[projects]]
   digest = "1:31e761d97c76151dde79e9d28964a812c46efc5baee4085b86f68f0c654450de"
@@ -73,7 +69,8 @@
   analyzer-name = "dep"
   analyzer-version = 1
   input-imports = [
-    "github.com/kassybas/tame/cmd",
+    "github.com/jeremywohl/flatten",
+    "github.com/kassybas/shell-exec/exec",
     "github.com/sirupsen/logrus",
     "github.com/urfave/cli",
     "gopkg.in/yaml.v2",
