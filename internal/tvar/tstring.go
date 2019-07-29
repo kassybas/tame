@@ -12,6 +12,10 @@ type TString struct {
 	value string
 }
 
+func (v TString) IsScalar() bool {
+	return true
+}
+
 func (v TString) Type() TVarType {
 	return TStringType
 }
@@ -24,12 +28,9 @@ func (v TString) Value() interface{} {
 	return v.value
 }
 
-func (v TString) ToInt() int {
+func (v TString) ToInt() (int, error) {
 	i, err := strconv.Atoi(v.value)
-	if err != nil {
-		return 0
-	}
-	return i
+	return i, err
 }
 
 func (v TString) ToStr() string {

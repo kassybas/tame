@@ -40,6 +40,7 @@ func buildArguments(argDefs map[string]string) ([]tvar.VariableI, error) {
 		if !strings.HasPrefix(argKey, keywords.PrefixReference) {
 			return args, fmt.Errorf("arguments must start with '$' symbol: %s (correct: %s%s)", argKey, keywords.PrefixReference, argKey)
 		}
+
 		newArg := tvar.CreateVariable(argKey, argValue)
 		args = append(args, newArg)
 	}

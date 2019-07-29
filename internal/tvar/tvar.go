@@ -4,9 +4,10 @@ type VariableI interface {
 	Type() TVarType
 	Name() string
 	Value() interface{}
-	ToInt() int
+	ToInt() (int, error)
 	ToStr() string
 	ToEnvVars() []string
+	IsScalar() bool
 }
 
 // type Variable struct {
@@ -18,10 +19,11 @@ type VariableI interface {
 // }
 
 func CreateVariable(name string, value interface{}) VariableI {
+	var newVar VariableI
 	switch value.(type) {
 	case string:
 		{
-			return TString{
+			newVar = TString{
 				name:  name,
 				value: value.(string),
 			}
@@ -29,23 +31,25 @@ func CreateVariable(name string, value interface{}) VariableI {
 	case TString:
 		{
 			ts := value.(TString)
-			return TString{
+			newVar = TString{
 				name:  name,
 				value: ts.value,
 			}
 		}
+	case map[interface{}]interface{}:
+		{
+			newVar = CreateMap(name, value)
+		}
+	case TMap:
+		{
+			tm := value.(TMap)
+			newVar = TMap{
+				name:  name,
+				value: tm.value,
+			}
+		}
 	}
-	// }
-	// case int:
-	// 	{
-	// 		return Variable{
-	// 			Name: name,
-	// 			// intValue: value.(int),
-	// 			// Type:     INT,
-	// 		}
-	// 	}
-	// }
-	return nil
+	return newVar
 }
 
 type TVarType int

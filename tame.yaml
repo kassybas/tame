@@ -22,8 +22,16 @@ targets:
     body:
       - var:
           $my:
-            lovely: "value"
+            lovely: "is amazing"
+            again: "somth"
+            deeper:
+              how: "deepisyour"
+              listing:
+                - "one"
+                - "two"
       - shell: echo $my_lovely
+      - shell: echo $my_again
+      - shell: echo $my_deeper_how
 
 
   # yolo:

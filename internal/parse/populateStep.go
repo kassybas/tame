@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/kassybas/mate/internal/tvar"
-
 	"github.com/kassybas/mate/internal/keywords"
 	"github.com/kassybas/mate/internal/step"
 	"github.com/kassybas/mate/schema"
@@ -51,9 +49,12 @@ func populateShellStep(newStep *step.ShellStep, stepDef schema.StepDefinition) e
 }
 
 func populateVarStep(newStep *step.VarStep, stepDef schema.StepDefinition) error {
-	newStep.Definitions = make(map[string]tvar.VariableI)
+	newStep.Definitions = make(map[string]interface{})
 	for k, v := range stepDef.Var {
-		newStep.Definitions[k] = tvar.CreateVariable(k, v)
+		if !strings.HasPrefix(k, keywords.PrefixReference) {
+			return fmt.Errorf("variables must start with '$' symbol: %s (correct: %s%s)", k, keywords.PrefixReference, k)
+		}
+		newStep.Definitions[k] = v
 	}
 	return nil
 }

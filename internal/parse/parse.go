@@ -91,7 +91,7 @@ func buildTarget(targetKey string, targetContainer schema.TargetDefinition) (ste
 	// Steps
 	newTarget.Steps, err = buildSteps(targetContainer.BodyDefinition)
 	if err != nil {
-		return newTarget, fmt.Errorf("failed to parse steps for '%s'\n\t%s", targetKey, err)
+		return newTarget, fmt.Errorf("failed to parse steps for target '%s'\n\t%s", targetKey, err)
 	}
 
 	newTarget.Summary = targetContainer.Summary

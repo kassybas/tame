@@ -62,12 +62,6 @@ func (t Target) Run(ctx tcontext.Context, vt vartable.VarTable) ([]tvar.Variable
 				return nil, s.GetResult().StdrcValue, nil
 			}
 		}
-		// Save result variables
-		// if s.GetResult().ResultVars != nil {
-		// 	if len(s.GetResult().ResultValues) != len(s.GetResult().ResultVars) {
-		// 		return nil, 0, fmt.Errorf("mismatched number of return and result variables:\n\treturn: %d, result: %d", len(s.GetResult().ResultValues), len(s.GetResult().ResultVars))
-		// 	}
-		// }
 		vt = updateResultVariables(vt, s.GetResult())
 	}
 

@@ -32,7 +32,8 @@ func NewVarTable() VarTable {
 }
 
 func (vt *VarTable) Add(name string, value interface{}) {
-	vt.vars[name] = tvar.CreateVariable(name, value)
+	v := tvar.CreateVariable(name, value)
+	vt.vars[name] = v
 }
 
 func (vt *VarTable) Append(names []string, values []tvar.VariableI) {
@@ -54,7 +55,6 @@ func (vt *VarTable) AddVariables(newVars []tvar.VariableI) {
 func (vt *VarTable) GetAllEnvVars() []string {
 	formattedVars := []string{}
 	for _, v := range vt.vars {
-		// Remove $ for shell env format
 		if v != nil {
 			formattedVars = append(formattedVars, v.ToEnvVars()...)
 		}
