@@ -21,14 +21,22 @@ targets:
   mapme:
     body:
       - var:
+          $nullme: null
+          $isit: true
+          $floatme: 3.1415
+          $num: 1
           $my:
             lovely: "is amazing"
             again: "somth"
             deeper:
               how: "deepisyour"
-              listing:
-                - "one"
-                - "two"
+              listzz:
+                - one: "is"
+                  two: "loneliest"
+                - 22
+                - and:
+                    it: "goes"
+                    deeper: "too"
       - shell: echo $my_lovely
       - shell: echo $my_again
       - shell: echo $my_deeper_how

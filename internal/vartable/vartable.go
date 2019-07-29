@@ -59,6 +59,8 @@ func (vt *VarTable) GetAllEnvVars() []string {
 			formattedVars = append(formattedVars, v.ToEnvVars()...)
 		}
 	}
+	fmt.Println("---HERE IT IS")
+	fmt.Println(strings.Join(formattedVars, "\n"))
 	return formattedVars
 }
 

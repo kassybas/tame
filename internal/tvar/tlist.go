@@ -1,44 +1,45 @@
 package tvar
 
 import (
+	"strconv"
 	"strings"
 
 	"github.com/kassybas/mate/internal/keywords"
 )
 
-type TMap struct {
+type TList struct {
 	name  string
-	value map[string]VariableI
+	value []VariableI
 }
 
-func (v TMap) Type() TVarType {
-	return TMapType
+func (v TList) Type() TVarType {
+	return TListType
 }
 
-func (v TMap) IsScalar() bool {
+func (v TList) IsScalar() bool {
 	return false
 }
 
-func (v TMap) Name() string {
+func (v TList) Name() string {
 	return v.name
 }
 
-func (v TMap) Value() interface{} {
+func (v TList) Value() interface{} {
 	return v.value
 }
 
-func (v TMap) ToInt() (int, error) {
+func (v TList) ToInt() (int, error) {
 	// i, err := strconv.Atoi(v.value.(string))
 	// return i, err
 	return 0, nil
 }
 
-func (v TMap) ToStr() string {
+func (v TList) ToStr() string {
 	return ""
 	// return v.value.(string)
 }
 
-func (v TMap) ToEnvVars() []string {
+func (v TList) ToEnvVars() []string {
 	var envVars []string
 	trimmedName := strings.TrimPrefix(v.name, keywords.PrefixReference)
 	for _, v := range v.value {
@@ -50,12 +51,12 @@ func (v TMap) ToEnvVars() []string {
 	return envVars
 }
 
-func CreateMap(name string, value map[interface{}]interface{}) VariableI {
-	var tm TMap
-	tm.name = name
-	tm.value = make(map[string]VariableI)
-	for k, v := range value {
-		tm.value[k.(string)] = CreateVariable(k.(string), v)
+func CreateList(name string, value []interface{}) VariableI {
+	var tl TList
+	tl.name = name
+	tl.value = make([]VariableI, len(value))
+	for i, elem := range value {
+		tl.value[i] = CreateVariable(strconv.Itoa(i), elem)
 	}
-	return tm
+	return tl
 }
