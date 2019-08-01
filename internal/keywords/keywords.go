@@ -33,6 +33,9 @@ var (
 	PrefixErr = "err_"
 	PrefixRc  = "rc_"
 
+	ShellFieldSeparator = "_"
+	TameFieldSeparator  = "."
+
 	CliArgSeparator        = "="
 	GlobalDefaultVarSuffix = "?"
 )

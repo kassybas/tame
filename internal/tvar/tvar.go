@@ -1,6 +1,9 @@
 package tvar
 
 import (
+	"strings"
+
+	"github.com/kassybas/mate/internal/keywords"
 	"github.com/sirupsen/logrus"
 )
 
@@ -14,35 +17,37 @@ type VariableI interface {
 	IsScalar() bool
 }
 
-// type Variable struct {
-// 	Name string
-// 	// TODO: interface
-// 	stringValue string
-// 	intValue    int
-// 	Type        TVarType
-// }
-
 func CreateVariable(name string, value interface{}) VariableI {
+	// _, file, line, _ := runtime.Caller(1)
+	// fmt.Printf("[cgl] debug %s:%d\n", file, line)
+	if strings.Contains(name, keywords.TameFieldSeparator) {
+		fields := strings.Split(name, keywords.TameFieldSeparator)
+		last := len(fields) - 1
+		innerVar := CreateVariable(fields[last], value)
+		outerVar := CreateVariable(strings.Join(fields[:last], keywords.TameFieldSeparator), innerVar)
+		return outerVar
+	}
+
 	switch value.(type) {
 	// Null
 	case nil:
 		{
 			return TNull{name: name}
 		}
-	case TNull:
-		{
-			return TNull{name: name}
-		}
+	// case TNull:
+	// 	{
+	// 		return TNull{name: name}
+	// 	}
 	// Bool
 	case bool:
 		{
 			return TBool{name: name, value: value.(bool)}
 		}
-	case TBool:
-		{
-			tb := value.(TBool)
-			return TBool{name: name, value: tb.value}
-		}
+	// case TBool:
+	// 	{
+	// 		tb := value.(TBool)
+	// 		return TBool{name: name, value: tb.value}
+	// 	}
 	// String
 	case string:
 		{
@@ -51,47 +56,56 @@ func CreateVariable(name string, value interface{}) VariableI {
 	case TString:
 		{
 			ts := value.(TString)
-			return TString{name: name, value: ts.value}
+			return TMap{
+				name:  name,
+				value: map[string]VariableI{ts.Name(): ts},
+			}
 		}
 	// Int
 	case int:
 		{
-			return TInt{name: name, value: value.(int)}
+			return &TInt{name: name, value: value.(int)}
 		}
-	case TInt:
-		{
-			ti := value.(TInt)
-			return TInt{name: name, value: ti.value}
-		}
-		// Float
+	// case TInt:
+	// 	{
+	// 		ti := value.(TInt)
+	// 		return TInt{name: name, value: ti.value}
+	// 	}
+	// Float
 	case float64:
 		{
 			return TFloat{name: name, value: value.(float64)}
 		}
-	case TFloat:
-		{
-			tf := value.(TFloat)
-			return TFloat{name: name, value: tf.value}
-		}
+	// case TFloat:
+	// 	{
+	// 		tf := value.(TFloat)
+	// 		return TFloat{name: name, value: tf.value}
+	// 	}
 	// Map
 	case map[interface{}]interface{}:
 		{
-			return CreateMap(name, value.(map[interface{}]interface{}))
+			m := CreateMap(name, value.(map[interface{}]interface{}))
+			return m
+		}
+	case map[string]VariableI:
+		{
+			return TMap{name: name, value: value.(map[string]VariableI)}
 		}
 	case TMap:
 		{
 			tm := value.(TMap)
-			return TMap{name: name, value: tm.value}
+			return TMap{name: name, value: map[string]VariableI{tm.name: tm}}
 		}
 	// List
 	case []interface{}:
 		{
-			return CreateList(name, value.([]interface{}))
+			l := CreateList(name, value.([]interface{}))
+			return l
 		}
 	case TList:
 		{
 			tl := value.(TList)
-			return TList{name: name, value: tl.value}
+			return TMap{name: name, value: map[string]VariableI{tl.name: tl}}
 		}
 	default:
 		{
@@ -99,6 +113,10 @@ func CreateVariable(name string, value interface{}) VariableI {
 		}
 	}
 	return nil
+}
+
+func CopyVariable(newName string, sourceVar VariableI) VariableI {
+	return CreateVariable(newName, sourceVar.Value())
 }
 
 type TVarType int

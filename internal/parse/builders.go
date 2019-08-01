@@ -20,14 +20,13 @@ func buildParameters(paramDefs map[string]interface{}) ([]step.Param, error) {
 			Name: paramKey,
 		}
 		switch paramValue.(type) {
-		case string:
+		case nil:
+			newParam.HasDefault = false
+		default:
 			{
 				newParam.HasDefault = true
-				newParam.DefaultValue = paramValue.(string)
+				newParam.DefaultValue = paramValue
 			}
-		default:
-			// nil or unknown type
-			newParam.HasDefault = false
 		}
 		params = append(params, newParam)
 	}

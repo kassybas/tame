@@ -6,3 +6,6 @@ targets:
     args: {$format: "+%D"}
     body:
       - shell: date ${format}
+      - var:
+          $hello:
+            tourist: youare

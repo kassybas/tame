@@ -41,6 +41,34 @@ targets:
       - shell: echo $my_again
       - shell: echo $my_deeper_how
 
+  setone:
+    body:
+      - var:
+          $person.sign.last: "yolo"
+  settwo:
+    body:
+      - var:
+          $person:
+            sign:
+              last: "yolo"
+  updone:
+    body:
+      - var:
+          $person:
+            sign:
+              last: "yolo"
+      - var:
+          $person.sign.first: "ok"
+      - shell: echo ${person_sign_first}
+
+  argme:
+    args:
+      $hello:
+        tourist: "dubist"
+    body:
+      - shell: "echo ${hello_tourist}"
+
+
 
   # yolo:
   #   body:

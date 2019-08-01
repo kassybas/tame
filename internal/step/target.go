@@ -16,7 +16,7 @@ import (
 type Param struct {
 	Name         string
 	HasDefault   bool
-	DefaultValue string
+	DefaultValue interface{}
 }
 type Target struct {
 	GlobalSettings *settings.Settings
@@ -76,13 +76,16 @@ func (t Target) Run(ctx tcontext.Context, vt vartable.VarTable) ([]tvar.Variable
 }
 func updateResultVariables(vt vartable.VarTable, r Result) vartable.VarTable {
 	if r.StdoutVar != "" {
-		vt.Add(r.StdoutVar, r.StdoutValue)
+		v := tvar.CreateVariable(r.StdoutVar, r.StdoutValue)
+		vt.Add(v)
 	}
 	if r.StderrVar != "" {
-		vt.Add(r.StderrVar, r.StderrValue)
+		v := tvar.CreateVariable(r.StderrVar, r.StderrValue)
+		vt.Add(v)
 	}
 	if r.StdrcVar != "" {
-		vt.Add(r.StdrcVar, strconv.Itoa(r.StdrcValue))
+		v := tvar.CreateVariable(r.StdrcVar, strconv.Itoa(r.StdrcValue))
+		vt.Add(v)
 	}
 	if r.ResultValue != nil {
 		vt.Append(r.ResultVars, r.ResultValue)
@@ -97,11 +100,13 @@ func resolveParams(vt vartable.VarTable, params []Param) (vartable.VarTable, err
 			if err != nil {
 				return vt, err
 			}
-			vt.Add(p.Name, val.Value())
+			v := tvar.CreateVariable(p.Name, val.Value())
+			vt.Add(v)
 			continue
 		}
 		if p.HasDefault {
-			vt.Add(p.Name, p.DefaultValue)
+			v := tvar.CreateVariable(p.Name, p.DefaultValue)
+			vt.Add(v)
 			continue
 		}
 		return vt, fmt.Errorf("parameter without value or default value: %s", p.Name)

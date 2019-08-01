@@ -31,14 +31,21 @@ func NewVarTable() VarTable {
 	return vt
 }
 
-func (vt *VarTable) Add(name string, value interface{}) {
-	v := tvar.CreateVariable(name, value)
-	vt.vars[name] = v
+func (vt *VarTable) Add(v tvar.VariableI) {
+	oldVar, err := vt.GetVar(v.Name())
+	// if exists && is map
+	if err == nil && oldVar.Type() == tvar.TMapType {
+		newMap := v.(tvar.TMap)
+		v = oldVar.(tvar.TMap).UpdateMap(newMap)
+	}
+	vt.vars[v.Name()] = v
 }
 
 func (vt *VarTable) Append(names []string, values []tvar.VariableI) {
 	for i := range names {
-		vt.Add(names[i], values[i])
+		rootName := strings.Split(names[i], keywords.TameFieldSeparator)[0]
+		v := tvar.CopyVariable(rootName, values[i])
+		vt.Add(v)
 	}
 }
 
@@ -59,8 +66,6 @@ func (vt *VarTable) GetAllEnvVars() []string {
 			formattedVars = append(formattedVars, v.ToEnvVars()...)
 		}
 	}
-	fmt.Println("---HERE IT IS")
-	fmt.Println(strings.Join(formattedVars, "\n"))
 	return formattedVars
 }
 
@@ -76,7 +81,6 @@ func (vt VarTable) ResolveVar(v tvar.VariableI) (tvar.VariableI, error) {
 	return tvar.CreateVariable(v.Name(), resolvedVar.Value()), nil
 }
 
-// TODO: should get an interface in case a list or map is returned
 func (vt VarTable) ResolveValue(refStr string) (tvar.VariableI, error) {
 	if !strings.HasPrefix(refStr, keywords.PrefixReference) {
 		// No resolution needed for constant value

@@ -43,19 +43,39 @@ func (v TMap) ToEnvVars() []string {
 	trimmedName := strings.TrimPrefix(v.name, keywords.PrefixReference)
 	for _, v := range v.value {
 		for _, memberEnvVar := range v.ToEnvVars() {
-			ev := trimmedName + "_" + memberEnvVar
+			ev := trimmedName + keywords.ShellFieldSeparator + memberEnvVar
 			envVars = append(envVars, ev)
 		}
 	}
 	return envVars
 }
 
-func CreateMap(name string, value map[interface{}]interface{}) VariableI {
+func (tm TMap) IsMember(key string) bool {
+	_, exist := tm.value[key]
+	return exist
+}
+
+func CreateMap(name string, value map[interface{}]interface{}) TMap {
 	var tm TMap
 	tm.name = name
 	tm.value = make(map[string]VariableI)
 	for k, v := range value {
 		tm.value[k.(string)] = CreateVariable(k.(string), v)
+	}
+	return tm
+}
+
+func (tm TMap) UpdateMap(newMap TMap) TMap {
+	for k, v := range newMap.value {
+		if !tm.IsMember(k) {
+			tm.value[k] = v
+			return tm
+		}
+		if tm.value[k].Type() != TMapType {
+			tm.value[k] = v
+			return tm
+		}
+		tm.value[k].(TMap).UpdateMap(v.(TMap))
 	}
 	return tm
 }

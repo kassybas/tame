@@ -58,5 +58,5 @@ func CreateList(name string, value []interface{}) VariableI {
 	for i, elem := range value {
 		tl.value[i] = CreateVariable(strconv.Itoa(i), elem)
 	}
-	return tl
+	return &tl
 }
