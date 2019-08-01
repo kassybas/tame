@@ -76,9 +76,23 @@ targets:
   argme:
     args:
       $hello:
-        tourist: "dubist"
+        tourist: "messageworld"
+        dubist: ~
     body:
-      - shell: "echo ${hello_tourist}"
+      - shell: "echo adding ${hello_tourist}"
+        out: $hello.dubist
+        opts: [silent]
+      - shell: "echo adding ${hello_tourist_dubist}"
+        opts: [silent]
+    return: "$hello"
+
+  getme:
+    body:
+      - call:
+          argme: {}
+        result: $hey
+
+      - shell: echo $hey_dubist
 
 
 

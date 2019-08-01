@@ -69,7 +69,6 @@ func UpdateValue(origVar, newField VariableI) VariableI {
 	if origVar.Type() != TMapType || newField.Type() != TMapType {
 		return newField
 	}
-
 	origM := origVar.(TMap)
 	newM := newField.(TMap)
 
