@@ -76,11 +76,11 @@ func CreateVariable(name string, value interface{}) VariableI {
 		{
 			return TFloat{name: name, value: value.(float64)}
 		}
-	// case TFloat:
-	// 	{
-	// 		tf := value.(TFloat)
-	// 		return TFloat{name: name, value: tf.value}
-	// 	}
+	case TFloat:
+		{
+			tf := value.(TFloat)
+			return EncapsulateValueToMap(name, tf)
+		}
 	// Map
 	case map[interface{}]interface{}:
 		{
@@ -94,7 +94,7 @@ func CreateVariable(name string, value interface{}) VariableI {
 	case TMap:
 		{
 			tm := value.(TMap)
-			return TMap{name: name, value: map[string]VariableI{tm.name: tm}}
+			return EncapsulateValueToMap(name, tm)
 		}
 	// List
 	case []interface{}:
@@ -105,7 +105,7 @@ func CreateVariable(name string, value interface{}) VariableI {
 	case TList:
 		{
 			tl := value.(TList)
-			return TMap{name: name, value: map[string]VariableI{tl.name: tl}}
+			return EncapsulateValueToMap(name, tl)
 		}
 	default:
 		{

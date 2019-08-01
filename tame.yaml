@@ -60,6 +60,18 @@ targets:
       - var:
           $person.sign.first: "ok"
       - shell: echo ${person_sign_first}
+      - shell: echo ${person_sign_last}
+
+  trunc:
+    body:
+      - var:
+          $person:
+            sign:
+              last: "yolo"
+      - var:
+          $person.sign: "over"
+      - shell: echo ${person_sign}
+
 
   argme:
     args:

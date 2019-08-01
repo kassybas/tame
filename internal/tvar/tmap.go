@@ -65,17 +65,31 @@ func CreateMap(name string, value map[interface{}]interface{}) TMap {
 	return tm
 }
 
-func (tm TMap) UpdateMap(newMap TMap) TMap {
-	for k, v := range newMap.value {
-		if !tm.IsMember(k) {
-			tm.value[k] = v
-			return tm
-		}
-		if tm.value[k].Type() != TMapType {
-			tm.value[k] = v
-			return tm
-		}
-		tm.value[k].(TMap).UpdateMap(v.(TMap))
+func UpdateValue(origVar, newField VariableI) VariableI {
+	if origVar.Type() != TMapType || newField.Type() != TMapType {
+		return newField
 	}
-	return tm
+
+	origM := origVar.(TMap)
+	newM := newField.(TMap)
+
+	for k, newVal := range newM.value {
+		member, exists := origM.value[k]
+		if exists && member.Type() != TMapType {
+			// scalar update
+			origM.value[k] = newVal
+			continue
+		}
+		if exists {
+			// merge with the member value
+			origM.value[k] = UpdateValue(member, newVal)
+			continue
+		}
+		origM.value[k] = newVal
+	}
+	return origM
+}
+
+func EncapsulateValueToMap(name string, innerValue VariableI) TMap {
+	return TMap{name: name, value: map[string]VariableI{innerValue.Name(): innerValue}}
 }

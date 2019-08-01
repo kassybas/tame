@@ -36,7 +36,7 @@ func (vt *VarTable) Add(v tvar.VariableI) {
 	// if exists && is map
 	if err == nil && oldVar.Type() == tvar.TMapType {
 		newMap := v.(tvar.TMap)
-		v = oldVar.(tvar.TMap).UpdateMap(newMap)
+		v = tvar.UpdateValue(oldVar, newMap)
 	}
 	vt.vars[v.Name()] = v
 }
