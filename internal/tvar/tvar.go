@@ -1,8 +1,6 @@
 package tvar
 
 import (
-	"fmt"
-	"runtime"
 	"strings"
 
 	"github.com/kassybas/mate/internal/keywords"
@@ -28,13 +26,10 @@ func CreateCompositeVariable(name string, value interface{}) VariableI {
 }
 
 func CreateVariable(name string, value interface{}) VariableI {
-	_, file, line, _ := runtime.Caller(1)
-	fmt.Printf("[cgl] debug %s:%d\n", file, line)
 	if strings.Contains(name, keywords.TameFieldSeparator) {
 		return CreateCompositeVariable(name, value)
 	}
 	if strings.Contains(name, keywords.IndexingSeparatorL) && strings.Contains(name, keywords.IndexingSeparatorR) {
-		fmt.Println("Creating ....", name)
 		l, err := CreateListFromBracketsName(name, value)
 		if err != nil {
 			logrus.Fatal(err)

@@ -42,7 +42,7 @@ func (s *VarStep) RunStep(ctx tcontext.Context, vt vartable.VarTable) error {
 	i := 0
 	for k, v := range s.Definitions {
 		s.Results.ResultVars[i] = k
-		s.Results.ResultValue[i] = tvar.CreateVariable(k, v)
+		s.Results.ResultValue[i] = tvar.CreateVariable("", v)
 		i++
 	}
 	return nil
