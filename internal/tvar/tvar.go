@@ -17,37 +17,38 @@ type VariableI interface {
 	IsScalar() bool
 }
 
-func CreateVariable(name string, value interface{}) VariableI {
-	// _, file, line, _ := runtime.Caller(1)
-	// fmt.Printf("[cgl] debug %s:%d\n", file, line)
-	if strings.Contains(name, keywords.TameFieldSeparator) {
-		fields := strings.Split(name, keywords.TameFieldSeparator)
-		last := len(fields) - 1
-		innerVar := CreateVariable(fields[last], value)
-		outerVar := CreateVariable(strings.Join(fields[:last], keywords.TameFieldSeparator), innerVar)
-		return outerVar
-	}
+func CreateCompositeVariable(name string, value interface{}) VariableI {
+	fields := strings.Split(name, keywords.TameFieldSeparator)
+	last := len(fields) - 1
+	innerVar := CreateVariable(fields[last], value)
+	outerVar := CreateVariable(strings.Join(fields[:last], keywords.TameFieldSeparator), innerVar)
+	return outerVar
+}
 
+func CreateVariable(name string, value interface{}) VariableI {
+	if strings.Contains(name, keywords.TameFieldSeparator) || strings.Contains(name, keywords.IndexingSeparatorL) || strings.Contains(name, keywords.IndexingSeparatorR) {
+		return CreateCompositeVariable(name, value)
+	}
 	switch value.(type) {
 	// Null
 	case nil:
 		{
 			return TNull{name: name}
 		}
-	// case TNull:
-	// 	{
-	// 		return TNull{name: name}
-	// 	}
+	case TNull:
+		{
+			return EncapsulateValueToMap(name, value.(TNull))
+		}
 	// Bool
 	case bool:
 		{
 			return TBool{name: name, value: value.(bool)}
 		}
-	// case TBool:
-	// 	{
-	// 		tb := value.(TBool)
-	// 		return TBool{name: name, value: tb.value}
-	// 	}
+	case TBool:
+		{
+			tb := value.(TBool)
+			return EncapsulateValueToMap(name, tb)
+		}
 	// String
 	case string:
 		{
@@ -56,21 +57,18 @@ func CreateVariable(name string, value interface{}) VariableI {
 	case TString:
 		{
 			ts := value.(TString)
-			return TMap{
-				name:  name,
-				value: map[string]VariableI{ts.Name(): ts},
-			}
+			return EncapsulateValueToMap(name, ts)
 		}
 	// Int
 	case int:
 		{
 			return &TInt{name: name, value: value.(int)}
 		}
-	// case TInt:
-	// 	{
-	// 		ti := value.(TInt)
-	// 		return TInt{name: name, value: ti.value}
-	// 	}
+	case TInt:
+		{
+			ti := value.(TInt)
+			return EncapsulateValueToMap(name, ti)
+		}
 	// Float
 	case float64:
 		{

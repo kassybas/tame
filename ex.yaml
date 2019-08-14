@@ -9,3 +9,8 @@ targets:
       - var:
           $hello:
             tourist: youare
+      - call:
+          dRun:
+            $image: "hey"
+            $cmd: "ok"
+            $runner: "k8s"

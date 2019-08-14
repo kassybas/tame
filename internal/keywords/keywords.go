@@ -35,6 +35,8 @@ var (
 
 	ShellFieldSeparator = "_"
 	TameFieldSeparator  = "."
+	IndexingSeparatorL  = "["
+	IndexingSeparatorR  = "]"
 
 	CliArgSeparator        = "="
 	GlobalDefaultVarSuffix = "?"
