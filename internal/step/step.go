@@ -30,4 +30,5 @@ type Result struct {
 	StdrcValue  int
 	ResultVars  []string
 	ResultValue []tvar.VariableI
+	// ResultValue interface{}
 }

@@ -1,6 +1,7 @@
 package tvar
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/kassybas/mate/internal/keywords"
@@ -65,7 +66,7 @@ func CreateMap(name string, value map[interface{}]interface{}) TMap {
 	return tm
 }
 
-func UpdateValue(origVar, newField VariableI) VariableI {
+func UpdateCompositeValue(origVar, newField VariableI) VariableI {
 	if origVar.Type() != TMapType || newField.Type() != TMapType {
 		return newField
 	}
@@ -81,7 +82,7 @@ func UpdateValue(origVar, newField VariableI) VariableI {
 		}
 		if exists {
 			// merge with the member value
-			origM.value[k] = UpdateValue(member, newVal)
+			origM.value[k] = UpdateCompositeValue(member, newVal)
 			continue
 		}
 		origM.value[k] = newVal
@@ -91,4 +92,17 @@ func UpdateValue(origVar, newField VariableI) VariableI {
 
 func EncapsulateValueToMap(name string, innerValue VariableI) TMap {
 	return TMap{name: name, value: map[string]VariableI{innerValue.Name(): innerValue}}
+}
+
+func MergeLists(origList, newList TList) (TList, error) {
+	newValueIndex := len(newList.value) - 1
+	if len(origList.value) <= newValueIndex {
+		return TList{}, fmt.Errorf("index out of range: %s[%d]", origList.name, newValueIndex)
+	}
+	for i := range origList.value {
+		if newList.value[i].Type() != TNullType {
+			origList.value[i] = newList.value[i]
+		}
+	}
+	return origList, nil
 }

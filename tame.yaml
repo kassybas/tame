@@ -96,11 +96,15 @@ targets:
 
   listme:
     body:
+    # - var:
+    #     $list:
+    #       - hey
+    #       - okay
+    # - var:
+    #     $list[1]: "new"
     - var:
-        $list:
-          - hey
-          - okay
-    - shell: echo ${list_1}
+        $newlist[1]: "yolo"
+    - shell: echo ${newlist_0}
 
 
 

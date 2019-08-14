@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/sirupsen/logrus"
+
 	"github.com/kassybas/mate/internal/keywords"
 	"github.com/kassybas/mate/internal/tvar"
 )
@@ -33,10 +35,18 @@ func NewVarTable() VarTable {
 
 func (vt *VarTable) Add(v tvar.VariableI) {
 	oldVar, err := vt.GetVar(v.Name())
-	// if exists && is map
-	if err == nil && oldVar.Type() == tvar.TMapType {
-		newMap := v.(tvar.TMap)
-		v = tvar.UpdateValue(oldVar, newMap)
+	// if already exists
+	if err == nil {
+		if oldVar.Type() == tvar.TMapType {
+			v = tvar.UpdateCompositeValue(oldVar.(tvar.TMap), v.(tvar.TMap))
+		}
+		if oldVar.Type() == tvar.TListType && v.Type() == tvar.TListType {
+			v, err = tvar.MergeLists(oldVar.(tvar.TList), v.(tvar.TList))
+			if err != nil {
+				logrus.Fatal(err)
+			}
+		}
+
 	}
 	vt.vars[v.Name()] = v
 }

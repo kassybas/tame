@@ -1,6 +1,8 @@
 package tvar
 
 import (
+	"fmt"
+	"runtime"
 	"strings"
 
 	"github.com/kassybas/mate/internal/keywords"
@@ -26,9 +28,20 @@ func CreateCompositeVariable(name string, value interface{}) VariableI {
 }
 
 func CreateVariable(name string, value interface{}) VariableI {
-	if strings.Contains(name, keywords.TameFieldSeparator) || strings.Contains(name, keywords.IndexingSeparatorL) || strings.Contains(name, keywords.IndexingSeparatorR) {
+	_, file, line, _ := runtime.Caller(1)
+	fmt.Printf("[cgl] debug %s:%d\n", file, line)
+	if strings.Contains(name, keywords.TameFieldSeparator) {
 		return CreateCompositeVariable(name, value)
 	}
+	if strings.Contains(name, keywords.IndexingSeparatorL) && strings.Contains(name, keywords.IndexingSeparatorR) {
+		fmt.Println("Creating ....", name)
+		l, err := CreateListFromBracketsName(name, value)
+		if err != nil {
+			logrus.Fatal(err)
+		}
+		return l
+	}
+
 	switch value.(type) {
 	// Null
 	case nil:
@@ -101,6 +114,7 @@ func CreateVariable(name string, value interface{}) VariableI {
 		{
 			return EncapsulateValueToMap(name, value.(TList))
 		}
+	// Undefined
 	default:
 		{
 			logrus.Fatalf("Undeterminable variable type for: %s -- %T", name, value)
@@ -116,7 +130,7 @@ func CopyVariable(newName string, sourceVar VariableI) VariableI {
 type TVarType int
 
 const (
-	TErrorType TVarType = iota
+	TUnknownType TVarType = iota
 	TStringType
 	TIntType
 	TFloatType
