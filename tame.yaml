@@ -94,6 +94,13 @@ targets:
         result: $hey
       - shell: echo $hey_dubist
 
+  listme:
+    body:
+    - var:
+        $list:
+          - hey
+          - okay
+    - shell: echo ${list_1}
 
 
 

@@ -51,12 +51,22 @@ func (v TList) ToEnvVars() []string {
 	return envVars
 }
 
-func CreateList(name string, value []interface{}) VariableI {
+func CreateListFromInterface(name string, values []interface{}) VariableI {
 	var tl TList
 	tl.name = name
-	tl.value = make([]VariableI, len(value))
-	for i, elem := range value {
-		tl.value[i] = CreateVariable(strconv.Itoa(i), elem)
+	tl.value = make([]VariableI, len(values))
+	for i, v := range values {
+		tl.value[i] = CreateVariable(strconv.Itoa(i), v)
 	}
-	return &tl
+	return tl
+}
+
+func CreateListFromVars(name string, values []VariableI) VariableI {
+	var tl TList
+	tl.name = name
+	tl.value = make([]VariableI, len(values))
+	for i, v := range values {
+		tl.value[i] = v
+	}
+	return tl
 }

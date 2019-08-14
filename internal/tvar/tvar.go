@@ -46,8 +46,7 @@ func CreateVariable(name string, value interface{}) VariableI {
 		}
 	case TBool:
 		{
-			tb := value.(TBool)
-			return EncapsulateValueToMap(name, tb)
+			return EncapsulateValueToMap(name, value.(TBool))
 		}
 	// String
 	case string:
@@ -56,8 +55,7 @@ func CreateVariable(name string, value interface{}) VariableI {
 		}
 	case TString:
 		{
-			ts := value.(TString)
-			return EncapsulateValueToMap(name, ts)
+			return EncapsulateValueToMap(name, value.(TString))
 		}
 	// Int
 	case int:
@@ -66,8 +64,7 @@ func CreateVariable(name string, value interface{}) VariableI {
 		}
 	case TInt:
 		{
-			ti := value.(TInt)
-			return EncapsulateValueToMap(name, ti)
+			return EncapsulateValueToMap(name, value.(TInt))
 		}
 	// Float
 	case float64:
@@ -76,14 +73,12 @@ func CreateVariable(name string, value interface{}) VariableI {
 		}
 	case TFloat:
 		{
-			tf := value.(TFloat)
-			return EncapsulateValueToMap(name, tf)
+			return EncapsulateValueToMap(name, value.(TFloat))
 		}
 	// Map
 	case map[interface{}]interface{}:
 		{
-			m := CreateMap(name, value.(map[interface{}]interface{}))
-			return m
+			return CreateMap(name, value.(map[interface{}]interface{}))
 		}
 	case map[string]VariableI:
 		{
@@ -91,19 +86,20 @@ func CreateVariable(name string, value interface{}) VariableI {
 		}
 	case TMap:
 		{
-			tm := value.(TMap)
-			return EncapsulateValueToMap(name, tm)
+			return EncapsulateValueToMap(name, value.(TMap))
 		}
 	// List
 	case []interface{}:
 		{
-			l := CreateList(name, value.([]interface{}))
-			return l
+			return CreateListFromInterface(name, value.([]interface{}))
+		}
+	case []VariableI:
+		{
+			return CreateListFromVars(name, value.([]VariableI))
 		}
 	case TList:
 		{
-			tl := value.(TList)
-			return EncapsulateValueToMap(name, tl)
+			return EncapsulateValueToMap(name, value.(TList))
 		}
 	default:
 		{
