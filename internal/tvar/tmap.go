@@ -95,11 +95,12 @@ func EncapsulateValueToMap(name string, innerValue VariableI) TMap {
 }
 
 func MergeLists(origList, newList TList) (TList, error) {
-	newValueIndex := len(newList.value) - 1
-	if len(origList.value) <= newValueIndex {
-		return TList{}, fmt.Errorf("index out of range: %s[%d]", origList.name, newValueIndex)
+	if len(origList.value) < len(newList.value) {
+		return TList{}, fmt.Errorf("index out of range: %s[%d]", origList.name, len(newList.value)-1)
 	}
-	for i := range origList.value {
+	// fmt.Println("ORIG", origList)
+	// fmt.Println("NEW", newList)
+	for i := range newList.value {
 		if newList.value[i].Type() != TNullType {
 			origList.value[i] = newList.value[i]
 		}
