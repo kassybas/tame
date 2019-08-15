@@ -5,3 +5,4 @@
 - vartable creates env_vars even if nothing has changes (should reuse previous one)
 - make lists work
 - document variables and conversions
+- do not create list from dotnotation be default

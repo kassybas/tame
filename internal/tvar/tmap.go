@@ -67,7 +67,7 @@ func CreateMap(name string, value map[interface{}]interface{}) TMap {
 }
 
 func UpdateCompositeValue(origVar, newField VariableI) VariableI {
-	if origVar.Type() != TMapType || newField.Type() != TMapType {
+	if newField.Type() != TMapType {
 		return newField
 	}
 	origM := origVar.(TMap)

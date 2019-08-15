@@ -1,7 +1,6 @@
 package tvar
 
 import (
-	"fmt"
 	"strconv"
 	"strings"
 
@@ -70,23 +69,4 @@ func CreateListFromVars(name string, values []VariableI) VariableI {
 		tl.value[i] = v
 	}
 	return tl
-}
-
-func CreateListFromBracketsName(name string, value interface{}) (VariableI, error) {
-	lBr := strings.Index(name, keywords.IndexingSeparatorL) + 1
-	rBr := strings.Index(name, keywords.IndexingSeparatorR)
-	index, err := strconv.Atoi(name[lBr:rBr])
-	if err != nil {
-		return nil, fmt.Errorf("not integer index: %s %d", name, name[lBr:rBr])
-	}
-	var tl TList
-	tl.name = name[0 : lBr-1]
-	tl.value = make([]VariableI, index+1)
-	for i := range tl.value {
-		// Null all values other than the index
-		tl.value[i] = TNull{}
-	}
-	tl.value[index] = CreateVariable(strconv.Itoa(index), value)
-	fmt.Println("Created list", tl.value)
-	return tl, nil
 }

@@ -38,7 +38,7 @@ func (vt *VarTable) Add(v tvar.VariableI) {
 	// if already exists
 	if err == nil {
 		if oldVar.Type() == tvar.TMapType {
-			v = tvar.UpdateCompositeValue(oldVar.(tvar.TMap), v.(tvar.TMap))
+			v = tvar.UpdateCompositeValue(oldVar, v)
 		}
 		if oldVar.Type() == tvar.TListType && v.Type() == tvar.TListType {
 			v, err = tvar.MergeLists(oldVar.(tvar.TList), v.(tvar.TList))

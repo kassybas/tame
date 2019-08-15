@@ -100,11 +100,38 @@ targets:
         $list:
           - hey
           - okay
+          - but:
+              my: love
+    - shell: echo ${list_2_but_my}
     - var:
-        $list[1]: "new"
-    # - var:
-    #     $list[1]: "yolo"
-    - shell: echo ${list_1}
+        $list[1].and: "new" # TODO :these do not work
+        # $mapme.again[0]: "hey"
+        # $list[1]: "yolo"
+    - shell: echo ${list_1_and}  #
+    - shell: echo ${mapme_again_0}
+    - shell: env
+
+  test1:
+    body:
+      - var:
+          $hello:
+            na: "tourist"
+            ja: "oook"
+      - var:
+          $hello.na: "new"
+      - shell: echo ${hello_ja}
+
+  test2:
+    body:
+      - var:
+          $hello:
+          - na: "tourist"
+          - ja: "oook"
+      - var:
+          $hello[1]: "new"
+      - shell: env | grep hello
+      - shell: echo ${hello_1}
+
 
 
 
