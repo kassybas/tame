@@ -168,3 +168,12 @@ targets:
         - var:
             $hello[1].again: followme
         - shell: env | grep hello
+
+  nope:
+    body:
+    - var:
+        $hello:
+          - yo
+    # - var:
+    #     $hello[0]: okay
+    - shell:  echo $hello_0

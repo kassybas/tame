@@ -42,7 +42,7 @@ func (v TList) ToStr() string {
 
 func (v TList) GetItem(i int) (VariableI, error) {
 	if len(v.value) <= i {
-		return nil, fmt.Errorf("index out of range: %s -- %d", v.name, i)
+		return nil, fmt.Errorf("index out of range: %s[%d]", v.name, i)
 	}
 	return v.value[i], nil
 }
