@@ -96,7 +96,7 @@ func ValidateUpdate(origVar VariableI, dr dotref.DotRef) error {
 		if cur.Type() != TMapType {
 			return fmt.Errorf("field reference on a non-map type: %s.%s (type: %s)", cur.Name(), field.FieldName, GetTypeNameString(cur.Type()))
 		}
-		// last field can be added to the map
+		// last fields can be added to the map
 		if i != lastField {
 			cur, err = cur.(TMap).GetMember(field.FieldName)
 			if err != nil {

@@ -151,11 +151,14 @@ targets:
 
   caller:
       body:
+        - var:
+            $ok:
+              me: "okay"
         - call:
             yolo: ~
-          result: $ok
+          result: $ok.result
         - shell: env | grep ok
-        - shell: echo $ok_2_jo_age
+        - shell: echo $ok_result_2_jo_age
 
   failme:
       body:
@@ -173,7 +176,9 @@ targets:
     body:
     - var:
         $hello:
-          - yo
-    # - var:
-    #     $hello[0]: okay
-    - shell:  echo $hello_0
+          hey:
+            you:
+              and: alrigh
+    - var:
+        $hello.hey: okay
+    - shell:  env | grep hello
