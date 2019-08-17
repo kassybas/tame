@@ -83,6 +83,36 @@ func (vt VarTable) ResolveVar(v tvar.VariableI) (tvar.VariableI, error) {
 	return tvar.CreateVariable(v.Name(), value), nil
 }
 
+func (vt VarTable) GetVarByDotRef(dr dotref.DotRef) (tvar.VariableI, error) {
+	cur, err := vt.GetVar(dr.Name)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, field := range dr.Fields {
+		if field.FieldName == "" {
+			// list reference
+			if cur.Type() != tvar.TListType {
+				return nil, fmt.Errorf("indexing non-list type: %d -- %s", cur.Name, field.Index)
+			}
+			cur, err = cur.(tvar.TList).GetItem(field.Index)
+			if err != nil {
+				return nil, err
+			}
+			continue
+		}
+		// map reference
+		if cur.Type() != tvar.TMapType {
+			return nil, fmt.Errorf("field reference on a non-map type: %s -- %s", cur.Name, field.FieldName)
+		}
+		cur, err = cur.(tvar.TMap).GetMember(field.FieldName)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return cur, nil
+}
+
 func (vt VarTable) ResolveValue(refStr string) (interface{}, error) {
 	if !strings.HasPrefix(refStr, keywords.PrefixReference) {
 		// No resolution needed for constant value
@@ -92,31 +122,10 @@ func (vt VarTable) ResolveValue(refStr string) (interface{}, error) {
 	if err != nil {
 		return nil, err
 	}
-	cur, err := vt.GetVar(dr.Name)
+	value, err := vt.GetVarByDotRef(dr)
 	if err != nil {
-		return nil, err
-	}
-	for _, field := range dr.Fields {
-		if field.FieldName == "" {
-			// list reference
-			if cur.Type() != tvar.TListType {
-				return nil, fmt.Errorf("indexing non-list type: %d -- %s", field.Index, refStr)
-			}
-			cur, err = cur.(tvar.TList).GetItem(field.Index)
-			if err != nil {
-				return nil, err
-			}
-			continue
-		}
+		return nil, fmt.Errorf("%s\n\tfailed to resolve variable reference: %s", err, refStr)
 
-		// map reference
-		if cur.Type() != tvar.TMapType {
-			return nil, fmt.Errorf("field reference on a non-map type: %s -- %s", field.FieldName, refStr)
-		}
-		cur, err = cur.(tvar.TMap).GetMember(field.FieldName)
-		if err != nil {
-			return nil, err
-		}
 	}
-	return cur.Value(), nil
+	return value.Value(), err
 }
