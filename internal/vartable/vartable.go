@@ -58,10 +58,6 @@ func (vt *VarTable) Append(names []string, values []interface{}) {
 	}
 }
 
-func (vt *VarTable) AddVar(newVar tvar.VariableI) {
-	vt.vars[newVar.Name()] = newVar
-}
-
 func (vt *VarTable) AddVariables(newVars []tvar.VariableI) {
 	for _, v := range newVars {
 		vt.vars[v.Name()] = v
@@ -79,6 +75,7 @@ func (vt *VarTable) GetAllEnvVars() []string {
 }
 
 func (vt VarTable) ResolveVar(v tvar.VariableI) (tvar.VariableI, error) {
+	// TODO: handle composite types
 	value, err := vt.ResolveValue(v.ToStr())
 	if err != nil {
 		return nil, err

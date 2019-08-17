@@ -54,7 +54,7 @@ func createArgsVartable(argDefs []tvar.VariableI, vt vartable.VarTable) (vartabl
 		if err != nil {
 			return argsVarTable, err
 		}
-		argsVarTable.AddVar(argVar)
+		argsVarTable.Add(argVar)
 	}
 	return argsVarTable, nil
 }
