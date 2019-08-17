@@ -4,7 +4,6 @@ import (
 	"strings"
 
 	"github.com/kassybas/mate/internal/tcontext"
-	"github.com/kassybas/mate/internal/tvar"
 	"github.com/kassybas/mate/internal/vartable"
 	"github.com/kassybas/mate/types/opts"
 	"github.com/kassybas/mate/types/steptype"
@@ -37,12 +36,12 @@ func (s *VarStep) GetResult() Result {
 }
 func (s *VarStep) RunStep(ctx tcontext.Context, vt vartable.VarTable) error {
 	// TODO: eval variables
-	s.Results.ResultVars = make([]string, len(s.Definitions))
-	s.Results.ResultValue = make([]tvar.VariableI, len(s.Definitions))
+	s.Results.ResultNames = make([]string, len(s.Definitions))
+	s.Results.ResultValues = make([]interface{}, len(s.Definitions))
 	i := 0
 	for k, v := range s.Definitions {
-		s.Results.ResultVars[i] = k
-		s.Results.ResultValue[i] = tvar.CreateVariable(k, v)
+		s.Results.ResultNames[i] = k
+		s.Results.ResultValues[i] = v
 		i++
 	}
 	return nil

@@ -37,7 +37,7 @@ func mergeOpts(globalOpts, targetOpts, stepOpts opts.ExecutionOpts) opts.Executi
 	}
 }
 
-func (t Target) Run(ctx tcontext.Context, vt vartable.VarTable) ([]tvar.VariableI, int, error) {
+func (t Target) Run(ctx tcontext.Context, vt vartable.VarTable) ([]interface{}, int, error) {
 	vt.AddVariables(ctx.Globals)
 	vt, err := resolveParams(vt, t.Params)
 	if err != nil {
@@ -68,7 +68,7 @@ func (t Target) Run(ctx tcontext.Context, vt vartable.VarTable) ([]tvar.Variable
 	returnValues, err := createReturnValues(vt, t.Return)
 
 	if err != nil {
-		return returnValues, 0, fmt.Errorf("%s\n\tin target: %s", err.Error(), t.Name)
+		return nil, 0, fmt.Errorf("%s\n\tin target: %s", err.Error(), t.Name)
 
 	}
 
@@ -87,8 +87,8 @@ func updateResultVariables(vt vartable.VarTable, r Result) vartable.VarTable {
 		v := tvar.CreateVariable(r.StdrcVar, strconv.Itoa(r.StdrcValue))
 		vt.Add(v)
 	}
-	if r.ResultValue != nil {
-		vt.Append(r.ResultVars, r.ResultValue)
+	if r.ResultValues != nil {
+		vt.Append(r.ResultNames, r.ResultValues)
 	}
 	return vt
 }
@@ -114,8 +114,8 @@ func resolveParams(vt vartable.VarTable, params []Param) (vartable.VarTable, err
 	return vt, nil
 }
 
-func createReturnValues(vt vartable.VarTable, returnDefinition string) ([]tvar.VariableI, error) {
+func createReturnValues(vt vartable.VarTable, returnDefinition string) ([]interface{}, error) {
 	rv, err := vt.ResolveValue(returnDefinition)
-	rvs := []tvar.VariableI{rv}
+	rvs := []interface{}{rv}
 	return rvs, err
 }

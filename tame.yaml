@@ -103,13 +103,15 @@ targets:
           - but:
               my: love
     - shell: echo ${list_2_but_my}
-    - var:
-        $list[1].and: "new" # TODO :these do not work
-        # $mapme.again[0]: "hey"
-        # $list[1]: "yolo"
-    - shell: echo ${list_1_and}  #
-    - shell: echo ${mapme_again_0}
-    - shell: env
+    return: $list
+
+  mapme2:
+    body:
+      - call:
+          listme: ~
+        result: $l
+      - shell: echo ${l_2_but_my}
+
 
   test1:
     body:
@@ -137,12 +139,12 @@ targets:
 
 
 
-  # yolo:
-  #   body:
-  #     - var:
-  #         $myvar: "lovelyday"
-  #         $other: "notso good"
-  #         $and: "aaaand"
-  #     - shell: echo variable is $myvar
-  #     - shell: echo and is $other
-  #     - shell: echo $and
+  yolo:
+    body:
+      - var:
+          $myvar: "lovelyday"
+          $other: "notso good"
+      - shell: echo $myvar
+      - var:
+          $myvar.de: 1
+      - shell: echo $myvar_de

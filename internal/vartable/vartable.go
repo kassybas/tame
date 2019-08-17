@@ -51,10 +51,9 @@ func (vt *VarTable) Add(v tvar.VariableI) {
 	vt.vars[v.Name()] = v
 }
 
-func (vt *VarTable) Append(names []string, values []tvar.VariableI) {
+func (vt *VarTable) Append(names []string, values []interface{}) {
 	for i := range names {
-		rootName := strings.Split(names[i], keywords.TameFieldSeparator)[0]
-		v := tvar.CopyVariable(rootName, values[i])
+		v := tvar.CreateVariable(names[i], values[i])
 		vt.Add(v)
 	}
 }
@@ -91,11 +90,11 @@ func (vt VarTable) ResolveVar(v tvar.VariableI) (tvar.VariableI, error) {
 	return tvar.CreateVariable(v.Name(), resolvedVar.Value()), nil
 }
 
-func (vt VarTable) ResolveValue(refStr string) (tvar.VariableI, error) {
+func (vt VarTable) ResolveValue(refStr string) (interface{}, error) {
 	if !strings.HasPrefix(refStr, keywords.PrefixReference) {
 		// No resolution needed for constant value
-		return tvar.CreateVariable("", refStr), nil
+		return tvar.CreateVariable("", refStr).Value(), nil
 	}
 	resolvedVar, err := vt.GetVar(refStr)
-	return resolvedVar, err
+	return resolvedVar.Value(), err
 }

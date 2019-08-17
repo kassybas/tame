@@ -98,8 +98,6 @@ func MergeLists(origList, newList TList) (TList, error) {
 	if len(origList.value) < len(newList.value) {
 		return TList{}, fmt.Errorf("index out of range: %s[%d]", origList.name, len(newList.value)-1)
 	}
-	// fmt.Println("ORIG", origList)
-	// fmt.Println("NEW", newList)
 	for i := range newList.value {
 		if newList.value[i].Type() != TNullType {
 			origList.value[i] = newList.value[i]

@@ -40,7 +40,7 @@ func (s *CallStep) RunStep(ctx tcontext.Context, vt vartable.VarTable) error {
 	if err != nil {
 		return err
 	}
-	s.Results.ResultValue, s.Results.StdrcValue, err = s.CalledTarget.Run(ctx, args)
+	s.Results.ResultValues, s.Results.StdrcValue, err = s.CalledTarget.Run(ctx, args)
 	if err != nil {
 		err = fmt.Errorf("error during step: %s\n\t%s", s.Name, err.Error())
 	}

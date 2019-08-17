@@ -24,19 +24,27 @@ func CreateCompositeVariable(name string, value interface{}) VariableI {
 	last := len(fields) - 1
 	innerVar := CreateVariable(fields[last], value)
 	outerVar := CreateVariable(strings.Join(fields[:last], keywords.TameFieldSeparator), innerVar)
-	fmt.Println(outerVar)
 	return outerVar
 }
 
-func CreateListFromBracketsName(name string, value interface{}) (VariableI, error) {
+// returns the index and variable name
+func parseIndex(name string) (int, string, error) {
 	lBr := strings.Index(name, keywords.IndexingSeparatorL) + 1
 	rBr := strings.Index(name, keywords.IndexingSeparatorR)
 	index, err := strconv.Atoi(name[lBr:rBr])
 	if err != nil {
-		return nil, fmt.Errorf("not integer index: %s %s", name, name[lBr:rBr])
+		return 0, "", fmt.Errorf("not integer index: %s %s", name, name[lBr:rBr])
 	}
+	return index, name[0 : lBr-1], nil
+}
+
+func CreateListFromBracketsName(name string, value interface{}) (VariableI, error) {
 	var tl TList
-	tl.name = name[0 : lBr-1]
+	index, n, err := parseIndex(name)
+	if err != nil {
+		return tl, err
+	}
+	tl.name = n
 	tl.value = make([]VariableI, index+1)
 	for i := range tl.value {
 		// Null all values other than the index
@@ -89,7 +97,7 @@ func CreateVariable(name string, value interface{}) VariableI {
 	// Int
 	case int:
 		{
-			return &TInt{name: name, value: value.(int)}
+			return TInt{name: name, value: value.(int)}
 		}
 	case TInt:
 		{
@@ -133,7 +141,7 @@ func CreateVariable(name string, value interface{}) VariableI {
 	// Undefined
 	default:
 		{
-			logrus.Fatalf("Undeterminable variable type for: %s -- %T", name, value)
+			logrus.Fatalf("Internal error: undeterminable variable type for %s -- %T", name, value)
 		}
 	}
 	return nil

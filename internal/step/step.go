@@ -1,7 +1,6 @@
 package step
 
 import (
-	"github.com/kassybas/mate/internal/tvar"
 	"github.com/kassybas/mate/internal/vartable"
 
 	"github.com/kassybas/mate/internal/tcontext"
@@ -22,13 +21,12 @@ type Step interface {
 
 // TODO: make result a variable interface
 type Result struct {
-	StdoutVar   string
-	StdoutValue string
-	StderrVar   string
-	StderrValue string
-	StdrcVar    string
-	StdrcValue  int
-	ResultVars  []string
-	ResultValue []tvar.VariableI
-	// ResultValue interface{}
+	StdoutVar    string
+	StdoutValue  string
+	StderrVar    string
+	StderrValue  string
+	StdrcVar     string
+	StdrcValue   int
+	ResultNames  []string
+	ResultValues []interface{}
 }
