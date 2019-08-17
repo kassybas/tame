@@ -2,33 +2,12 @@ package helpers
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 
 	"github.com/kassybas/mate/internal/keywords"
-	"github.com/kassybas/mate/internal/step"
 	"github.com/kassybas/mate/types/opts"
 )
-
-func PrintTeafileDescription(targets map[string]step.Target) {
-	fmt.Println("Available targets:")
-	for k, v := range targets {
-		fmt.Printf("- %s", k)
-		if v.Params == nil {
-			fmt.Println()
-			continue
-		}
-		fmt.Print(":\n")
-		fmt.Printf("    @params: ")
-
-		for _, p := range v.Params {
-			fmt.Printf("%s", p.Name)
-			if p.HasDefault {
-				fmt.Printf(" (default: %s), ", p.DefaultValue)
-			}
-		}
-		fmt.Printf("\n")
-	}
-}
 
 func GetKeyValueFromEnvString(envStr string) (string, string, error) {
 	if !strings.Contains(envStr, "=") {
@@ -55,4 +34,15 @@ func BuildOpts(optsDef []string) (opts.ExecutionOpts, error) {
 		}
 	}
 	return opts, nil
+}
+
+// returns the index and variable name
+func ParseIndex(name string) (int, string, error) {
+	lBr := strings.Index(name, keywords.IndexingSeparatorL) + 1
+	rBr := strings.Index(name, keywords.IndexingSeparatorR)
+	index, err := strconv.Atoi(name[lBr:rBr])
+	if err != nil {
+		return 0, "", fmt.Errorf("not integer index: %s %s", name, name[lBr:rBr])
+	}
+	return index, name[0 : lBr-1], nil
 }

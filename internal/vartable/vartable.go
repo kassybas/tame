@@ -6,6 +6,7 @@ import (
 
 	"github.com/sirupsen/logrus"
 
+	"github.com/kassybas/mate/internal/dotref"
 	"github.com/kassybas/mate/internal/keywords"
 	"github.com/kassybas/mate/internal/tvar"
 )
@@ -46,7 +47,6 @@ func (vt *VarTable) Add(v tvar.VariableI) {
 				logrus.Fatal(err)
 			}
 		}
-
 	}
 	vt.vars[v.Name()] = v
 }
@@ -79,22 +79,47 @@ func (vt *VarTable) GetAllEnvVars() []string {
 }
 
 func (vt VarTable) ResolveVar(v tvar.VariableI) (tvar.VariableI, error) {
-	if !strings.HasPrefix(v.ToStr(), keywords.PrefixReference) {
-		// No resolution needed for constant value
-		return v, nil
-	}
-	resolvedVar, err := vt.GetVar(v.ToStr())
+	value, err := vt.ResolveValue(v.ToStr())
 	if err != nil {
 		return nil, err
 	}
-	return tvar.CreateVariable(v.Name(), resolvedVar.Value()), nil
+	return tvar.CreateVariable(v.Name(), value), nil
 }
 
 func (vt VarTable) ResolveValue(refStr string) (interface{}, error) {
 	if !strings.HasPrefix(refStr, keywords.PrefixReference) {
 		// No resolution needed for constant value
-		return tvar.CreateVariable("", refStr).Value(), nil
+		return refStr, nil
 	}
-	resolvedVar, err := vt.GetVar(refStr)
-	return resolvedVar.Value(), err
+	dr, err := dotref.NewReference(refStr, nil)
+	if err != nil {
+		return nil, err
+	}
+	cur, err := vt.GetVar(dr.Name)
+	if err != nil {
+		return nil, err
+	}
+	for _, field := range dr.Fields {
+		if field.FieldName == "" {
+			// list reference
+			if cur.Type() != tvar.TListType {
+				return nil, fmt.Errorf("indexing non-list type: %d -- %s", field.Index, refStr)
+			}
+			cur, err = cur.(tvar.TList).GetItem(field.Index)
+			if err != nil {
+				return nil, err
+			}
+			continue
+		}
+
+		// map reference
+		if cur.Type() != tvar.TMapType {
+			return nil, fmt.Errorf("field reference on a non-map type: %s -- %s", field.FieldName, refStr)
+		}
+		cur, err = cur.(tvar.TMap).GetMember(field.FieldName)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return cur.Value(), nil
 }

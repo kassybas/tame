@@ -56,6 +56,14 @@ func (tm TMap) IsMember(key string) bool {
 	return exist
 }
 
+func (tm TMap) GetMember(key string) (VariableI, error) {
+	v, exist := tm.value[key]
+	if !exist {
+		return nil, fmt.Errorf("variable is not member of map: %s :: %s", tm.name, key)
+	}
+	return v, nil
+}
+
 func CreateMap(name string, value map[interface{}]interface{}) TMap {
 	var tm TMap
 	tm.name = name

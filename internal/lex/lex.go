@@ -6,6 +6,7 @@ import (
 	"github.com/kassybas/mate/schema"
 
 	"github.com/kassybas/mate/internal/helpers"
+	"github.com/kassybas/mate/internal/helpscreen"
 	"github.com/kassybas/mate/internal/parse"
 	"github.com/kassybas/mate/internal/step"
 	"github.com/kassybas/mate/internal/tvar"
@@ -28,7 +29,7 @@ func createDependencyGraph(targets map[string]step.Target, targetName string, cl
 	var root step.CallStep
 	var err error
 	// TODO: Remove parse CLI args from this
-	root.Name = "root"
+	root.Name = targetName
 	root.CalledTargetName = targetName
 	root.Arguments, err = parseCLITargetArgs(cliVarArgs)
 	if err != nil {
@@ -53,7 +54,7 @@ func Analyse(tf schema.Tamefile, targetName string, cliVarArgs []string) (step.S
 	}
 
 	if targetName == "" {
-		helpers.PrintTeafileDescription(parsedTargets)
+		helpscreen.PrintTeafileDescription(parsedTargets)
 		os.Exit(0)
 	}
 

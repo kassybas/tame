@@ -1,6 +1,7 @@
 package tvar
 
 import (
+	"fmt"
 	"strconv"
 	"strings"
 
@@ -37,6 +38,13 @@ func (v TList) ToInt() (int, error) {
 func (v TList) ToStr() string {
 	return ""
 	// return v.value.(string)
+}
+
+func (v TList) GetItem(i int) (VariableI, error) {
+	if len(v.value) <= i {
+		return nil, fmt.Errorf("index out of range: %s -- %d", v.name, i)
+	}
+	return v.value[i], nil
 }
 
 func (v TList) ToEnvVars() []string {

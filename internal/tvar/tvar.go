@@ -1,10 +1,10 @@
 package tvar
 
 import (
-	"fmt"
 	"strconv"
 	"strings"
 
+	"github.com/kassybas/mate/internal/helpers"
 	"github.com/kassybas/mate/internal/keywords"
 	"github.com/sirupsen/logrus"
 )
@@ -27,20 +27,9 @@ func CreateCompositeVariable(name string, value interface{}) VariableI {
 	return outerVar
 }
 
-// returns the index and variable name
-func parseIndex(name string) (int, string, error) {
-	lBr := strings.Index(name, keywords.IndexingSeparatorL) + 1
-	rBr := strings.Index(name, keywords.IndexingSeparatorR)
-	index, err := strconv.Atoi(name[lBr:rBr])
-	if err != nil {
-		return 0, "", fmt.Errorf("not integer index: %s %s", name, name[lBr:rBr])
-	}
-	return index, name[0 : lBr-1], nil
-}
-
 func CreateListFromBracketsName(name string, value interface{}) (VariableI, error) {
 	var tl TList
-	index, n, err := parseIndex(name)
+	index, n, err := helpers.ParseIndex(name)
 	if err != nil {
 		return tl, err
 	}

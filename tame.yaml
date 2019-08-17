@@ -142,9 +142,21 @@ targets:
   yolo:
     body:
       - var:
-          $myvar: "lovelyday"
-          $other: "notso good"
-      - shell: echo $myvar
-      - var:
-          $myvar.de: 1
-      - shell: echo $myvar_de
+          $myvar:
+            name: john
+            age: 12
+            kids:
+              - maria
+              - santa
+              - jo:
+                  age: 12
+      # - shell: echo $myvar_name
+    return: $myvar.kids
+
+  caller:
+      body:
+        - call:
+            yolo: ~
+          result: $ok
+        - shell: env | grep ok
+        - shell: echo $ok_2_jo_age

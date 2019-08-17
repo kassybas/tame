@@ -1,12 +1,11 @@
 
 # TODOs
 
-- populateVarStep + other createVariable error handling
-- vartable creates env_vars even if nothing has changes (should reuse previous one)
-- make lists work
-- document variables and conversions
-- do not create list from dotnotation be default
+- should map + list throw error if created by dot reference?
 
-- die if index out of bound or nonexistent list
-- resolve in names
+- vartable creates env_vars even if nothing has changes (should reuse previous one)
+- document variables and conversions
+
+- resolve $values in variable names
 - make field separators configurable
+- non-string map keys
