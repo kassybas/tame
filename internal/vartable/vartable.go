@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/sirupsen/logrus"
-
 	"github.com/kassybas/mate/internal/dotref"
 	"github.com/kassybas/mate/internal/keywords"
 	"github.com/kassybas/mate/internal/tvar"
@@ -34,7 +32,7 @@ func NewVarTable() VarTable {
 	return vt
 }
 
-func (vt *VarTable) Add(v tvar.VariableI) {
+func (vt *VarTable) Add(v tvar.VariableI) error {
 	oldVar, err := vt.GetVar(v.Name())
 	// if already exists
 	if err == nil {
@@ -44,18 +42,34 @@ func (vt *VarTable) Add(v tvar.VariableI) {
 		if oldVar.Type() == tvar.TListType && v.Type() == tvar.TListType {
 			v, err = tvar.MergeLists(oldVar.(tvar.TList), v.(tvar.TList))
 			if err != nil {
-				logrus.Fatal(err)
+				return err
 			}
 		}
 	}
 	vt.vars[v.Name()] = v
+	return nil
 }
 
-func (vt *VarTable) Append(names []string, values []interface{}) {
+func (vt *VarTable) Append(names []string, values []interface{}) error {
 	for i := range names {
+		if dotref.IsDotRef(names[i]) {
+			dr, err := dotref.NewReference(names[i], values)
+			if err != nil {
+				return err
+			}
+			origVar, err := vt.GetVar(dr.Name)
+			if err != nil {
+				return fmt.Errorf("%s\n\treferenced result variable or field does not exist: %s", err, names[i])
+			}
+			err = tvar.ValidateUpdate(origVar, dr)
+			if err != nil {
+				return err
+			}
+		}
 		v := tvar.CreateVariable(names[i], values[i])
 		vt.Add(v)
 	}
+	return nil
 }
 
 func (vt *VarTable) AddVariables(newVars []tvar.VariableI) {
@@ -75,7 +89,6 @@ func (vt *VarTable) GetAllEnvVars() []string {
 }
 
 func (vt VarTable) ResolveVar(v tvar.VariableI) (tvar.VariableI, error) {
-	// TODO: handle composite types
 	value, err := vt.ResolveValue(v.ToStr())
 	if err != nil {
 		return nil, err
@@ -93,7 +106,7 @@ func (vt VarTable) GetVarByDotRef(dr dotref.DotRef) (tvar.VariableI, error) {
 		if field.FieldName == "" {
 			// list reference
 			if cur.Type() != tvar.TListType {
-				return nil, fmt.Errorf("indexing non-list type: %d -- %s", cur.Name, field.Index)
+				return nil, fmt.Errorf("indexing non-list type: %s[%d] (type: %s)", cur.Name(), field.Index, tvar.GetTypeNameString(cur.Type()))
 			}
 			cur, err = cur.(tvar.TList).GetItem(field.Index)
 			if err != nil {
@@ -103,7 +116,7 @@ func (vt VarTable) GetVarByDotRef(dr dotref.DotRef) (tvar.VariableI, error) {
 		}
 		// map reference
 		if cur.Type() != tvar.TMapType {
-			return nil, fmt.Errorf("field reference on a non-map type: %s -- %s", cur.Name, field.FieldName)
+			return nil, fmt.Errorf("field reference on a non-map type: %s.%s (type: %s)", cur.Name(), field.FieldName, tvar.GetTypeNameString(cur.Type()))
 		}
 		cur, err = cur.(tvar.TMap).GetMember(field.FieldName)
 		if err != nil {

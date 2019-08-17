@@ -152,3 +152,38 @@ const (
 	TBoolType
 	TNullType
 )
+
+func GetTypeNameString(t TVarType) string {
+	switch t {
+	case TStringType:
+		{
+			return "TStringType"
+		}
+	case TIntType:
+		{
+			return "TIntType"
+		}
+	case TFloatType:
+		{
+			return "TFloatType"
+		}
+	case TListType:
+		{
+			return "TListType"
+		}
+	case TMapType:
+		{
+			return "TMapType"
+		}
+	case TBoolType:
+		{
+			return "TBoolType"
+		}
+	case TNullType:
+		{
+			return "TNullType"
+		}
+	default:
+		return "TUnknownType"
+	}
+}

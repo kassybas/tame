@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/kassybas/mate/internal/dotref"
 	"github.com/kassybas/mate/internal/keywords"
 )
 
@@ -59,7 +60,7 @@ func (tm TMap) IsMember(key string) bool {
 func (tm TMap) GetMember(key string) (VariableI, error) {
 	v, exist := tm.value[key]
 	if !exist {
-		return nil, fmt.Errorf("variable is not member of map: %s :: %s", tm.name, key)
+		return nil, fmt.Errorf("field is not member of map: %s.%s", tm.name, key)
 	}
 	return v, nil
 }
@@ -72,6 +73,38 @@ func CreateMap(name string, value map[interface{}]interface{}) TMap {
 		tm.value[k.(string)] = CreateVariable(k.(string), v)
 	}
 	return tm
+}
+
+func ValidateUpdate(origVar VariableI, dr dotref.DotRef) error {
+	if len(dr.Fields) == 0 {
+		return nil
+	}
+	var err error
+	cur := origVar
+	lastField := len(dr.Fields) - 1
+	for i, field := range dr.Fields {
+		if field.FieldName == "" {
+			if cur.Type() != TListType {
+				return fmt.Errorf("indexing non-list type: %s[%d] (type: %s)", cur.Name(), field.Index, GetTypeNameString(cur.Type()))
+			}
+			cur, err = cur.(TList).GetItem(field.Index)
+			if err != nil {
+				return err
+			}
+			continue
+		}
+		if cur.Type() != TMapType {
+			return fmt.Errorf("field reference on a non-map type: %s.%s (type: %s)", cur.Name(), field.FieldName, GetTypeNameString(cur.Type()))
+		}
+		// last field can be added to the map
+		if i != lastField {
+			cur, err = cur.(TMap).GetMember(field.FieldName)
+			if err != nil {
+				return err
+			}
+		}
+	}
+	return nil
 }
 
 func UpdateCompositeValue(origVar, newField VariableI) VariableI {

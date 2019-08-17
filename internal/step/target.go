@@ -62,7 +62,10 @@ func (t Target) Run(ctx tcontext.Context, vt vartable.VarTable) ([]interface{}, 
 				return nil, s.GetResult().StdrcValue, nil
 			}
 		}
-		vt = updateResultVariables(vt, s.GetResult())
+		vt, err = updateResultVariables(vt, s.GetResult())
+		if err != nil {
+			return nil, 0, err
+		}
 	}
 
 	returnValues, err := createReturnValues(vt, t.Return)
@@ -74,7 +77,7 @@ func (t Target) Run(ctx tcontext.Context, vt vartable.VarTable) ([]interface{}, 
 
 	return returnValues, 0, err
 }
-func updateResultVariables(vt vartable.VarTable, r Result) vartable.VarTable {
+func updateResultVariables(vt vartable.VarTable, r Result) (vartable.VarTable, error) {
 	if r.StdoutVar != "" {
 		v := tvar.CreateVariable(r.StdoutVar, r.StdoutValue)
 		vt.Add(v)
@@ -88,9 +91,12 @@ func updateResultVariables(vt vartable.VarTable, r Result) vartable.VarTable {
 		vt.Add(v)
 	}
 	if r.ResultValues != nil {
-		vt.Append(r.ResultNames, r.ResultValues)
+		err := vt.Append(r.ResultNames, r.ResultValues)
+		if err != nil {
+			return vt, err
+		}
 	}
-	return vt
+	return vt, nil
 }
 
 func resolveParams(vt vartable.VarTable, params []Param) (vartable.VarTable, error) {

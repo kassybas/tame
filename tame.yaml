@@ -135,10 +135,6 @@ targets:
       - shell: echo ${hello_1}
 
 
-
-
-
-
   yolo:
     body:
       - var:
@@ -160,3 +156,15 @@ targets:
           result: $ok
         - shell: env | grep ok
         - shell: echo $ok_2_jo_age
+
+  failme:
+      body:
+        - var:
+            $hello:
+              -
+                  - asdf
+                  - 2asdf
+              - again: a234
+        - var:
+            $hello[1].again: followme
+        - shell: env | grep hello
