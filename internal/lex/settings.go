@@ -16,6 +16,7 @@ func BuildSettings(tfs schema.SettingsDefintion) (settings.Settings, error) {
 		UsedShell:  tfs.Shell,
 		InitScript: tfs.Init,
 		GlobalOpts: opts,
+		ShieldEnv:  tfs.ShieldEnv,
 	}
 
 	return s, nil

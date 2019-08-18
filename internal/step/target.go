@@ -67,16 +67,13 @@ func (t Target) Run(ctx tcontext.Context, vt vartable.VarTable) ([]interface{}, 
 			return nil, 0, err
 		}
 	}
-
 	returnValues, err := createReturnValues(vt, t.Return)
-
 	if err != nil {
 		return nil, 0, fmt.Errorf("%s\n\tin target: %s", err.Error(), t.Name)
-
 	}
-
 	return returnValues, 0, err
 }
+
 func updateResultVariables(vt vartable.VarTable, r Result) (vartable.VarTable, error) {
 	if r.StdoutVar != "" {
 		v := tvar.CreateVariable(r.StdoutVar, r.StdoutValue)

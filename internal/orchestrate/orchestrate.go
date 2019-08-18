@@ -2,6 +2,9 @@ package orchestrate
 
 import (
 	"os"
+	"strings"
+
+	"github.com/kassybas/mate/internal/keywords"
 
 	"github.com/kassybas/mate/internal/vartable"
 
@@ -13,13 +16,28 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func EvaluateGlobals(globalDefs map[string]string) ([]tvar.VariableI, error) {
-	// TODO
-	return nil, nil
+func EvaluateGlobals(globalDefs map[string]interface{}) ([]tvar.VariableI, error) {
+	var vars []tvar.VariableI
+	for k, v := range globalDefs {
+		if strings.HasSuffix(k, keywords.GlobalDefaultVarSuffix) {
+			name := strings.TrimSuffix(k, keywords.GlobalDefaultVarSuffix)
+			name = strings.TrimSpace(name)
+			sysEnvValue, sysEnvExists := os.LookupEnv(name)
+			var value interface{}
+			if sysEnvExists {
+				value = sysEnvValue
+			} else {
+				value = v
+			}
+			vars = append(vars, tvar.CreateVariable(name, value))
+			continue
+		}
+		vars = append(vars, tvar.CreateVariable(k, v))
+	}
+	return vars, nil
 }
 
 func CreateContext(globals []tvar.VariableI, sts settings.Settings) (tcontext.Context, error) {
-	// TODO
 	return tcontext.Context{
 		Globals:  globals,
 		Settings: sts,

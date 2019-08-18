@@ -28,7 +28,6 @@ func parseCLITargetArgs(targetArgs []string) ([]tvar.VariableI, error) {
 func createDependencyGraph(targets map[string]step.Target, targetName string, cliVarArgs []string) (step.Step, error) {
 	var root step.CallStep
 	var err error
-	// TODO: Remove parse CLI args from this
 	root.Name = targetName
 	root.CalledTargetName = targetName
 	root.Arguments, err = parseCLITargetArgs(cliVarArgs)
@@ -46,7 +45,7 @@ func createDependencyGraph(targets map[string]step.Target, targetName string, cl
 }
 
 // Analyse creates the internal representation
-func Analyse(tf schema.Tamefile, targetName string, cliVarArgs []string) (step.Step, map[string]string, error) {
+func Analyse(tf schema.Tamefile, targetName string, cliVarArgs []string) (step.Step, map[string]interface{}, error) {
 
 	parsedTargets, err := parse.ParseTeafile(tf)
 	if err != nil {

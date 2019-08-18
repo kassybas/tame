@@ -51,6 +51,7 @@ func (s *ShellStep) RunStep(ctx tcontext.Context, vt vartable.VarTable) error {
 		Silent:       s.Opts.Silent,
 		ShellPath:    ctx.Settings.UsedShell,
 		IgnoreResult: ignoreResult,
+		ShieldEnv:    ctx.Settings.ShieldEnv,
 	}
 	envVars := vt.GetAllEnvVars()
 	prefixedScript := ctx.Settings.InitScript + "\n" + s.Script

@@ -1,14 +1,14 @@
 package schema
 
 type Tamefile struct {
-	TameVersion string                      `yaml:"tame-version,omitempty"`
+	TameVersion string                      `yaml:"tameVersion,omitempty"`
 	Includes    []string                    `yaml:"include,omitempty"`
 	Loads       []string                    `yaml:"load,omitempty"`
 	Sets        SettingsDefintion           `yaml:"settings,omitempty"`
-	Globals     map[string]string           `yaml:"globals,omitempty"`
+	Globals     map[string]interface{}      `yaml:"globals,omitempty"`
 	Targets     map[string]TargetDefinition `yaml:"targets,omitempty"`
 
-	WorkDir        string            `yaml:"work-dir,omitempty"`
+	WorkDir        string            `yaml:"workDir,omitempty"`
 	DefaultEnvVars map[string]string `yaml:"defaults,omitempty"`
 }
 
@@ -35,4 +35,5 @@ type SettingsDefintion struct {
 	Shell      string   `yaml:"shell,omitempty"`
 	Init       string   `yaml:"init,omitempty"`
 	GlobalOpts []string `yaml:"opts,omitempty"`
+	ShieldEnv  bool     `yaml:"shieldEnv,omitempty"`
 }
