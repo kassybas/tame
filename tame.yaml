@@ -9,4 +9,6 @@ globals:
 targets:
   echo:
     body:
-      - shell: echo $yolo
+      - sh: echo $okay
+        $: $myvar
+      - sh: echo good-$myvar

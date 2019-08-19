@@ -21,14 +21,14 @@ type TargetDefinition struct {
 }
 
 type StepDefinition struct {
-	Shell  string                       `yaml:"shell,omitempty"`
+	Shell  string                       `yaml:"sh,omitempty"`
 	Call   map[string]map[string]string `yaml:"call,omitempty"`
 	Var    map[string]interface{}       `yaml:"var,omitempty"`
 	Result string                       `yaml:"result,omitempty"`
 	Opts   []string                     `yaml:"opts,omitempty"`
-	Out    string                       `yaml:"out,omitempty"`
-	Err    string                       `yaml:"err,omitempty"`
-	Rc     string                       `yaml:"rc,omitempty"`
+	Out    string                       `yaml:"$,omitempty"`
+	Err    string                       `yaml:"err$,omitempty"`
+	Rc     string                       `yaml:"status$,omitempty"`
 }
 
 type SettingsDefintion struct {
