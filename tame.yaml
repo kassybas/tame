@@ -8,7 +8,7 @@ globals:
 
 targets:
   echo:
-    body:
-      - sh: echo $okay
-        $: $myvar
-      - sh: echo good-$myvar
+    run:
+    - sh: echo $okay
+      $: $myvar
+    - sh: echo good-$myvar
