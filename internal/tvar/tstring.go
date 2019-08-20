@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/kassybas/mate/internal/keywords"
+	"github.com/kassybas/mate/types/vartype"
 )
 
 type TString struct {
@@ -16,8 +17,8 @@ func (v TString) IsScalar() bool {
 	return true
 }
 
-func (v TString) Type() TVarType {
-	return TStringType
+func (v TString) Type() vartype.TVarType {
+	return vartype.TStringType
 }
 
 func (v TString) Name() string {

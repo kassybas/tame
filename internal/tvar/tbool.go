@@ -4,6 +4,7 @@ import (
 	"strings"
 
 	"github.com/kassybas/mate/internal/keywords"
+	"github.com/kassybas/mate/types/vartype"
 )
 
 type TBool struct {
@@ -15,8 +16,8 @@ func (v TBool) IsScalar() bool {
 	return true
 }
 
-func (v TBool) Type() TVarType {
-	return TBoolType
+func (v TBool) Type() vartype.TVarType {
+	return vartype.TBoolType
 }
 
 func (v TBool) Name() string {

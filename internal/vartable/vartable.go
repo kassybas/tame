@@ -7,6 +7,7 @@ import (
 	"github.com/kassybas/mate/internal/dotref"
 	"github.com/kassybas/mate/internal/keywords"
 	"github.com/kassybas/mate/internal/tvar"
+	"github.com/kassybas/mate/types/vartype"
 )
 
 type VarTable struct {
@@ -36,10 +37,10 @@ func (vt *VarTable) Add(v tvar.VariableI) error {
 	oldVar, err := vt.GetVar(v.Name())
 	// if already exists
 	if err == nil {
-		if oldVar.Type() == tvar.TMapType {
+		if oldVar.Type() == vartype.TMapType {
 			v = tvar.UpdateCompositeValue(oldVar, v)
 		}
-		if oldVar.Type() == tvar.TListType && v.Type() == tvar.TListType {
+		if oldVar.Type() == vartype.TListType && v.Type() == vartype.TListType {
 			v, err = tvar.MergeLists(oldVar.(tvar.TList), v.(tvar.TList))
 			if err != nil {
 				return err
@@ -105,8 +106,8 @@ func (vt VarTable) GetVarByDotRef(dr dotref.DotRef) (tvar.VariableI, error) {
 	for _, field := range dr.Fields {
 		if field.FieldName == "" {
 			// list reference
-			if cur.Type() != tvar.TListType {
-				return nil, fmt.Errorf("indexing non-list type: %s[%d] (type: %s)", cur.Name(), field.Index, tvar.GetTypeNameString(cur.Type()))
+			if cur.Type() != vartype.TListType {
+				return nil, fmt.Errorf("indexing non-list type: %s[%d] (type: %s)", cur.Name(), field.Index, vartype.GetTypeNameString(cur.Type()))
 			}
 			cur, err = cur.(tvar.TList).GetItem(field.Index)
 			if err != nil {
@@ -115,8 +116,8 @@ func (vt VarTable) GetVarByDotRef(dr dotref.DotRef) (tvar.VariableI, error) {
 			continue
 		}
 		// map reference
-		if cur.Type() != tvar.TMapType {
-			return nil, fmt.Errorf("field reference on a non-map type: %s.%s (type: %s)", cur.Name(), field.FieldName, tvar.GetTypeNameString(cur.Type()))
+		if cur.Type() != vartype.TMapType {
+			return nil, fmt.Errorf("field reference on a non-map type: %s.%s (type: %s)", cur.Name(), field.FieldName, vartype.GetTypeNameString(cur.Type()))
 		}
 		cur, err = cur.(tvar.TMap).GetMember(field.FieldName)
 		if err != nil {

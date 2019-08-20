@@ -1,11 +1,13 @@
 package tvar
 
+import "github.com/kassybas/mate/types/vartype"
+
 type TNull struct {
 	name string
 }
 
-func (v TNull) Type() TVarType {
-	return TNullType
+func (v TNull) Type() vartype.TVarType {
+	return vartype.TNullType
 }
 
 func (v TNull) IsScalar() bool {

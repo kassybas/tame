@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/kassybas/mate/internal/keywords"
+	"github.com/kassybas/mate/types/vartype"
 )
 
 type TList struct {
@@ -13,8 +14,8 @@ type TList struct {
 	value []VariableI
 }
 
-func (v TList) Type() TVarType {
-	return TListType
+func (v TList) Type() vartype.TVarType {
+	return vartype.TListType
 }
 
 func (v TList) IsScalar() bool {

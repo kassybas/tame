@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/kassybas/mate/internal/keywords"
+	"github.com/kassybas/mate/types/vartype"
 )
 
 type TFloat struct {
@@ -16,8 +17,8 @@ func (v TFloat) IsScalar() bool {
 	return true
 }
 
-func (v TFloat) Type() TVarType {
-	return TFloatType
+func (v TFloat) Type() vartype.TVarType {
+	return vartype.TFloatType
 }
 
 func (v TFloat) Name() string {

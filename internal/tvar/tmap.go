@@ -6,6 +6,7 @@ import (
 
 	"github.com/kassybas/mate/internal/dotref"
 	"github.com/kassybas/mate/internal/keywords"
+	"github.com/kassybas/mate/types/vartype"
 )
 
 type TMap struct {
@@ -13,8 +14,8 @@ type TMap struct {
 	value map[string]VariableI
 }
 
-func (v TMap) Type() TVarType {
-	return TMapType
+func (v TMap) Type() vartype.TVarType {
+	return vartype.TMapType
 }
 
 func (v TMap) IsScalar() bool {
@@ -84,8 +85,8 @@ func ValidateUpdate(origVar VariableI, dr dotref.DotRef) error {
 	lastField := len(dr.Fields) - 1
 	for i, field := range dr.Fields {
 		if field.FieldName == "" {
-			if cur.Type() != TListType {
-				return fmt.Errorf("indexing non-list type: %s[%d] (type: %s)", cur.Name(), field.Index, GetTypeNameString(cur.Type()))
+			if cur.Type() != vartype.TListType {
+				return fmt.Errorf("indexing non-list type: %s[%d] (type: %s)", cur.Name(), field.Index, vartype.GetTypeNameString(cur.Type()))
 			}
 			cur, err = cur.(TList).GetItem(field.Index)
 			if err != nil {
@@ -93,8 +94,8 @@ func ValidateUpdate(origVar VariableI, dr dotref.DotRef) error {
 			}
 			continue
 		}
-		if cur.Type() != TMapType {
-			return fmt.Errorf("field reference on a non-map type: %s.%s (type: %s)", cur.Name(), field.FieldName, GetTypeNameString(cur.Type()))
+		if cur.Type() != vartype.TMapType {
+			return fmt.Errorf("field reference on a non-map type: %s.%s (type: %s)", cur.Name(), field.FieldName, vartype.GetTypeNameString(cur.Type()))
 		}
 		// last fields can be added to the map
 		if i != lastField {
@@ -108,7 +109,7 @@ func ValidateUpdate(origVar VariableI, dr dotref.DotRef) error {
 }
 
 func UpdateCompositeValue(origVar, newField VariableI) VariableI {
-	if newField.Type() != TMapType {
+	if newField.Type() != vartype.TMapType {
 		return newField
 	}
 	origM := origVar.(TMap)
@@ -116,7 +117,7 @@ func UpdateCompositeValue(origVar, newField VariableI) VariableI {
 
 	for k, newVal := range newM.value {
 		member, exists := origM.value[k]
-		if exists && member.Type() != TMapType {
+		if exists && member.Type() != vartype.TMapType {
 			// scalar update
 			origM.value[k] = newVal
 			continue
@@ -140,7 +141,7 @@ func MergeLists(origList, newList TList) (TList, error) {
 		return TList{}, fmt.Errorf("index out of range: %s[%d]", origList.name, len(newList.value)-1)
 	}
 	for i := range newList.value {
-		if newList.value[i].Type() != TNullType {
+		if newList.value[i].Type() != vartype.TNullType {
 			origList.value[i] = newList.value[i]
 		}
 	}
