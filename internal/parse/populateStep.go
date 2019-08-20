@@ -19,7 +19,7 @@ func populateCallStep(newStep *step.CallStep, stepDef schema.StepDefinition) err
 		return fmt.Errorf("multiple calls defined in single step: %s", keys)
 	}
 	newStep.CalledTargetName = keys[0]
-	newStep.Results.ResultNames = []string{stepDef.Result}
+	newStep.Results.ResultNames = []string{stepDef.Out}
 	newStep.Arguments, err = buildArguments(stepDef.Call[newStep.CalledTargetName])
 	return err
 }
