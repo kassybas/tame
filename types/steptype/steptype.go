@@ -7,4 +7,5 @@ const (
 	Call
 	Shell
 	Var
+	Return
 )

@@ -55,7 +55,7 @@ func (s *ShellStep) RunStep(ctx tcontext.Context, vt vartable.VarTable) error {
 	}
 	envVars := vt.GetAllEnvVars()
 	prefixedScript := ctx.Settings.InitScript + "\n" + s.Script
-	s.Results.StdoutValue, s.Results.StderrValue, s.Results.StdrcValue, err = exec.ShellExec(prefixedScript, envVars, opts)
+	s.Results.StdoutValue, s.Results.StderrValue, s.Results.StdStatusValue, err = exec.ShellExec(prefixedScript, envVars, opts)
 
 	return err
 }

@@ -24,9 +24,6 @@ func Load(filePath string) (schema.Tamefile, error) {
 
 	t := schema.Tamefile{}
 
-	// Setting default opts here to be able to differentiate
-	// between the empty opt (go default) and unset opt
-	// t.Sets.DefaultOptsDefinition = keywords.OptsNotSet
 	err = yaml.UnmarshalStrict([]byte(fc), &t)
 	return t, err
 }

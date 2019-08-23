@@ -72,5 +72,5 @@ func Make(path, targetName string, targetArgs []string) {
 		logrus.Fatal("error during execution: ", err.Error())
 	}
 	// pass through the status code
-	os.Exit(root.GetResult().StdrcValue)
+	os.Exit(root.GetResult().StdStatusValue)
 }

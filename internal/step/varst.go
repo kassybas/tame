@@ -1,8 +1,6 @@
 package step
 
 import (
-	"strings"
-
 	"github.com/kassybas/mate/internal/tcontext"
 	"github.com/kassybas/mate/internal/vartable"
 	"github.com/kassybas/mate/types/opts"
@@ -10,17 +8,14 @@ import (
 )
 
 type VarStep struct {
-	Definitions map[string]interface{} // tvar.VariableI
-	Opts        opts.ExecutionOpts
-	Results     Result
+	Definition interface{}
+	Opts       opts.ExecutionOpts
+	Results    Result
+	Name       string
 }
 
 func (s VarStep) GetName() string {
-	keys := make([]string, 0, len(s.Definitions))
-	for key := range s.Definitions {
-		keys = append(keys, key)
-	}
-	return strings.Join(keys, ",")
+	return s.Name
 }
 
 func (s *VarStep) Kind() steptype.Steptype {
@@ -36,14 +31,8 @@ func (s *VarStep) GetResult() Result {
 }
 func (s *VarStep) RunStep(ctx tcontext.Context, vt vartable.VarTable) error {
 	// TODO: eval variables
-	s.Results.ResultNames = make([]string, len(s.Definitions))
-	s.Results.ResultValues = make([]interface{}, len(s.Definitions))
-	i := 0
-	for k, v := range s.Definitions {
-		s.Results.ResultNames[i] = k
-		s.Results.ResultValues[i] = v
-		i++
-	}
+	s.Results.ResultNames = []string{s.Name}
+	s.Results.ResultValues = []interface{}{s.Definition}
 	return nil
 }
 

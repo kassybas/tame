@@ -27,6 +27,10 @@ func BuildOpts(optsDef []string) (opts.ExecutionOpts, error) {
 			{
 				opts.Silent = true
 			}
+		case keywords.OptCanFail:
+			{
+				opts.CanFail = true
+			}
 		default:
 			{
 				return opts, fmt.Errorf("unknown option: %s", opt)

@@ -25,8 +25,8 @@ type Result struct {
 	StdoutValue  string
 	StderrVar    string
 	StderrValue  string
-	StdrcVar     string
-	StdrcValue   int
+	StdStatusVar     string
+	StdStatusValue   int
 	ResultNames  []string
 	ResultValues []interface{}
 }

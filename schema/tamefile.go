@@ -13,22 +13,25 @@ type Tamefile struct {
 }
 
 type TargetDefinition struct {
-	ArgDefinition    map[string]interface{} `yaml:"args,omitempty"`
-	BodyDefinition   []StepDefinition       `yaml:"run,omitempty"`
-	ReturnDefinition string                 `yaml:"return,omitempty"`
-	OptsDefinition   []string               `yaml:"opts,omitempty"`
-	Summary          string                 `yaml:"summary,omitempty"`
+	ArgDefinition  map[string]interface{}   `yaml:"args,omitempty"`
+	StepDefinition []map[string]interface{} `yaml:"run,omitempty"`
+	OptsDefinition []string                 `yaml:"opts,omitempty"`
+	Summary        string                   `yaml:"summary,omitempty"`
 }
 
-type StepDefinition struct {
-	Shell string                       `yaml:"sh,omitempty"`
-	Call  map[string]map[string]string `yaml:"call,omitempty"`
-	Var   map[string]interface{}       `yaml:"var,omitempty"`
-	Opts  []string                     `yaml:"opts,omitempty"`
-	Out   string                       `yaml:"$,omitempty"`
-	Err   string                       `yaml:"err$,omitempty"`
-	Rc    string                       `yaml:"status$,omitempty"`
-}
+// type StepDefinition struct { Def map[string]interface{}
+// // }
+
+// type StepDefinition struct {
+// 	Shell  string                       `yaml:"sh,omitempty"`
+// 	Return string                       `yaml:"return,omitempty"`
+// 	Call   map[string]map[string]string `yaml:"call,omitempty"`
+// 	Var    map[string]interface{}       `yaml:"var,omitempty"`
+// 	Opts   []string                     `yaml:"opts,omitempty"`
+// 	Out    string                       `yaml:"$,omitempty"`
+// 	Err    string                       `yaml:"err$,omitempty"`
+// 	Rc     string                       `yaml:"status$,omitempty"`
+// }
 
 type SettingsDefintion struct {
 	Shell      string   `yaml:"shell,omitempty"`

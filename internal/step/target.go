@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/kassybas/mate/types/steptype"
+
 	"github.com/kassybas/mate/internal/vartable"
 
 	"github.com/kassybas/mate/internal/tcontext"
@@ -20,14 +22,12 @@ type Param struct {
 }
 type Target struct {
 	GlobalSettings *settings.Settings
-
-	Name      string
-	Return    string
-	Steps     []Step
-	Params    []Param
-	Opts      opts.ExecutionOpts
-	Variables []tvar.VariableI
-	Summary   string
+	Name           string
+	Steps          []Step
+	Params         []Param
+	Opts           opts.ExecutionOpts
+	Variables      []tvar.VariableI
+	Summary        string
 }
 
 func mergeOpts(globalOpts, targetOpts, stepOpts opts.ExecutionOpts) opts.ExecutionOpts {
@@ -43,7 +43,16 @@ func (t Target) Run(ctx tcontext.Context, vt vartable.VarTable) ([]interface{}, 
 	if err != nil {
 		return nil, 0, fmt.Errorf("could not resolve parameters in target: %s\n\t%s", t.Name, err)
 	}
+	var returnValues []interface{}
 	for _, s := range t.Steps {
+		if s.Kind() == steptype.Return {
+			rs := s.(*ReturnStep)
+			returnValues, err = createReturnValues(vt, rs.Return)
+			if err != nil {
+				return nil, 0, err
+			}
+			break
+		}
 		// Opts
 		// TODO: straighten out this mess
 		s.SetOpts(mergeOpts(ctx.Settings.GlobalOpts, t.Opts, s.GetOpts()))
@@ -53,28 +62,28 @@ func (t Target) Run(ctx tcontext.Context, vt vartable.VarTable) ([]interface{}, 
 		// Run
 		err = s.RunStep(newCtx, vt)
 		if err != nil {
-			return nil, 0, fmt.Errorf("%s\n\tin target: %s, calling: %s", err.Error(), t.Name, s.GetCalledTargetName())
+			return nil, 0, fmt.Errorf("%s\n\ttarget: %s, calling: %s", err.Error(), t.Name, s.GetCalledTargetName())
 		}
 		// Check result status
 		if s.GetOpts().CanFail == false {
-			if s.GetResult().StdrcValue != 0 {
-				logrus.Errorf("execution failed: status %d\n\tin target:%s", s.GetResult().StdrcValue, t.Name)
-				return nil, s.GetResult().StdrcValue, nil
+			if s.GetResult().StdStatusValue != 0 {
+				logrus.Errorf("execution failed: status %d\n\ttarget: %s", s.GetResult().StdStatusValue, t.Name)
+				return nil, s.GetResult().StdStatusValue, nil
 			}
 		}
-		vt, err = updateResultVariables(vt, s.GetResult())
+		vt, err = updateVarsWithResultVariables(vt, s.GetResult())
 		if err != nil {
 			return nil, 0, err
 		}
 	}
-	returnValues, err := createReturnValues(vt, t.Return)
+
 	if err != nil {
-		return nil, 0, fmt.Errorf("%s\n\tin target: %s", err.Error(), t.Name)
+		return nil, 0, fmt.Errorf("%s\n\ttarget: %s", err.Error(), t.Name)
 	}
 	return returnValues, 0, err
 }
 
-func updateResultVariables(vt vartable.VarTable, r Result) (vartable.VarTable, error) {
+func updateVarsWithResultVariables(vt vartable.VarTable, r Result) (vartable.VarTable, error) {
 	if r.StdoutVar != "" {
 		v := tvar.CreateVariable(r.StdoutVar, r.StdoutValue)
 		vt.Add(v)
@@ -83,8 +92,8 @@ func updateResultVariables(vt vartable.VarTable, r Result) (vartable.VarTable, e
 		v := tvar.CreateVariable(r.StderrVar, r.StderrValue)
 		vt.Add(v)
 	}
-	if r.StdrcVar != "" {
-		v := tvar.CreateVariable(r.StdrcVar, strconv.Itoa(r.StdrcValue))
+	if r.StdStatusVar != "" {
+		v := tvar.CreateVariable(r.StdStatusVar, strconv.Itoa(r.StdStatusValue))
 		vt.Add(v)
 	}
 	if r.ResultValues != nil {
@@ -117,8 +126,14 @@ func resolveParams(vt vartable.VarTable, params []Param) (vartable.VarTable, err
 	return vt, nil
 }
 
-func createReturnValues(vt vartable.VarTable, returnDefinition string) ([]interface{}, error) {
-	rv, err := vt.ResolveValue(returnDefinition)
-	rvs := []interface{}{rv}
-	return rvs, err
+func createReturnValues(vt vartable.VarTable, returnDefinitions []string) ([]interface{}, error) {
+	rvs := []interface{}{}
+	for _, retDef := range returnDefinitions {
+		rv, err := vt.ResolveValue(retDef)
+		if err != nil {
+			return rvs, err
+		}
+		rvs = append(rvs, rv)
+	}
+	return rvs, nil
 }

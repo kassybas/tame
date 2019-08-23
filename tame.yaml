@@ -1,14 +1,35 @@
-
 settings:
   shieldEnv: true
+  init: "set -eu"
 
 globals:
   okay ?: "nop"
 
-
 targets:
-  echo:
+  echo: {}
+
+  caller:
     run:
-    - sh: echo $okay
-      $: $myvar
-    - sh: echo good-$myvar
+      - call my: {}
+        $: $ho
+      - sh: echo result is $ho
+
+  my:
+    run:
+      - sh: echo hello world >&2; echo yokomo; exit 5
+        $: "$hi"
+        err$: "$hai"
+        status$: "$s"
+        opts: [allowed-fail, silent]
+      - sh: echo okay $hi
+      - sh: echo okay $hai
+      - return: $hi
+      - sh: echo okay $s
+
+  vme:
+    run:
+      - sh: echo hey
+      - var $name:
+          surname: doe
+          first: john
+      - sh: echo $name_first

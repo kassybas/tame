@@ -1,13 +1,7 @@
 package keywords
 
 var (
-	Arg     = ".args"
-	Opts    = ".opts"
-	Exec    = ".exec"
-	OutVar  = ".out"
-	ErrVar  = ".err"
-	RcVar   = ".rc"
-	Summary = ".summary"
+	Opts = "opts"
 
 	PrefixReference   = "$"
 	PrefixTameKeyword = "."
@@ -40,4 +34,14 @@ var (
 
 	CliArgSeparator        = "="
 	GlobalDefaultVarSuffix = "?"
+
+	StepShell  = "sh"
+	StepVar    = "var"
+	StepCall   = "call"
+	StepReturn = "return"
+
+	StepCallResult    = "$"
+	ShellOutResult    = "$"
+	ShellErrResult    = "err$"
+	ShellStatusResult = "status$"
 )
