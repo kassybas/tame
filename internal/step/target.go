@@ -62,7 +62,7 @@ func (t Target) Run(ctx tcontext.Context, vt vartable.VarTable) ([]interface{}, 
 		// Run
 		err = s.RunStep(newCtx, vt)
 		if err != nil {
-			return nil, 0, fmt.Errorf("%s\n\ttarget: %s, calling: %s", err.Error(), t.Name, s.GetCalledTargetName())
+			return nil, 0, fmt.Errorf("%s\n[target: %s, step: %s]", err.Error(), t.Name, s.GetName())
 		}
 		// Check result status
 		if s.GetOpts().CanFail == false {
@@ -138,4 +138,13 @@ func createReturnValues(vt vartable.VarTable, returnDefinitions []string) ([]int
 		rvs = append(rvs, rv)
 	}
 	return rvs, nil
+}
+
+func (t Target) isParameter(name string) bool {
+	for _, p := range t.Params {
+		if p.Name == name {
+			return true
+		}
+	}
+	return false
 }

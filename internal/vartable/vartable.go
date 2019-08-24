@@ -90,6 +90,9 @@ func (vt *VarTable) GetAllEnvVars() []string {
 }
 
 func (vt VarTable) ResolveVar(v tvar.VariableI) (tvar.VariableI, error) {
+	if !strings.HasPrefix(v.ToStr(), keywords.PrefixReference) {
+		return v, nil
+	}
 	value, err := vt.ResolveValue(v.ToStr())
 	if err != nil {
 		return nil, err

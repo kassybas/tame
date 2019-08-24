@@ -6,32 +6,15 @@ globals:
   okay ?: "nop"
 
 targets:
-  echo: {}
+  echo:
+    run:
+      - sh: echo echo-$okay
+        $: $myvar
+      - return: $myvar
 
   caller:
     run:
-      - call my: {}
-        $: [$ho, $num]
-      - sh: echo result is $ho
-      - sh: echo number is $num
-
-  my:
-    run:
-      - sh: echo hello world >&2; echo yokomo; exit 5
-        $: "$hi"
-        err$: "$hai"
-        status$: "$s"
-        opts: [allowed-fail, silent]
-      - sh: echo okay $hi
-        opts: silent
-      - sh: echo okay $hai
-      - sh: echo okay $s
-      - return: [$hi, $s]
-
-  vme:
-    run:
-      - sh: echo hey
-      - var $name:
-          surname: doe
-          first: john
-      - sh: echo $name_first
+      - call echo: {}
+        opts: [silent]
+        $: $yo
+      - sh: echo caller-$yo

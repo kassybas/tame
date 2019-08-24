@@ -6,6 +6,7 @@ import (
 	"github.com/kassybas/mate/types/opts"
 	"github.com/kassybas/mate/types/steptype"
 	"github.com/kassybas/shell-exec/exec"
+	"github.com/sirupsen/logrus"
 )
 
 type ShellStep struct {
@@ -40,7 +41,7 @@ func (s *ShellStep) GetResult() Result {
 }
 
 func (s *ShellStep) SetCalledTarget(t Target) {
-	panic("calling target in shell")
+	logrus.Fatal("internal error: calling target in shell")
 }
 
 func (s *ShellStep) RunStep(ctx tcontext.Context, vt vartable.VarTable) error {
