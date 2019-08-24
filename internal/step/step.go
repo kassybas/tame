@@ -21,12 +21,12 @@ type Step interface {
 
 // TODO: make result a variable interface
 type Result struct {
-	StdoutVar    string
-	StdoutValue  string
-	StderrVar    string
-	StderrValue  string
-	StdStatusVar     string
-	StdStatusValue   int
-	ResultNames  []string
-	ResultValues []interface{}
+	StdoutVar      string
+	StdoutValue    string
+	StderrVar      string
+	StderrValue    string
+	StdStatusVar   string
+	StdStatusValue int
+	ResultNames    []string
+	ResultValues   []interface{}
 }

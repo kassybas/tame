@@ -69,13 +69,18 @@ func parseCallStepResults(value interface{}) ([]string, error) {
 		{
 			return []string{value.(string)}, nil
 		}
-	case []string:
+	case []interface{}:
 		{
-			return value.([]string), nil
+			res, err := ifaceSliceToStringSlice(value.([]interface{}))
+			if err != nil {
+				return nil, fmt.Errorf("failed to parse result variables: %v\n\t%s", value, err)
+
+			}
+			return res, nil
 		}
 	default:
 		{
-			return nil, fmt.Errorf("unknown parameter type: %s (type %T)", value, value)
+			return nil, fmt.Errorf("unknown result type: %s (type %T)", value, value)
 		}
 	}
 }

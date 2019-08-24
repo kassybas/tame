@@ -55,11 +55,11 @@ func Make(path, targetName string, targetArgs []string) {
 	}
 	globals, err := EvaluateGlobals(globalDefs)
 	if err != nil {
-		logrus.Fatal("error while evaluating global variables", err.Error())
+		logrus.Fatal("failed to evaluate global variables", err.Error())
 	}
 	stgs, err := lex.BuildSettings(tf.Sets)
 	if err != nil {
-		logrus.Fatal("error while evaluating settings", err.Error())
+		logrus.Fatal("failed to evaluate settings", err.Error())
 	}
 	ctx, err := CreateContext(globals, stgs)
 	if err != nil {
@@ -69,7 +69,7 @@ func Make(path, targetName string, targetArgs []string) {
 	// TODO: put cli args in here
 	err = root.RunStep(ctx, vartable.NewVarTable())
 	if err != nil {
-		logrus.Fatal("error during execution: ", err.Error())
+		logrus.Fatal("error during execution:\n\t", err.Error())
 	}
 	// pass through the status code
 	os.Exit(root.GetResult().StdStatusValue)

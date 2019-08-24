@@ -11,8 +11,9 @@ targets:
   caller:
     run:
       - call my: {}
-        $: $ho
+        $: [$ho, $num]
       - sh: echo result is $ho
+      - sh: echo number is $num
 
   my:
     run:
@@ -22,9 +23,10 @@ targets:
         status$: "$s"
         opts: [allowed-fail, silent]
       - sh: echo okay $hi
+        opts: silent
       - sh: echo okay $hai
-      - return: $hi
       - sh: echo okay $s
+      - return: [$hi, $s]
 
   vme:
     run:

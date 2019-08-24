@@ -49,7 +49,7 @@ func (t Target) Run(ctx tcontext.Context, vt vartable.VarTable) ([]interface{}, 
 			rs := s.(*ReturnStep)
 			returnValues, err = createReturnValues(vt, rs.Return)
 			if err != nil {
-				return nil, 0, err
+				return nil, 0, fmt.Errorf("in target: %s\n\tin step: %s\n\t%s", t.Name, s.GetName(), err)
 			}
 			break
 		}
@@ -73,14 +73,13 @@ func (t Target) Run(ctx tcontext.Context, vt vartable.VarTable) ([]interface{}, 
 		}
 		vt, err = updateVarsWithResultVariables(vt, s.GetResult())
 		if err != nil {
-			return nil, 0, err
+			return nil, 0, fmt.Errorf("in step: %s\n\t%s", s.GetName(), err)
 		}
 	}
-
 	if err != nil {
 		return nil, 0, fmt.Errorf("%s\n\ttarget: %s", err.Error(), t.Name)
 	}
-	return returnValues, 0, err
+	return returnValues, 0, nil
 }
 
 func updateVarsWithResultVariables(vt vartable.VarTable, r Result) (vartable.VarTable, error) {
@@ -97,6 +96,9 @@ func updateVarsWithResultVariables(vt vartable.VarTable, r Result) (vartable.Var
 		vt.Add(v)
 	}
 	if r.ResultValues != nil {
+		if len(r.ResultValues) != len(r.ResultNames) {
+			return vt, fmt.Errorf("return and result variables do not match: %d != %d", len(r.ResultValues), len(r.ResultNames))
+		}
 		err := vt.Append(r.ResultNames, r.ResultValues)
 		if err != nil {
 			return vt, err
