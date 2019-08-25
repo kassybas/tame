@@ -1,20 +1,52 @@
 settings:
-  shieldEnv: true
-  init: "set -eu"
+  init: "set -ex"
 
 globals:
-  okay ?: "nop"
+  $platforms:
+    linux:
+      os: "linux"
+      arch: "amd64"
+    mac:
+      os: "darwin"
+      arch: "amd64"
+  $docker:
+    image: "kassybas/tame"
 
 targets:
+
   echo:
     run:
-      - sh: echo echo-$okay
-        $: $myvar
-      - return: $myvar
+      - sh: echo $releases_linux_arch
 
-  caller:
+  local-build:
     run:
-      - call echo: {}
-        opts: [silent]
-        $: $yo
-      - sh: echo caller-$yo
+    - call build: { $platform: $platforms.mac}
+  
+  build-all:
+    run:
+    - call build: { $platform: $platforms.mac}
+    - call build: { $platform: $platforms.linux}
+
+  build:
+    args: { $platform } 
+    run: 
+    - sh: |
+        echo "Building for ${platform_os}:${platform_arch}..."
+        mkdir -p bin
+        GOOS=${platform_os} GOARCH=${platform_arch} go build -o bin/tame_${platform_os}_${platform_arch}
+  
+  docker-build:
+    args: { $version: "latest"}
+    run:
+    - call build: { $platform: $platforms.linux }
+    - var $os: $platforms.linux.os
+    - var $arch: $platforms.linux.arch
+    - sh: docker build --build-arg=bin/tame_${os}_${arch} -t ${docker_image}:${version} .
+    
+  clean-bin:
+    run:
+      - sh: rm -rf ./bin/*
+  
+  test:
+    run:
+    - sh: go test ./...
