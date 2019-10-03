@@ -1,0 +1,4 @@
+FROM scratch
+ARG BIN_PATH
+
+COPY bin/${BIN_PATH} /

@@ -1,0 +1,20 @@
+settings:
+  shieldEnv: true
+  init: "set -eu"
+
+globals:
+  okay ?: "nop"
+
+targets:
+  echo:
+    run:
+      - sh: echo echo-$okay
+        $: $myvar
+      - return: $myvar
+
+  caller:
+    run:
+      - call echo: {}
+        opts: [silent]
+        $: $yo
+      - sh: echo caller-$yo

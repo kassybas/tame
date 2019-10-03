@@ -13,3 +13,7 @@
 - add include of others
 - add for
 - add if
+
+- select values: approachability, composability, extensibility, maintainability, simplicity, velocity
+
+- docker-build fails
