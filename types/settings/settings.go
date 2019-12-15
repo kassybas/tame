@@ -1,6 +1,6 @@
 package settings
 
-import "github.com/kassybas/mate/types/opts"
+import "github.com/kassybas/tame/types/opts"
 
 type Settings struct {
 	UsedShell  string

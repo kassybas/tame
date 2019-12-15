@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/kassybas/mate/internal/helpers"
+	"github.com/kassybas/tame/internal/helpers"
 
-	"github.com/kassybas/mate/internal/keywords"
+	"github.com/kassybas/tame/internal/keywords"
 )
 
 type Field struct {

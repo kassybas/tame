@@ -4,13 +4,13 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/kassybas/mate/types/opts"
-	"github.com/kassybas/mate/types/steptype"
+	"github.com/kassybas/tame/types/opts"
+	"github.com/kassybas/tame/types/steptype"
 
-	"github.com/kassybas/mate/internal/helpers"
-	"github.com/kassybas/mate/internal/keywords"
-	"github.com/kassybas/mate/internal/step"
-	"github.com/kassybas/mate/schema"
+	"github.com/kassybas/tame/internal/helpers"
+	"github.com/kassybas/tame/internal/keywords"
+	"github.com/kassybas/tame/internal/step"
+	"github.com/kassybas/tame/schema"
 )
 
 func ParseTeafile(tf schema.Tamefile) (map[string]step.Target, error) {

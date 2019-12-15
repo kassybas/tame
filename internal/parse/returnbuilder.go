@@ -3,7 +3,7 @@ package parse
 import (
 	"fmt"
 
-	"github.com/kassybas/mate/internal/step"
+	"github.com/kassybas/tame/internal/step"
 )
 
 func buildReturnStep(stepDef map[string]interface{}) (step.ReturnStep, error) {

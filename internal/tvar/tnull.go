@@ -1,6 +1,6 @@
 package tvar
 
-import "github.com/kassybas/mate/types/vartype"
+import "github.com/kassybas/tame/types/vartype"
 
 type TNull struct {
 	name string

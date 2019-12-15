@@ -3,13 +3,13 @@ package lex
 import (
 	"os"
 
-	"github.com/kassybas/mate/schema"
+	"github.com/kassybas/tame/schema"
 
-	"github.com/kassybas/mate/internal/helpers"
-	"github.com/kassybas/mate/internal/helpscreen"
-	"github.com/kassybas/mate/internal/parse"
-	"github.com/kassybas/mate/internal/step"
-	"github.com/kassybas/mate/internal/tvar"
+	"github.com/kassybas/tame/internal/helpers"
+	"github.com/kassybas/tame/internal/helpscreen"
+	"github.com/kassybas/tame/internal/parse"
+	"github.com/kassybas/tame/internal/step"
+	"github.com/kassybas/tame/internal/tvar"
 )
 
 func parseCLITargetArgs(targetArgs []string) ([]tvar.VariableI, error) {

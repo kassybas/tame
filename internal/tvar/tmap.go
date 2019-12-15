@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/kassybas/mate/internal/dotref"
-	"github.com/kassybas/mate/internal/keywords"
-	"github.com/kassybas/mate/types/vartype"
+	"github.com/kassybas/tame/internal/dotref"
+	"github.com/kassybas/tame/internal/keywords"
+	"github.com/kassybas/tame/types/vartype"
 )
 
 type TMap struct {

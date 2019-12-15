@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/kassybas/mate/internal/tvar"
+	"github.com/kassybas/tame/internal/tvar"
 
-	"github.com/kassybas/mate/internal/keywords"
-	"github.com/kassybas/mate/internal/step"
+	"github.com/kassybas/tame/internal/keywords"
+	"github.com/kassybas/tame/internal/step"
 )
 
 func parseCalledTargetName(k string) (string, error) {

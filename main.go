@@ -3,7 +3,7 @@ package main
 import (
 	"os"
 
-	"github.com/kassybas/mate/cmd"
+	"github.com/kassybas/tame/cmd"
 	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli"
 )

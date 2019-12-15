@@ -3,8 +3,8 @@ package lex
 import (
 	"fmt"
 
-	"github.com/kassybas/mate/internal/step"
-	"github.com/kassybas/mate/types/steptype"
+	"github.com/kassybas/tame/internal/step"
+	"github.com/kassybas/tame/types/steptype"
 )
 
 func findCalledTarget(name, caller string, targets map[string]step.Target) (step.Target, error) {

@@ -4,15 +4,15 @@ import (
 	"os"
 	"strings"
 
-	"github.com/kassybas/mate/internal/keywords"
+	"github.com/kassybas/tame/internal/keywords"
 
-	"github.com/kassybas/mate/internal/vartable"
+	"github.com/kassybas/tame/internal/vartable"
 
-	"github.com/kassybas/mate/internal/lex"
-	"github.com/kassybas/mate/internal/loader"
-	"github.com/kassybas/mate/internal/tcontext"
-	"github.com/kassybas/mate/internal/tvar"
-	"github.com/kassybas/mate/types/settings"
+	"github.com/kassybas/tame/internal/lex"
+	"github.com/kassybas/tame/internal/loader"
+	"github.com/kassybas/tame/internal/tcontext"
+	"github.com/kassybas/tame/internal/tvar"
+	"github.com/kassybas/tame/types/settings"
 	"github.com/sirupsen/logrus"
 )
 

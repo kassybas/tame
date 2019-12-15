@@ -5,8 +5,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/kassybas/mate/internal/keywords"
-	"github.com/kassybas/mate/types/opts"
+	"github.com/kassybas/tame/internal/keywords"
+	"github.com/kassybas/tame/types/opts"
 )
 
 func GetKeyValueFromEnvString(envStr string) (string, string, error) {

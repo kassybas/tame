@@ -3,7 +3,7 @@ package helpscreen
 import (
 	"fmt"
 
-	"github.com/kassybas/mate/internal/step"
+	"github.com/kassybas/tame/internal/step"
 )
 
 func PrintTeafileDescription(targets map[string]step.Target) {

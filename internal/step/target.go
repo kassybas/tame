@@ -4,14 +4,14 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/kassybas/mate/types/steptype"
+	"github.com/kassybas/tame/types/steptype"
 
-	"github.com/kassybas/mate/internal/vartable"
+	"github.com/kassybas/tame/internal/vartable"
 
-	"github.com/kassybas/mate/internal/tcontext"
-	"github.com/kassybas/mate/internal/tvar"
-	"github.com/kassybas/mate/types/opts"
-	"github.com/kassybas/mate/types/settings"
+	"github.com/kassybas/tame/internal/tcontext"
+	"github.com/kassybas/tame/internal/tvar"
+	"github.com/kassybas/tame/types/opts"
+	"github.com/kassybas/tame/types/settings"
 	"github.com/sirupsen/logrus"
 )
 

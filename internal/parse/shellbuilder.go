@@ -3,8 +3,8 @@ package parse
 import (
 	"fmt"
 
-	"github.com/kassybas/mate/internal/keywords"
-	"github.com/kassybas/mate/internal/step"
+	"github.com/kassybas/tame/internal/keywords"
+	"github.com/kassybas/tame/internal/step"
 )
 
 func buildShellStep(stepDef map[string]interface{}) (step.ShellStep, error) {

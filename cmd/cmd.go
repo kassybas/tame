@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"github.com/kassybas/mate/internal/orchestrate"
+	"github.com/kassybas/tame/internal/orchestrate"
 )
 
 // MakeCommand runs the given target of the file

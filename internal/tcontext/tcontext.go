@@ -1,8 +1,8 @@
 package tcontext
 
 import (
-	"github.com/kassybas/mate/internal/tvar"
-	"github.com/kassybas/mate/types/settings"
+	"github.com/kassybas/tame/internal/tvar"
+	"github.com/kassybas/tame/types/settings"
 )
 
 type Context struct {

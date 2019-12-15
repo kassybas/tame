@@ -3,7 +3,7 @@ package loader
 import (
 	"io/ioutil"
 
-	"github.com/kassybas/mate/schema"
+	"github.com/kassybas/tame/schema"
 	"gopkg.in/yaml.v2"
 )
 

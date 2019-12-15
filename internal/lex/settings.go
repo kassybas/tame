@@ -1,9 +1,9 @@
 package lex
 
 import (
-	"github.com/kassybas/mate/internal/helpers"
-	"github.com/kassybas/mate/schema"
-	"github.com/kassybas/mate/types/settings"
+	"github.com/kassybas/tame/internal/helpers"
+	"github.com/kassybas/tame/schema"
+	"github.com/kassybas/tame/types/settings"
 )
 
 func BuildSettings(tfs schema.SettingsDefintion) (settings.Settings, error) {
