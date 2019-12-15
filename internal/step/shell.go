@@ -7,7 +7,6 @@ import (
 	"github.com/kassybas/tame/types/steptype"
 	"github.com/kassybas/shell-exec/exec"
 	"github.com/sirupsen/logrus"
-	"fmt"
 )
 
 type ShellStep struct {
@@ -58,7 +57,5 @@ func (s *ShellStep) RunStep(ctx tcontext.Context, vt vartable.VarTable) error {
 	envVars := vt.GetAllEnvVars()
 	prefixedScript := ctx.Settings.InitScript + "\n" + s.Script
 	s.Results.StdoutValue, s.Results.StderrValue, s.Results.StdStatusValue, err = exec.ShellExec(prefixedScript, envVars, opts)
-	fmt.Println(s.Results.StdStatusValue)
-
 	return err
 }
