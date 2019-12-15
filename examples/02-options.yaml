@@ -1,0 +1,14 @@
+
+settings:
+  init: set -e
+
+targets:
+  
+  sound-of-silence:
+    run:
+    - sh: echo "hello darkness"
+      opts: silent # stdout and sterr is not printed
+    - sh: |
+        echo "i fail"
+        exit 66
+  

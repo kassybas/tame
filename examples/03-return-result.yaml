@@ -1,0 +1,17 @@
+
+targets:
+  
+  today:
+    args: { $format: "+%m-%d-%Y"} # setting a default argument
+    run:
+    - sh: date "${format}"
+      $: $today  # save stdout to $welcome variable
+    - sh: echo "today's date was generated"
+    - return: $today  # return the value of variable
+  
+  welcome-today:
+    run:
+    - call today: {}   # call is always followed by map
+      $: $todays_date
+    - sh: echo "The date is ${todays_date}"
+  

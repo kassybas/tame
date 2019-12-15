@@ -46,7 +46,7 @@ func (s *CallStep) RunStep(ctx tcontext.Context, vt vartable.VarTable) error {
 	if err != nil {
 		return fmt.Errorf("in step: %s\n\t%s", s.Name, err.Error())
 	}
-	if len(s.Results.ResultValues) != len(s.Results.ResultNames) {
+	if len(s.Results.ResultNames) != 0 && len(s.Results.ResultValues) != len(s.Results.ResultNames) {
 		return fmt.Errorf("mismatch count of return values and result variables: %d != %d", len(s.Results.ResultValues), len(s.Results.ResultNames))
 	}
 	return nil

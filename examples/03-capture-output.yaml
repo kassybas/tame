@@ -1,33 +1,26 @@
 
-settings:
-  init: set -ex
-
-globals:
-  $foo: "my global value"
-
-# tame -f examples/02-capture-output.yaml shell-out
 targets:
+# tame -f examples/03-capture-output.yaml shell-out
   shell-out:
    run:
     - sh: echo "hello world"
       $: $welcome  # save stdout to $welcome variable
     - sh: echo "welcome ${welcome}"
   
+# tame -f examples/03-capture-output.yaml shell-err
   shell-err:
    run:
     - sh: echo "hello std error" >&2  # redirect output to stderr
       err$: $welcome  # save stderr to $welcome variable
     - sh: echo "welcome ${welcome}"
   
+# tame -f examples/03-capture-output.yaml shell-status
   shell-status:
     run:
-    - sh: | 
-        set -ex
-        exit 42
+    - sh: exit 42
       status$: $exit_code  # save return code to $exit-code
-    - var $hello: hi
+      opts: allowed-fail   # allowing failure: because of exit code 42, the execution would halt by default
     - sh: echo "process exited with ${exit_code}"  # dash converts to underscore
-    - sh: env
 
 
   

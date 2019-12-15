@@ -7,6 +7,7 @@ import (
 	"github.com/kassybas/tame/types/steptype"
 	"github.com/kassybas/shell-exec/exec"
 	"github.com/sirupsen/logrus"
+	"fmt"
 )
 
 type ShellStep struct {
@@ -46,8 +47,8 @@ func (s *ShellStep) SetCalledTarget(t Target) {
 
 func (s *ShellStep) RunStep(ctx tcontext.Context, vt vartable.VarTable) error {
 	var err error
-	// ignore result if neither stdout variable and stderr variable is defined
-	ignoreResult := s.Results.StderrVar == "" && s.Results.StdoutVar == ""
+	// ignore result if it is not caputered
+	ignoreResult := s.Results.StderrVar == "" && s.Results.StdoutVar == "" && s.Results.StdStatusVar == ""
 	opts := exec.Options{
 		Silent:       s.Opts.Silent,
 		ShellPath:    ctx.Settings.UsedShell,
@@ -57,6 +58,7 @@ func (s *ShellStep) RunStep(ctx tcontext.Context, vt vartable.VarTable) error {
 	envVars := vt.GetAllEnvVars()
 	prefixedScript := ctx.Settings.InitScript + "\n" + s.Script
 	s.Results.StdoutValue, s.Results.StderrValue, s.Results.StdStatusValue, err = exec.ShellExec(prefixedScript, envVars, opts)
+	fmt.Println(s.Results.StdStatusValue)
 
 	return err
 }
