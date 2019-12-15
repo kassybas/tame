@@ -1,0 +1,17 @@
+
+globals:
+  $my_string: "hello world"
+  $my_int: 42
+  $user:
+    name: John
+    age: 22
+    address:
+      city: London
+      street: Main street
+
+targets:
+  print-user:
+    run:
+    - sh: |
+        echo "${user_name} is ${user_age} years old. Lives in ${user_address_city}"
+

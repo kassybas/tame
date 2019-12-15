@@ -1,9 +1,7 @@
 
-settings:
-  init: set -e
-
 targets:
-  
+
+# tame -f examples/02-options.yaml sound-of-silence
   sound-of-silence:
     run:
     - sh: echo "hello darkness"
@@ -11,4 +9,18 @@ targets:
     - sh: |
         echo "i fail"
         exit 66
+      opts: allowed-fail # allow non-zero return codes and continue execution
+    - sh: echo "target execution finished"
+  
+# tame -f examples/02-options.yaml multiple-opts
+  multiple-opts:
+    run:
+      - sh: |
+          echo "verbose cmd"
+          exit 42
+        opts: [silent, allowed-fail]
+        
+
+
+
   
