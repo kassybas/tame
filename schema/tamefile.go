@@ -19,20 +19,6 @@ type TargetDefinition struct {
 	Summary        string                   `yaml:"summary,omitempty"`
 }
 
-// type StepDefinition struct { Def map[string]interface{}
-// // }
-
-// type StepDefinition struct {
-// 	Shell  string                       `yaml:"sh,omitempty"`
-// 	Return string                       `yaml:"return,omitempty"`
-// 	Call   map[string]map[string]string `yaml:"call,omitempty"`
-// 	Var    map[string]interface{}       `yaml:"var,omitempty"`
-// 	Opts   []string                     `yaml:"opts,omitempty"`
-// 	Out    string                       `yaml:"$,omitempty"`
-// 	Err    string                       `yaml:"err$,omitempty"`
-// 	Rc     string                       `yaml:"status$,omitempty"`
-// }
-
 type SettingsDefintion struct {
 	Shell      string   `yaml:"shell,omitempty"`
 	Init       string   `yaml:"init,omitempty"`

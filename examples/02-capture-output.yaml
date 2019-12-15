@@ -1,0 +1,33 @@
+
+settings:
+  init: set -ex
+
+globals:
+  $foo: "my global value"
+
+# tame -f examples/02-capture-output.yaml shell-out
+targets:
+  shell-out:
+   run:
+    - sh: echo "hello world"
+      $: $welcome  # save stdout to $welcome variable
+    - sh: echo "welcome ${welcome}"
+  
+  shell-err:
+   run:
+    - sh: echo "hello std error" >&2  # redirect output to stderr
+      err$: $welcome  # save stderr to $welcome variable
+    - sh: echo "welcome ${welcome}"
+  
+  shell-status:
+    run:
+    - sh: | 
+        set -ex
+        exit 42
+      status$: $exit_code  # save return code to $exit-code
+    - var $hello: hi
+    - sh: echo "process exited with ${exit_code}"  # dash converts to underscore
+    - sh: env
+
+
+  
