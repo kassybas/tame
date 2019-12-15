@@ -10,3 +10,7 @@ Something like `make`, but not for building. Written in Go.
 ```
 go build -o tame
 ```
+
+## Examples
+
+See [examples/](https://github.com/kassybas/tame/tree/master/)
