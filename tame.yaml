@@ -1,5 +1,5 @@
 settings:
-  init: "set -ex"
+  init: "set -e"
 
 globals:
   $platforms:
@@ -16,7 +16,7 @@ targets:
 
   echo:
     run:
-      - sh: echo $releases_linux_arch
+      - sh: echo $platforms_linux_arch
 
   local-build:
     run:

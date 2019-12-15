@@ -1,0 +1,30 @@
+globals:
+  $foo: "my global value"
+
+# tame -f examples/01-hello-world.yaml hello
+targets:
+  hello:
+   run:
+    - sh: echo "hello world"
+  
+# tame -f examples/01-hello-world.yaml hello-global
+  hello-global:
+    run:
+    - sh: echo "hello $foo"
+  
+# tame -f examples/01-hello-world.yaml hello-local
+  hello-local:
+    run:
+    - var $name: "john doe"
+    - sh: echo "hello $name"
+
+ # tame -f examples/01-hello-world.yaml hello-arg 
+  hello-arg:
+    args: {$name: "my default name"}
+    run:
+    - sh: echo "hello $name"
+
+ # tame -f examples/01-hello-world.yaml hello-call 
+  hello-call:
+    run:
+    - call hello-arg: {$name: "passing an argument"}
