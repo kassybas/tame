@@ -13,4 +13,4 @@ go build -o tame
 
 ## Examples
 
-See [examples/](https://github.com/kassybas/tame/tree/master/)
+See [examples/](https://github.com/kassybas/tame/tree/master/examples)
