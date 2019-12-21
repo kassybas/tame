@@ -14,12 +14,12 @@ globals:
 
 targets:
 
-  print-user:
+  PrintUser:
     run:
     - sh: |
         echo "${user_name} is ${user_age} years old. Lives in ${user_address_city}"  # maps fields are separated by `_` in shell context which should configurable sooner or later
 
-  test-silence:
+  TestSilence:
     run:
     - sh: echo "YOYOYOYOYO"
       opts: silent
@@ -27,7 +27,7 @@ targets:
     - sh: echo MSG:"${MSG}"
       
   
-  build-all:
+  BuildAll:
     run:
     - var $platforms:
         darwin:
@@ -36,10 +36,10 @@ targets:
         linux:
           bin_path: "bin/bin_linux"
           flags: "-cdsw"
-    - call build: {$config: $platforms.darwin}   # maps fields are separated by `.` in tame context
-    - call build: {$config: $platforms.linux}
+    - call Build: {$config: $platforms.darwin}   # maps fields are separated by `.` in tame context
+    - call Build: {$config: $platforms.linux}
     
-  build:
+  Build:
     args: { $config }
     run:
     - sh: echo "I build to $config_bin_path with flags $config_flags"

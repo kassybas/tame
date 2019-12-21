@@ -1,7 +1,7 @@
 
 targets:
   
-  today:
+  Today:
     args: { $format: "+%m-%d-%Y"} # setting a default argument
     run:
     - sh: date "${format}"
@@ -9,19 +9,19 @@ targets:
     - sh: echo "done"
     - return: $today  # return the value of variable
   
-  user:
+  User:
     run:
     - sh: whoami
       $: $user
     - return: $user
   
-  welcome-today:
+  WelcomeToday:
     run:
-    - call today: {$format: "+%a"}   # overwriting default $format argument
+    - call Today: {$format: "+%a"}   # overwriting default $format argument
       $: $day_of_week
       opts: silent    # silencing all steps in today target
 
-    - call user: {}   # call is followed by empty map, because no arguments needed
+    - call User: {}   # call is followed by empty map, because no arguments needed
       $: $user
       opts: silent
 

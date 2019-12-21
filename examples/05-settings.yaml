@@ -13,11 +13,11 @@ settings:
 
 targets:
 
-  get-shell:
+  GetShell:
     run:
     - sh: echo $0
   
-  env-vars:
+  EnvVars:
     run:
     - sh: env
 
