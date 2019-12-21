@@ -13,10 +13,11 @@ func BuildSettings(tfs schema.SettingsDefintion) (settings.Settings, error) {
 	}
 
 	s := settings.Settings{
-		UsedShell:  tfs.Shell,
-		InitScript: tfs.Init,
-		GlobalOpts: opts,
-		ShieldEnv:  tfs.ShieldEnv,
+		UsedShell:           tfs.Shell,
+		InitScript:          tfs.Init,
+		GlobalOpts:          opts,
+		ShieldEnv:           tfs.ShieldEnv,
+		ShellFieldSeparator: tfs.ShellFieldSeparator,
 	}
 
 	return s, nil

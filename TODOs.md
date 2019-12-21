@@ -7,7 +7,6 @@
 - make field separators configurable
 - non-string map keys
 - make append to list possible
-- select values: approachability, composability, extensibility, maintainability, simplicity, velocity
 
 - add load step
 - add include of others

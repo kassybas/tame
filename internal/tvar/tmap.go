@@ -41,12 +41,12 @@ func (v TMap) ToStr() string {
 	// return v.value.(string)
 }
 
-func (v TMap) ToEnvVars() []string {
+func (v TMap) ToEnvVars(ShellFieldSeparator string) []string {
 	var envVars []string
 	trimmedName := strings.TrimPrefix(v.name, keywords.PrefixReference)
 	for _, v := range v.value {
-		for _, memberEnvVar := range v.ToEnvVars() {
-			ev := trimmedName + keywords.ShellFieldSeparator + memberEnvVar
+		for _, memberEnvVar := range v.ToEnvVars(ShellFieldSeparator) {
+			ev := fmt.Sprintf("%s%s%s", trimmedName, ShellFieldSeparator, memberEnvVar)
 			envVars = append(envVars, ev)
 		}
 	}

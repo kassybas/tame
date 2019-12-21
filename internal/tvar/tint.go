@@ -37,7 +37,7 @@ func (v TInt) ToStr() string {
 	return strconv.Itoa(v.value)
 }
 
-func (v TInt) ToEnvVars() []string {
+func (v TInt) ToEnvVars(ShellFieldSeparator string) []string {
 	// Remove $ for shell env format
 	trimmedName := strings.TrimPrefix(v.name, keywords.PrefixReference)
 	return []string{trimmedName + "=" + v.ToStr()}

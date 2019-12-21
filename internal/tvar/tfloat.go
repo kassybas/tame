@@ -37,7 +37,7 @@ func (v TFloat) ToStr() string {
 	return strconv.FormatFloat(v.value, 'f', -1, 64)
 }
 
-func (v TFloat) ToEnvVars() []string {
+func (v TFloat) ToEnvVars(ShellFieldSeparator string) []string {
 	// Remove $ for shell env format
 	trimmedName := strings.TrimPrefix(v.name, keywords.PrefixReference)
 	return []string{trimmedName + "=" + v.ToStr()}

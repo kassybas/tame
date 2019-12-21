@@ -42,7 +42,7 @@ func (v TBool) ToStr() string {
 	return "false"
 }
 
-func (v TBool) ToEnvVars() []string {
+func (v TBool) ToEnvVars(ShellFieldSeparator string) []string {
 	// Remove $ for shell env format
 	trimmedName := strings.TrimPrefix(v.name, keywords.PrefixReference)
 	return []string{trimmedName + "=" + v.ToStr()}

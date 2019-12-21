@@ -30,6 +30,6 @@ func (v TNull) ToStr() string {
 	return ""
 }
 
-func (v TNull) ToEnvVars() []string {
+func (v TNull) ToEnvVars(ShellFieldSeparator string) []string {
 	return []string{}
 }

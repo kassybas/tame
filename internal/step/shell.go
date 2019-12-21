@@ -1,11 +1,13 @@
 package step
 
 import (
+	"fmt"
+
+	"github.com/kassybas/shell-exec/exec"
 	"github.com/kassybas/tame/internal/tcontext"
 	"github.com/kassybas/tame/internal/vartable"
 	"github.com/kassybas/tame/types/opts"
 	"github.com/kassybas/tame/types/steptype"
-	"github.com/kassybas/shell-exec/exec"
 	"github.com/sirupsen/logrus"
 )
 
@@ -54,8 +56,8 @@ func (s *ShellStep) RunStep(ctx tcontext.Context, vt vartable.VarTable) error {
 		IgnoreResult: ignoreResult,
 		ShieldEnv:    ctx.Settings.ShieldEnv,
 	}
-	envVars := vt.GetAllEnvVars()
-	prefixedScript := ctx.Settings.InitScript + "\n" + s.Script
+	envVars := vt.GetAllEnvVars(ctx.Settings.ShellFieldSeparator)
+	prefixedScript := fmt.Sprintf("%s\n%s", ctx.Settings.InitScript, s.Script)
 	s.Results.StdoutValue, s.Results.StderrValue, s.Results.StdStatusValue, err = exec.ShellExec(prefixedScript, envVars, opts)
 	return err
 }

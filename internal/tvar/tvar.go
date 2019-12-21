@@ -16,7 +16,7 @@ type VariableI interface {
 	Value() interface{}
 	ToInt() (int, error)
 	ToStr() string
-	ToEnvVars() []string
+	ToEnvVars(string) []string
 	IsScalar() bool
 }
 

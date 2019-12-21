@@ -79,11 +79,11 @@ func (vt *VarTable) AddVariables(newVars []tvar.VariableI) {
 	}
 }
 
-func (vt *VarTable) GetAllEnvVars() []string {
+func (vt *VarTable) GetAllEnvVars(ShellFieldSeparator string) []string {
 	formattedVars := []string{}
 	for _, v := range vt.vars {
 		if v != nil {
-			formattedVars = append(formattedVars, v.ToEnvVars()...)
+			formattedVars = append(formattedVars, v.ToEnvVars(ShellFieldSeparator)...)
 		}
 	}
 	return formattedVars

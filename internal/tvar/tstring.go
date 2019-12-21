@@ -38,7 +38,7 @@ func (v TString) ToStr() string {
 	return v.value
 }
 
-func (v TString) ToEnvVars() []string {
+func (v TString) ToEnvVars(ShellFieldSeparator string) []string {
 	// Remove $ for shell env format
 	trimmedName := strings.TrimPrefix(v.name, keywords.PrefixReference)
 	return []string{trimmedName + "=" + v.value}

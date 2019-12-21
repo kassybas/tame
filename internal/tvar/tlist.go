@@ -48,11 +48,11 @@ func (v TList) GetItem(i int) (VariableI, error) {
 	return v.value[i], nil
 }
 
-func (v TList) ToEnvVars() []string {
+func (v TList) ToEnvVars(ShellFieldSeparator string) []string {
 	var envVars []string
 	trimmedName := strings.TrimPrefix(v.name, keywords.PrefixReference)
 	for _, v := range v.value {
-		for _, memberEnvVar := range v.ToEnvVars() {
+		for _, memberEnvVar := range v.ToEnvVars(ShellFieldSeparator) {
 			ev := trimmedName + "_" + memberEnvVar
 			envVars = append(envVars, ev)
 		}
