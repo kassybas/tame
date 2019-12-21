@@ -66,13 +66,15 @@ func ShellExec(script string, envVars []string, opts Options) (resOut, resErr st
 
 	// Run and wait for Cmd to return
 	status := <-scriptCmd.Start()
+
+	resRc = status.Exit
+	err = status.Error
+
 	if opts.IgnoreResult {
 		return
 	}
 
 	resOut = strings.Join(status.Stdout, "\n")
 	resErr = strings.Join(status.Stderr, "\n")
-	resRc = status.Exit
-	err = status.Error
 	return
 }
