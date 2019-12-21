@@ -1,11 +1,14 @@
 package exec
 
+// Based on article: https://blog.kowalczyk.info/article/wOYk/advanced-command-execution-in-go-with-osexec.html
+
 import (
 	"fmt"
+	"io"
 	"os"
+	"os/exec"
 	"strings"
-
-	"github.com/go-cmd/cmd"
+	"sync"
 )
 
 type Options struct {
@@ -22,59 +25,98 @@ type Options struct {
 const DefaultShellCmdFlag = "-c"
 const DefaultShell = "sh"
 
-func ShellExec(script string, envVars []string, opts Options) (resOut, resErr string, resRc int, err error) {
-	cmdOptions := cmd.Options{
-		Buffered:  !opts.IgnoreResult,
-		Streaming: !opts.Silent,
+func copyAndCapture(w io.Writer, r io.Reader) ([]byte, error) {
+	var out []byte
+	buf := make([]byte, 1024, 1024)
+	for {
+		n, err := r.Read(buf[:])
+		if n > 0 {
+			d := buf[:n]
+			out = append(out, d...)
+			_, err := w.Write(d)
+			if err != nil {
+				return out, err
+			}
+		}
+		if err != nil {
+			// Read returns io.EOF at the end of file, which is not an error for us
+			if err == io.EOF {
+				err = nil
+			}
+			return out, err
+		}
 	}
+}
 
+func createCommand(script string, envVars []string, opts Options) *exec.Cmd {
 	// Create Cmd with options
 	if opts.ShellPath == "" {
 		opts.ShellPath = DefaultShell
 	}
-	scriptCmd := cmd.NewCmdOptions(cmdOptions, opts.ShellPath)
-	if opts.ShellExtraFlags != nil {
-		scriptCmd.Args = append(scriptCmd.Args, opts.ShellExtraFlags...)
-	}
-
-	// Set default command flag of shell if not set
-	if opts.ShellCmdFlag == "" {
-		opts.ShellCmdFlag = DefaultShellCmdFlag
-	}
-
-	scriptCmd.Args = append(scriptCmd.Args, opts.ShellCmdFlag, script)
+	// TODO: handle extra flags
+	args := append(opts.ShellExtraFlags, DefaultShellCmdFlag, script)
+	cmd := exec.Command(opts.ShellPath, args...)
+	// Add environment variables
 	if opts.ShieldEnv {
-		scriptCmd.Env = []string{}
+		cmd.Env = []string{}
 	} else {
-		scriptCmd.Env = os.Environ()
+		cmd.Env = os.Environ()
 	}
-	scriptCmd.Env = append(scriptCmd.Env, envVars...)
+	cmd.Env = append(cmd.Env, envVars...)
+	return cmd
 
-	if !opts.Silent {
-		// Print STDOUT and STDERR lines streaming from Cmd
-		go func() {
-			for {
-				select {
-				case line := <-scriptCmd.Stdout:
-					fmt.Println(line)
-				case line := <-scriptCmd.Stderr:
-					fmt.Fprintln(os.Stderr, line)
-				}
-			}
-		}()
+}
+
+func getOutputFileDescriptors(silent bool) (*os.File, *os.File) {
+	if silent {
+		devNull := os.NewFile(0, os.DevNull)
+		return devNull, devNull
 	}
+	return os.Stdout, os.Stderr
+}
 
-	// Run and wait for Cmd to return
-	status := <-scriptCmd.Start()
+func ShellExec(script string, envVars []string, opts Options) (string, string, int, error) {
+	var stdout, stderr []byte
+	var errStdout, errStderr error
 
-	resRc = status.Exit
-	err = status.Error
+	targetStdout, targetStderr := getOutputFileDescriptors(opts.Silent)
 
-	if opts.IgnoreResult {
-		return
+	cmd := createCommand(script, envVars, opts)
+
+	stdoutIn, _ := cmd.StdoutPipe()
+	stderrIn, _ := cmd.StderrPipe()
+
+	err := cmd.Start()
+	if err != nil {
+		return "", "", -1, err
 	}
+	var wg sync.WaitGroup
+	// cmd.Wait() should be called only after we finish reading
+	// from stdoutIn and stderrIn.
+	// wg ensures that we finish
+	wg.Add(1)
+	go func() {
+		stdout, errStdout = copyAndCapture(targetStdout, stdoutIn)
+		wg.Done()
+	}()
 
-	resOut = strings.Join(status.Stdout, "\n")
-	resErr = strings.Join(status.Stderr, "\n")
-	return
+	stderr, errStderr = copyAndCapture(targetStderr, stderrIn)
+
+	wg.Wait()
+	var exitCode int
+	err = cmd.Wait()
+	if err != nil {
+		if exitError, ok := err.(*exec.ExitError); ok {
+			exitCode = exitError.ExitCode()
+			err = nil
+		}
+	}
+	if errStdout != nil {
+		err = fmt.Errorf("failed to capture stdout\n\t%s", errStdout)
+	}
+	if errStderr != nil {
+		err = fmt.Errorf("failed to capture stderr\n\t%s", errStderr)
+	}
+	outStr, errStr := strings.TrimSuffix(string(stdout), "\n"), strings.TrimSuffix(string(stderr), "\n")
+	return outStr, errStr, exitCode, err
 }

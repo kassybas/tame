@@ -1,6 +1,7 @@
 package orchestrate
 
 import (
+	"fmt"
 	"os"
 	"strings"
 
@@ -72,5 +73,9 @@ func Make(path, targetName string, targetArgs []string) {
 		logrus.Fatal("error during execution:\n\t", err.Error())
 	}
 	// pass through the status code
+	if root.GetResult().StdStatusValue != 0 {
+		fmt.Fprintf(os.Stdout, "tame: *** [%s] Error %d\n", targetName, root.GetResult().StdStatusValue)
+	}
+
 	os.Exit(root.GetResult().StdStatusValue)
 }
