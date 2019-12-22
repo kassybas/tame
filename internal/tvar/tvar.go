@@ -96,7 +96,7 @@ func CreateVariable(name string, value interface{}) VariableI {
 	// Float
 	case float64:
 		{
-			return TFloat{name: name, value: value.(float64)}
+			return NewFloat(name, value.(float64))
 		}
 	case TFloat:
 		{

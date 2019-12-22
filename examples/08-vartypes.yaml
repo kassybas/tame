@@ -1,9 +1,9 @@
 globals:
   $config:
-    build: true  # these nested variable values can be accessed via "." in Tame context
+    build: 6.4
 
 targets:
   testVar:
     run:
-    - sh: env
-    - sh: echo "config is ${config_build}" # use "__" as separator in the flattened map variable name
+    - sh: echo "config is ${config_build}" 
+    - sh: echo "yolo"

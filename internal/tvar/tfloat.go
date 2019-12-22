@@ -4,29 +4,26 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/kassybas/tame/internal/keywords"
 	"github.com/kassybas/tame/types/vartype"
+
+	"github.com/kassybas/tame/internal/keywords"
 )
 
 type TFloat struct {
-	name  string
+	TBaseVar
 	value float64
 }
 
-func (v TFloat) IsScalar() bool {
-	return true
-}
-
-func (v TFloat) Type() vartype.TVarType {
-	return vartype.TFloatType
-}
-
-func (v TFloat) Name() string {
-	return v.name
-}
-
-func (v TFloat) Value() interface{} {
-	return v.value
+func NewFloat(name string, value float64) TFloat {
+	return TFloat{
+		TBaseVar: TBaseVar{
+			name:     name,
+			iValue:   interface{}(value),
+			isScalar: true,
+			varType:  vartype.TFloatType,
+		},
+		value: value,
+	}
 }
 
 func (v TFloat) ToInt() (int, error) {
