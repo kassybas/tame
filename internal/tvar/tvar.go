@@ -87,7 +87,7 @@ func CreateVariable(name string, value interface{}) VariableI {
 	// Int
 	case int:
 		{
-			return TInt{name: name, value: value.(int)}
+			return NewInt(name, value.(int))
 		}
 	case TInt:
 		{
