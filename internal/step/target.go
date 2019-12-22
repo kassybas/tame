@@ -89,11 +89,9 @@ func updateVarsWithResultVariables(vt vartable.VarTable, r Result) (vartable.Var
 	}
 	if r.StderrVar != "" {
 		v := tvar.CreateVariable(r.StderrVar, r.StderrValue)
-		fmt.Println("ERROR IS ",r.StderrValue)
 		vt.Add(v)
 	}
 	if r.StdStatusVar != "" {
-		fmt.Println("STATUS IS",r.StdStatusValue)
 		v := tvar.CreateVariable(r.StdStatusVar, strconv.Itoa(r.StdStatusValue))
 		vt.Add(v)
 	}

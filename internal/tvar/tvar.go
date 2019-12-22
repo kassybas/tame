@@ -60,7 +60,7 @@ func CreateVariable(name string, value interface{}) VariableI {
 	// Null
 	case nil:
 		{
-			return TNull{name: name}
+			return NewNull(name)
 		}
 	case TNull:
 		{
@@ -69,7 +69,7 @@ func CreateVariable(name string, value interface{}) VariableI {
 	// Bool
 	case bool:
 		{
-			return TBool{name: name, value: value.(bool)}
+			return NewBool(name, value.(bool))
 		}
 	case TBool:
 		{
@@ -78,7 +78,7 @@ func CreateVariable(name string, value interface{}) VariableI {
 	// String
 	case string:
 		{
-			return TString{name: name, value: value.(string)}
+			return NewString(name, value.(string))
 		}
 	case TString:
 		{
@@ -87,7 +87,7 @@ func CreateVariable(name string, value interface{}) VariableI {
 	// Int
 	case int:
 		{
-			return TInt{name: name, value: value.(int)}
+			return NewInt(name, value.(int))
 		}
 	case TInt:
 		{
@@ -96,7 +96,7 @@ func CreateVariable(name string, value interface{}) VariableI {
 	// Float
 	case float64:
 		{
-			return TFloat{name: name, value: value.(float64)}
+			return NewFloat(name, value.(float64))
 		}
 	case TFloat:
 		{
@@ -105,11 +105,7 @@ func CreateVariable(name string, value interface{}) VariableI {
 	// Map
 	case map[interface{}]interface{}:
 		{
-			return CreateMap(name, value.(map[interface{}]interface{}))
-		}
-	case map[string]VariableI:
-		{
-			return TMap{name: name, value: value.(map[string]VariableI)}
+			return NewMap(name, value.(map[interface{}]interface{}))
 		}
 	case TMap:
 		{

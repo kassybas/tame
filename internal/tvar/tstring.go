@@ -4,29 +4,27 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/kassybas/tame/internal/keywords"
 	"github.com/kassybas/tame/types/vartype"
+
+	"github.com/kassybas/tame/internal/keywords"
 )
 
 type TString struct {
-	name  string
+	TBaseVar
 	value string
 }
 
-func (v TString) IsScalar() bool {
-	return true
-}
+func NewString(name string, value string) TString {
+	return TString{
+		TBaseVar: TBaseVar{
+			name:     name,
+			iValue:   interface{}(value),
+			isScalar: true,
+			varType:  vartype.TStringType,
+		},
+		value: value,
+	}
 
-func (v TString) Type() vartype.TVarType {
-	return vartype.TStringType
-}
-
-func (v TString) Name() string {
-	return v.name
-}
-
-func (v TString) Value() interface{} {
-	return v.value
 }
 
 func (v TString) ToInt() (int, error) {

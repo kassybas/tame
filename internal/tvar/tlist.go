@@ -10,24 +10,21 @@ import (
 )
 
 type TList struct {
-	name  string
+	TBaseVar
 	value []VariableI
 }
 
-func (v TList) Type() vartype.TVarType {
-	return vartype.TListType
-}
+func NewList(name string, value []VariableI) TList {
+	return TList{
+		TBaseVar: TBaseVar{
+			name:     name,
+			iValue:   interface{}(value),
+			isScalar: false,
+			varType:  vartype.TListType,
+		},
+		value: value,
+	}
 
-func (v TList) IsScalar() bool {
-	return false
-}
-
-func (v TList) Name() string {
-	return v.name
-}
-
-func (v TList) Value() interface{} {
-	return v.value
 }
 
 func (v TList) ToInt() (int, error) {
@@ -38,7 +35,6 @@ func (v TList) ToInt() (int, error) {
 
 func (v TList) ToStr() string {
 	return ""
-	// return v.value.(string)
 }
 
 func (v TList) GetItem(i int) (VariableI, error) {
@@ -78,4 +74,16 @@ func CreateListFromVars(name string, values []VariableI) VariableI {
 		tl.value[i] = v
 	}
 	return tl
+}
+
+func MergeLists(origList, newList TList) (TList, error) {
+	if len(origList.value) < len(newList.value) {
+		return TList{}, fmt.Errorf("index out of range: %s[%d]", origList.name, len(newList.value)-1)
+	}
+	for i := range newList.value {
+		if newList.value[i].Type() != vartype.TNullType {
+			origList.value[i] = newList.value[i]
+		}
+	}
+	return origList, nil
 }

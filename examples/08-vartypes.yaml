@@ -1,0 +1,23 @@
+settings:
+  shieldEnv: true
+
+globals:
+  $config:
+    build: "OKOKOK"
+
+targets:
+  testVar:
+    run:
+    - sh: echo "config is ${config_build}" 
+    - sh: echo "${config_12}"
+    - call returnMap: {}
+      $: date
+    - sh: echo "${date_day}"
+
+  returnMap:
+    run:
+    - var $mymap:
+        date:
+          month: september
+          day: 22
+    - return: $mymap.date

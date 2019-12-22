@@ -1,25 +1,22 @@
 package tvar
 
-import "github.com/kassybas/tame/types/vartype"
+import (
+	"github.com/kassybas/tame/types/vartype"
+)
 
 type TNull struct {
-	name string
+	TBaseVar
 }
 
-func (v TNull) Type() vartype.TVarType {
-	return vartype.TNullType
-}
-
-func (v TNull) IsScalar() bool {
-	return false
-}
-
-func (v TNull) Name() string {
-	return v.name
-}
-
-func (v TNull) Value() interface{} {
-	return nil
+func NewNull(name string) TNull {
+	return TNull{
+		TBaseVar: TBaseVar{
+			iValue:   interface{}(nil),
+			name:     name,
+			isScalar: true,
+			varType:  vartype.TNullType,
+		},
+	}
 }
 
 func (v TNull) ToInt() (int, error) {

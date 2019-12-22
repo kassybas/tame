@@ -10,4 +10,3 @@ targets:
   FieldSepExample:
     run:
     - sh: echo "config is ${config__linux}" # use "__" as separator in the flattened map variable name
-  
