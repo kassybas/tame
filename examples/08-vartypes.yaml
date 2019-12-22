@@ -1,6 +1,6 @@
 globals:
   $config:
-    build: 5
+    build: "OKOKOK"
 
 targets:
   testVar:

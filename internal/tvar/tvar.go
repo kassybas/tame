@@ -60,7 +60,7 @@ func CreateVariable(name string, value interface{}) VariableI {
 	// Null
 	case nil:
 		{
-			return TNull{name: name}
+			return NewNull(name)
 		}
 	case TNull:
 		{
@@ -78,7 +78,7 @@ func CreateVariable(name string, value interface{}) VariableI {
 	// String
 	case string:
 		{
-			return TString{name: name, value: value.(string)}
+			return NewString(name, value.(string))
 		}
 	case TString:
 		{
