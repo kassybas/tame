@@ -69,8 +69,7 @@ func CreateVariable(name string, value interface{}) VariableI {
 	// Bool
 	case bool:
 		{
-			// return TBool{ Xname: name, value: value.(bool)}
-			return TBool{TBaseVar: TBaseVar{name: name}, value: value.(bool)}
+			return NewBool(name, value.(bool))
 		}
 	case TBool:
 		{

@@ -3,12 +3,26 @@ package tvar
 import (
 	"strings"
 
+	"github.com/kassybas/tame/types/vartype"
+
 	"github.com/kassybas/tame/internal/keywords"
 )
 
 type TBool struct {
 	TBaseVar
 	value bool
+}
+
+func NewBool(name string, value bool) TBool {
+	return TBool{
+		TBaseVar: TBaseVar{
+			name:     name,
+			iValue:   interface{}(value),
+			isScalar: true,
+			varType:  vartype.TBoolType,
+		},
+		value: value,
+	}
 }
 
 func (v TBool) ToInt() (int, error) {

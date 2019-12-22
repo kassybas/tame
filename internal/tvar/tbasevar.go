@@ -1,9 +1,6 @@
 package tvar
 
 import (
-	"strings"
-
-	"github.com/kassybas/tame/internal/keywords"
 	"github.com/kassybas/tame/types/vartype"
 )
 
@@ -28,10 +25,4 @@ func (v TBaseVar) IsScalar() bool {
 
 func (v TBaseVar) Type() vartype.TVarType {
 	return v.varType
-}
-
-func (v TBaseVar) ToEnvVars(ShellFieldSeparator string) []string {
-	// Remove $ for shell env format
-	trimmedName := strings.TrimPrefix(v.name, keywords.PrefixReference)
-	return []string{trimmedName + "=" + v.ToStr()}
 }
