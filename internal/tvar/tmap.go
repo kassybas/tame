@@ -46,7 +46,7 @@ func NewMap(name string, value map[interface{}]interface{}) TMap {
 	tm := TMap{
 		TBaseVar: TBaseVar{
 			name:    name,
-			iValue:  value,
+			iValue:  interface{}(value),
 			varType: vartype.TMapType,
 		},
 	}
@@ -154,16 +154,4 @@ func EncapsulateValueToMap(name string, innerValue VariableI) TMap {
 	m := make(map[interface{}]interface{})
 	m[innerValue.Name()] = innerValue.Value()
 	return NewMap(name, m)
-}
-
-func MergeLists(origList, newList TList) (TList, error) {
-	if len(origList.value) < len(newList.value) {
-		return TList{}, fmt.Errorf("index out of range: %s[%d]", origList.name, len(newList.value)-1)
-	}
-	for i := range newList.value {
-		if newList.value[i].Type() != vartype.TNullType {
-			origList.value[i] = newList.value[i]
-		}
-	}
-	return origList, nil
 }
