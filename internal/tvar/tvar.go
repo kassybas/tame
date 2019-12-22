@@ -105,11 +105,7 @@ func CreateVariable(name string, value interface{}) VariableI {
 	// Map
 	case map[interface{}]interface{}:
 		{
-			return CreateMap(name, value.(map[interface{}]interface{}))
-		}
-	case map[string]VariableI:
-		{
-			return TMap{name: name, value: value.(map[string]VariableI)}
+			return NewMap(name, value.(map[interface{}]interface{}))
 		}
 	case TMap:
 		{

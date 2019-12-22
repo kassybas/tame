@@ -2,6 +2,8 @@ package tvar
 
 import (
 	"fmt"
+	"log"
+	"strconv"
 	"strings"
 
 	"github.com/kassybas/tame/internal/dotref"
@@ -10,29 +12,55 @@ import (
 )
 
 type TMap struct {
-	name  string
+	TBaseVar
 	value map[string]VariableI
 }
 
-func (v TMap) Type() vartype.TVarType {
-	return vartype.TMapType
+func convertKeyToString(key interface{}) string {
+	switch key.(type) {
+	case string:
+		{
+			return key.(string)
+		}
+	case int:
+		{
+			return strconv.Itoa(key.(int))
+		}
+	case float64:
+		{
+			return fmt.Sprintf("%g", key.(float64))
+		}
+	case bool:
+		{
+			if key.(bool) {
+				return "true"
+			}
+			return "false"
+		}
+	}
+	log.Fatal("yaml key not valid type (must be: string, int, float, bool)", key)
+	return ""
 }
 
-func (v TMap) IsScalar() bool {
-	return false
-}
-
-func (v TMap) Name() string {
-	return v.name
-}
-
-func (v TMap) Value() interface{} {
-	return v.value
+func NewMap(name string, value map[interface{}]interface{}) TMap {
+	tm := TMap{
+		TBaseVar: TBaseVar{
+			name:    name,
+			iValue:  value,
+			varType: vartype.TMapType,
+		},
+	}
+	tm.value = make(map[string]VariableI)
+	for k, v := range value {
+		// original type of key is converted to string
+		// TODO: make this more flexible
+		stringKey := convertKeyToString(k)
+		tm.value[stringKey] = CreateVariable(stringKey, v)
+	}
+	return tm
 }
 
 func (v TMap) ToInt() (int, error) {
-	// i, err := strconv.Atoi(v.value.(string))
-	// return i, err
 	return 0, nil
 }
 
@@ -64,16 +92,6 @@ func (tm TMap) GetMember(key string) (VariableI, error) {
 		return nil, fmt.Errorf("field is not member of map: %s.%s", tm.name, key)
 	}
 	return v, nil
-}
-
-func CreateMap(name string, value map[interface{}]interface{}) TMap {
-	var tm TMap
-	tm.name = name
-	tm.value = make(map[string]VariableI)
-	for k, v := range value {
-		tm.value[k.(string)] = CreateVariable(k.(string), v)
-	}
-	return tm
 }
 
 func ValidateUpdate(origVar VariableI, dr dotref.DotRef) error {
@@ -133,7 +151,9 @@ func UpdateCompositeValue(origVar, newField VariableI) VariableI {
 }
 
 func EncapsulateValueToMap(name string, innerValue VariableI) TMap {
-	return TMap{name: name, value: map[string]VariableI{innerValue.Name(): innerValue}}
+	m := make(map[interface{}]interface{})
+	m[innerValue.Name()] = innerValue.Value()
+	return NewMap(name, m)
 }
 
 func MergeLists(origList, newList TList) (TList, error) {

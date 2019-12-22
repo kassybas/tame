@@ -13,7 +13,7 @@ func NewNull(name string) TNull {
 		TBaseVar: TBaseVar{
 			iValue:   interface{}(nil),
 			name:     name,
-			isScalar: false,
+			isScalar: true,
 			varType:  vartype.TNullType,
 		},
 	}
