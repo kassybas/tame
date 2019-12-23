@@ -2,88 +2,88 @@ package tvar
 
 import (
 	"fmt"
-	"strconv"
 	"strings"
+
+	"github.com/kassybas/tame/internal/dotref"
 
 	"github.com/kassybas/tame/internal/keywords"
 	"github.com/kassybas/tame/types/vartype"
 )
 
 type TList struct {
-	TBaseVar
-	value []VariableI
+	name   string
+	values []TVariable
 }
 
-func NewList(name string, value []VariableI) TList {
-	return TList{
-		TBaseVar: TBaseVar{
-			name:     name,
-			iValue:   interface{}(value),
-			isScalar: false,
-			varType:  vartype.TListType,
-		},
-		value: value,
+func NewList(name string, values []interface{}) TList {
+	tl := TList{
+		name:   name,
+		values: make([]TVariable, len(values)),
 	}
-
+	for i := range values {
+		tl.values[i] = NewVariable(ConvertKeyToString(i), values[i])
+	}
+	return tl
 }
 
-func (v TList) ToInt() (int, error) {
-	// i, err := strconv.Atoi(v.value.(string))
-	// return i, err
-	return 0, nil
+func (v TList) Name() string {
+	return v.name
 }
 
 func (v TList) ToStr() string {
-	return ""
+	// TODO: yaml dump?
+	return fmt.Sprintf("%v", v.values)
 }
 
-func (v TList) GetItem(i int) (VariableI, error) {
-	if len(v.value) <= i {
+func (v TList) Value() interface{} {
+	return v.values
+}
+
+func (v TList) Type() vartype.TVarType {
+	return vartype.TListType
+}
+
+func (v TList) GetItem(i int) (interface{}, error) {
+	if len(v.values) <= i {
 		return nil, fmt.Errorf("index out of range: %s[%d]", v.name, i)
 	}
-	return v.value[i], nil
+	return v.values[i], nil
 }
 
 func (v TList) ToEnvVars(ShellFieldSeparator string) []string {
 	var envVars []string
 	trimmedName := strings.TrimPrefix(v.name, keywords.PrefixReference)
-	for _, v := range v.value {
-		for _, memberEnvVar := range v.ToEnvVars(ShellFieldSeparator) {
-			ev := trimmedName + "_" + memberEnvVar
+	for _, item := range v.values {
+		// TODO: handle brackets better
+		for _, itemEnvVar := range item.ToEnvVars(ShellFieldSeparator) {
+			ev := fmt.Sprintf("%s%s", trimmedName, itemEnvVar)
 			envVars = append(envVars, ev)
 		}
 	}
 	return envVars
 }
 
-func CreateListFromInterface(name string, values []interface{}) VariableI {
-	var tl TList
-	tl.name = name
-	tl.value = make([]VariableI, len(values))
-	for i, v := range values {
-		tl.value[i] = CreateVariable(strconv.Itoa(i), v)
+func (v TList) SetValue(fields []dotref.RefField, value interface{}) (TVariable, error) {
+	var err error
+	field := fields[0]
+	if field.FieldName != "" {
+		return nil, fmt.Errorf("setting map on a list: [%s] %v ", v.name, fields)
 	}
-	return tl
+	if field.Index >= len(v.values) {
+		return nil, fmt.Errorf("index out-of-range: %s[%d]", v.name, field.Index)
+	}
+	v.values[field.Index], err = v.values[field.Index].SetValue(fields[1:], value)
+	return v, err
 }
 
-func CreateListFromVars(name string, values []VariableI) VariableI {
-	var tl TList
-	tl.name = name
-	tl.value = make([]VariableI, len(values))
-	for i, v := range values {
-		tl.value[i] = v
-	}
-	return tl
-}
-
-func MergeLists(origList, newList TList) (TList, error) {
-	if len(origList.value) < len(newList.value) {
-		return TList{}, fmt.Errorf("index out of range: %s[%d]", origList.name, len(newList.value)-1)
-	}
-	for i := range newList.value {
-		if newList.value[i].Type() != vartype.TNullType {
-			origList.value[i] = newList.value[i]
-		}
-	}
-	return origList, nil
-}
+// func MergeLists(origList, newList TList) (TList, error) {
+// 	if len(origList.value) < len(newList.value) {
+// 		return TList{}, fmt.Errorf("index out of range: %s[%d]", origList.name, len(newList.value)-1)
+// 	}
+// 	for i := range newList.value {
+// 		if newList.value[i].Type() != vartype.TNullType {
+// 			origList.value[i] = newList.value[i]
+// 		}
+// 	}
+// 	return origList, nil
+// }

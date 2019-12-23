@@ -26,7 +26,7 @@ type Target struct {
 	Steps          []Step
 	Params         []Param
 	Opts           opts.ExecutionOpts
-	Variables      []tvar.VariableI
+	Variables      []tvar.TVariable
 	Summary        string
 }
 
@@ -84,16 +84,13 @@ func (t Target) Run(ctx tcontext.Context, vt vartable.VarTable) ([]interface{}, 
 
 func updateVarsWithResultVariables(vt vartable.VarTable, r Result) (vartable.VarTable, error) {
 	if r.StdoutVar != "" {
-		v := tvar.CreateVariable(r.StdoutVar, r.StdoutValue)
-		vt.Add(v)
+		vt.Add(r.StdoutVar, r.StdoutValue)
 	}
 	if r.StderrVar != "" {
-		v := tvar.CreateVariable(r.StderrVar, r.StderrValue)
-		vt.Add(v)
+		vt.Add(r.StderrVar, r.StderrValue)
 	}
 	if r.StdStatusVar != "" {
-		v := tvar.CreateVariable(r.StdStatusVar, strconv.Itoa(r.StdStatusValue))
-		vt.Add(v)
+		vt.Add(r.StdStatusVar, strconv.Itoa(r.StdStatusValue))
 	}
 	if r.ResultValues != nil {
 		if len(r.ResultValues) != len(r.ResultNames) {
@@ -107,6 +104,7 @@ func updateVarsWithResultVariables(vt vartable.VarTable, r Result) (vartable.Var
 	return vt, nil
 }
 
+// TODO: unify variable resolution
 func resolveParams(vt vartable.VarTable, params []Param) (vartable.VarTable, error) {
 	for _, p := range params {
 		if vt.Exists(p.Name) {
@@ -114,13 +112,11 @@ func resolveParams(vt vartable.VarTable, params []Param) (vartable.VarTable, err
 			if err != nil {
 				return vt, err
 			}
-			v := tvar.CreateVariable(p.Name, val.Value())
-			vt.Add(v)
+			vt.Add(p.Name, val.Value())
 			continue
 		}
 		if p.HasDefault {
-			v := tvar.CreateVariable(p.Name, p.DefaultValue)
-			vt.Add(v)
+			vt.Add(p.Name, p.DefaultValue)
 			continue
 		}
 		return vt, fmt.Errorf("parameter without value or default value: %s", p.Name)

@@ -10,7 +10,7 @@ import (
 
 type ReturnStep struct {
 	Name      string
-	Arguments []tvar.VariableI
+	Arguments []tvar.TVariable
 	Return    []string
 }
 

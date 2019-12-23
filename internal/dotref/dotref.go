@@ -9,15 +9,9 @@ import (
 	"github.com/kassybas/tame/internal/keywords"
 )
 
-type Field struct {
+type RefField struct {
 	FieldName string
 	Index     int
-}
-
-type DotRef struct {
-	Fields []Field
-	Name   string
-	Value  interface{}
 }
 
 func checkIndexSeparators(field string) (bool, error) {
@@ -38,40 +32,27 @@ func IsDotRef(dotName string) bool {
 		return true
 	}
 	return false
-
 }
 
-func NewReference(dotName string, value interface{}) (DotRef, error) {
-	var dv DotRef
-	// if !IsDotRef(dotName) {
-	// 	return dv, fmt.Errorf("internal error: creatign reference from non-dot name %s", dotName)
-	// }
-	fields := strings.Split(dotName, keywords.TameFieldSeparator)
+func ParseFields(dotName string) ([]RefField, error) {
+	tmp_fields := strings.Split(dotName, keywords.TameFieldSeparator)
+	fields := []RefField{}
 
-	firstField := fields[0]
-	dv.Name = strings.Split(firstField, keywords.IndexingSeparatorL)[0]
-
-	dv.Fields = []Field{}
-	for i, field := range fields {
+	for _, field := range tmp_fields {
 		hasIndex, err := checkIndexSeparators(field)
 		if err != nil {
-			return dv, err
+			return fields, err
 		}
 		if hasIndex {
 			index, f, err := helpers.ParseIndex(field)
 			if err != nil {
-				return dv, err
+				return fields, err
 			}
-			// skipping first field because that is the name
-			if i != 0 {
-				dv.Fields = append(dv.Fields, Field{FieldName: f})
-			}
-			dv.Fields = append(dv.Fields, Field{Index: index})
-		} else if i != 0 {
-			f := field
-			dv.Fields = append(dv.Fields, Field{FieldName: f})
+			fields = append(fields, RefField{FieldName: f})
+			fields = append(fields, RefField{Index: index})
+		} else {
+			fields = append(fields, RefField{FieldName: field})
 		}
 	}
-	dv.Value = value
-	return dv, nil
+	return fields, nil
 }

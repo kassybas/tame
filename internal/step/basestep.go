@@ -19,7 +19,6 @@ type Step interface {
 	SetCalledTarget(Target)
 }
 
-// TODO: make result a variable interface
 type Result struct {
 	StdoutVar      string
 	StdoutValue    string

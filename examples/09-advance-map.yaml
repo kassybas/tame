@@ -1,0 +1,29 @@
+settings:
+  shieldEnv: true
+
+targets:
+
+  createMap:
+    run:
+    - var $config:
+        linux:
+          arch: amd64
+          os: linux
+        mac:
+          arch: amd64
+          os: darwin
+        listy:
+        - one
+        - two
+    - return: $config
+  
+  build:
+    run:
+    - call createMap: {}
+      $: $result
+    - sh: env
+    # - var $result.listy[0]: okaaay
+    # - sh: echo ----
+    # - sh: env
+      
+
