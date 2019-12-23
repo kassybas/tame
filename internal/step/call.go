@@ -3,8 +3,6 @@ package step
 import (
 	"fmt"
 
-	"github.com/kassybas/tame/types/vartype"
-
 	"github.com/kassybas/tame/internal/tcontext"
 	"github.com/kassybas/tame/internal/tvar"
 	"github.com/kassybas/tame/internal/vartable"
@@ -14,7 +12,7 @@ import (
 
 type CallStep struct {
 	Name             string
-	Arguments        []tvar.VariableI
+	Arguments        []tvar.TVariable
 	Opts             opts.ExecutionOpts
 	Results          Result
 	CalledTargetName string
@@ -52,20 +50,20 @@ func (s *CallStep) RunStep(ctx tcontext.Context, vt vartable.VarTable) error {
 	return nil
 }
 
-func createArgsVartable(argDefs []tvar.VariableI, calledTarget Target, vt vartable.VarTable) (vartable.VarTable, error) {
+func createArgsVartable(argDefs []tvar.TVariable, calledTarget Target, vt vartable.VarTable) (vartable.VarTable, error) {
 	argsVarTable := vartable.NewVarTable()
 	for _, arg := range argDefs {
 		if !calledTarget.isParameter(arg.Name()) {
 			return argsVarTable, fmt.Errorf("unknown parameter for target %s: '%s'", calledTarget.Name, arg.Name())
 		}
-		if arg.Type() == vartype.TNullType {
+		if arg.Value() == nil {
 			return argsVarTable, fmt.Errorf("passing empty(null) argument for target %s: '%s: %v'", calledTarget.Name, arg.Name(), arg.Value())
 		}
 		argVar, err := vt.ResolveVar(arg)
 		if err != nil {
 			return argsVarTable, err
 		}
-		argsVarTable.Add(argVar)
+		argsVarTable.AddVar(argVar)
 	}
 
 	return argsVarTable, nil

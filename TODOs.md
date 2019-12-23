@@ -3,14 +3,15 @@
 
 - vartable creates env_vars even if nothing has changes (should reuse previous one)
 - document variables and conversions
-- resolve $values in variable names
-- make field separators configurable
-- non-string map keys
 - make append to list possible
-
-- add load step
-- add include of others
-- add for
-- add if
-
-- docker-build fails
+- add for and if to step
+- eval
+- load
+- include
+- docker
+- cli
+- logging
+- check variable names at creation
+- resolve $values in variable names: make $config.$os resolve
+- make all field separators configurable
+- non-string map keys

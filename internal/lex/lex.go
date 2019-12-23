@@ -12,14 +12,14 @@ import (
 	"github.com/kassybas/tame/internal/tvar"
 )
 
-func parseCLITargetArgs(targetArgs []string) ([]tvar.VariableI, error) {
-	var args []tvar.VariableI
+func parseCLITargetArgs(targetArgs []string) ([]tvar.TVariable, error) {
+	var args []tvar.TVariable
 	for _, argStr := range targetArgs {
 		k, v, err := helpers.GetKeyValueFromEnvString(argStr)
 		if err != nil {
 			return nil, err
 		}
-		newArg := tvar.CreateVariable(k, v)
+		newArg := tvar.NewVariable(k, v)
 		args = append(args, newArg)
 	}
 	return args, nil

@@ -17,8 +17,8 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func EvaluateGlobals(globalDefs map[string]interface{}) ([]tvar.VariableI, error) {
-	var vars []tvar.VariableI
+func EvaluateGlobals(globalDefs map[string]interface{}) ([]tvar.TVariable, error) {
+	var vars []tvar.TVariable
 	for k, v := range globalDefs {
 		if strings.HasSuffix(k, keywords.GlobalDefaultVarSuffix) {
 			name := strings.TrimSuffix(k, keywords.GlobalDefaultVarSuffix)
@@ -30,15 +30,15 @@ func EvaluateGlobals(globalDefs map[string]interface{}) ([]tvar.VariableI, error
 			} else {
 				value = v
 			}
-			vars = append(vars, tvar.CreateVariable(name, value))
+			vars = append(vars, tvar.NewVariable(name, value))
 			continue
 		}
-		vars = append(vars, tvar.CreateVariable(k, v))
+		vars = append(vars, tvar.NewVariable(k, v))
 	}
 	return vars, nil
 }
 
-func CreateContext(globals []tvar.VariableI, sts settings.Settings) (tcontext.Context, error) {
+func CreateContext(globals []tvar.TVariable, sts settings.Settings) (tcontext.Context, error) {
 	return tcontext.Context{
 		Globals:  globals,
 		Settings: sts,

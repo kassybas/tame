@@ -21,8 +21,8 @@ func parseCalledTargetName(k string) (string, error) {
 	return fields[1], nil
 }
 
-func parseCallStepArgs(argDefs map[interface{}]interface{}) ([]tvar.VariableI, error) {
-	args := []tvar.VariableI{}
+func parseCallStepArgs(argDefs map[interface{}]interface{}) ([]tvar.TVariable, error) {
+	args := []tvar.TVariable{}
 	for argKey, argValue := range argDefs {
 
 		varName, err := ifaceToString(argKey)
@@ -32,7 +32,8 @@ func parseCallStepArgs(argDefs map[interface{}]interface{}) ([]tvar.VariableI, e
 		if err := validateVariableName(varName); err != nil {
 			return nil, err
 		}
-		newArg := tvar.CreateVariable(argKey.(string), argValue)
+		// TODO: hanlde nonstring argKeys
+		newArg := tvar.NewVariable(tvar.ConvertKeyToString(argKey), argValue)
 		args = append(args, newArg)
 	}
 	return args, nil

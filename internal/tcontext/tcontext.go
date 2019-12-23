@@ -6,6 +6,6 @@ import (
 )
 
 type Context struct {
-	Globals  []tvar.VariableI
+	Globals  []tvar.TVariable
 	Settings settings.Settings
 }
