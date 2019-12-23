@@ -75,15 +75,3 @@ func (v TList) SetValue(fields []dotref.RefField, value interface{}) (TVariable,
 	v.values[field.Index], err = v.values[field.Index].SetValue(fields[1:], value)
 	return v, err
 }
-
-// func MergeLists(origList, newList TList) (TList, error) {
-// 	if len(origList.value) < len(newList.value) {
-// 		return TList{}, fmt.Errorf("index out of range: %s[%d]", origList.name, len(newList.value)-1)
-// 	}
-// 	for i := range newList.value {
-// 		if newList.value[i].Type() != vartype.TNullType {
-// 			origList.value[i] = newList.value[i]
-// 		}
-// 	}
-// 	return origList, nil
-// }
