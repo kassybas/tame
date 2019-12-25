@@ -61,11 +61,9 @@ func (t Target) Make(ctx tcontext.Context, vt vartable.VarTable) ([]interface{},
 			return results, stdstatus, err
 		}
 		// Check result status
-		if s.GetOpts().CanFail == false {
-			if stdstatus != 0 {
-				logrus.Errorf("execution failed: status %d\n\ttarget: %s", stdstatus, t.Name)
-				return nil, stdstatus, nil
-			}
+		if s.GetOpts().CanFail == false && stdstatus != 0 {
+			logrus.Errorf("execution failed: status %d\n\ttarget: %s", stdstatus, t.Name)
+			return nil, stdstatus, nil
 		}
 		vt, err = updateVarsWithResultVariables(vt, s.ResultNames(), results)
 		if err != nil {
