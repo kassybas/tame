@@ -2,7 +2,6 @@ package step
 
 import (
 	"fmt"
-	"strconv"
 
 	"github.com/kassybas/tame/types/steptype"
 
@@ -28,6 +27,7 @@ type Target struct {
 	Opts           opts.ExecutionOpts
 	Variables      []tvar.TVariable
 	Summary        string
+	Status         int
 }
 
 func mergeOpts(globalOpts, targetOpts, stepOpts opts.ExecutionOpts) opts.ExecutionOpts {
@@ -37,7 +37,7 @@ func mergeOpts(globalOpts, targetOpts, stepOpts opts.ExecutionOpts) opts.Executi
 	}
 }
 
-func (t Target) Run(ctx tcontext.Context, vt vartable.VarTable) ([]interface{}, int, error) {
+func (t Target) Make(ctx tcontext.Context, vt vartable.VarTable) ([]interface{}, int, error) {
 	vt.AddVariables(ctx.Globals)
 	vt, err := resolveParams(vt, t.Params)
 	if err != nil {
@@ -45,14 +45,6 @@ func (t Target) Run(ctx tcontext.Context, vt vartable.VarTable) ([]interface{}, 
 	}
 	var returnValues []interface{}
 	for _, s := range t.Steps {
-		if s.Kind() == steptype.Return {
-			rs := s.(*ReturnStep)
-			returnValues, err = createReturnValues(vt, rs.Return)
-			if err != nil {
-				return nil, 0, fmt.Errorf("in target: %s\n\tin step: %s\n\t%s", t.Name, s.GetName(), err)
-			}
-			break
-		}
 		// Opts
 		// TODO: straighten out this mess
 		s.SetOpts(mergeOpts(ctx.Settings.GlobalOpts, t.Opts, s.GetOpts()))
@@ -60,20 +52,24 @@ func (t Target) Run(ctx tcontext.Context, vt vartable.VarTable) ([]interface{}, 
 		newCtx.Settings.GlobalOpts = s.GetOpts()
 
 		// Run
-		err = s.RunStep(newCtx, vt)
+		results, stdstatus, err := s.RunStep(newCtx, vt)
 		if err != nil {
-			return nil, 0, fmt.Errorf("%s\n[target: %s, step: %s]", err.Error(), t.Name, s.GetName())
+			return nil, stdstatus, fmt.Errorf("%s\n[target: %s, step: %s]", err.Error(), t.Name, s.GetName())
+		}
+		if s.Kind() == steptype.Return {
+			// if return step, break execution
+			return results, stdstatus, err
 		}
 		// Check result status
 		if s.GetOpts().CanFail == false {
-			if s.GetResult().StdStatusValue != 0 {
-				logrus.Errorf("execution failed: status %d\n\ttarget: %s", s.GetResult().StdStatusValue, t.Name)
-				return nil, s.GetResult().StdStatusValue, nil
+			if stdstatus != 0 {
+				logrus.Errorf("execution failed: status %d\n\ttarget: %s", stdstatus, t.Name)
+				return nil, stdstatus, nil
 			}
 		}
-		vt, err = updateVarsWithResultVariables(vt, s.GetResult())
+		vt, err = updateVarsWithResultVariables(vt, s.ResultNames(), results)
 		if err != nil {
-			return nil, 0, fmt.Errorf("in step: %s\n\t%s", s.GetName(), err)
+			return nil, stdstatus, fmt.Errorf("in step: %s\n\t%s", s.GetName(), err)
 		}
 	}
 	if err != nil {
@@ -82,26 +78,15 @@ func (t Target) Run(ctx tcontext.Context, vt vartable.VarTable) ([]interface{}, 
 	return returnValues, 0, nil
 }
 
-func updateVarsWithResultVariables(vt vartable.VarTable, r Result) (vartable.VarTable, error) {
-	if r.StdoutVar != "" {
-		vt.Add(r.StdoutVar, r.StdoutValue)
+func updateVarsWithResultVariables(vt vartable.VarTable, resultVarNames []string, resultValues []interface{}) (vartable.VarTable, error) {
+	if len(resultVarNames) == 0 {
+		return vt, nil
 	}
-	if r.StderrVar != "" {
-		vt.Add(r.StderrVar, r.StderrValue)
+	if len(resultVarNames) != len(resultValues) {
+		return vt, fmt.Errorf("return and result variables do not match: %d != %d", len(resultVarNames), len(resultValues))
 	}
-	if r.StdStatusVar != "" {
-		vt.Add(r.StdStatusVar, strconv.Itoa(r.StdStatusValue))
-	}
-	if r.ResultValues != nil {
-		if len(r.ResultValues) != len(r.ResultNames) {
-			return vt, fmt.Errorf("return and result variables do not match: %d != %d", len(r.ResultValues), len(r.ResultNames))
-		}
-		err := vt.Append(r.ResultNames, r.ResultValues)
-		if err != nil {
-			return vt, err
-		}
-	}
-	return vt, nil
+	err := vt.Append(resultVarNames, resultValues)
+	return vt, err
 }
 
 // TODO: unify variable resolution
@@ -122,18 +107,6 @@ func resolveParams(vt vartable.VarTable, params []Param) (vartable.VarTable, err
 		return vt, fmt.Errorf("parameter without value or default value: %s", p.Name)
 	}
 	return vt, nil
-}
-
-func createReturnValues(vt vartable.VarTable, returnDefinitions []string) ([]interface{}, error) {
-	rvs := []interface{}{}
-	for _, retDef := range returnDefinitions {
-		rv, err := vt.ResolveValue(retDef)
-		if err != nil {
-			return rvs, err
-		}
-		rvs = append(rvs, rv)
-	}
-	return rvs, nil
 }
 
 func (t Target) isParameter(name string) bool {

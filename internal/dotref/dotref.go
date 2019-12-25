@@ -14,6 +14,10 @@ type RefField struct {
 	Index     int
 }
 
+func Empty() []RefField {
+	return []RefField{}
+}
+
 func checkIndexSeparators(field string) (bool, error) {
 	if !strings.Contains(field, keywords.IndexingSeparatorL) && !strings.Contains(field, keywords.IndexingSeparatorR) {
 		// no indexing in field

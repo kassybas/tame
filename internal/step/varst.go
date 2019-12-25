@@ -10,7 +10,6 @@ import (
 type VarStep struct {
 	Definition interface{}
 	Opts       opts.ExecutionOpts
-	Results    Result
 	Name       string
 }
 
@@ -26,14 +25,14 @@ func (s *VarStep) SetOpts(o opts.ExecutionOpts) {
 	s.Opts = o
 }
 
-func (s *VarStep) GetResult() Result {
-	return s.Results
+func (s *VarStep) ResultNames() []string {
+	// in varstep: the name of the step is equal to the var
+	return []string{s.Name}
 }
-func (s *VarStep) RunStep(ctx tcontext.Context, vt vartable.VarTable) error {
+
+func (s *VarStep) RunStep(ctx tcontext.Context, vt vartable.VarTable) ([]interface{}, int, error) {
 	// TODO: eval variables
-	s.Results.ResultNames = []string{s.Name}
-	s.Results.ResultValues = []interface{}{s.Definition}
-	return nil
+	return []interface{}{s.Definition}, 0, nil
 }
 
 func (s *VarStep) GetCalledTargetName() string {

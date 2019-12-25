@@ -15,15 +15,17 @@ targets:
         listy:
         - one
         - two
-    - return: $config
+    - return: $config.mac
   
   build:
     run:
+    - var $all:
+      - this
+      - is 
+      - a
+      - foo
     - call createMap: {}
       $: $result
     - sh: env
-    # - var $result.listy[0]: okaaay
-    # - sh: echo ----
-    # - sh: env
       
 

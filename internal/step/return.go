@@ -26,12 +26,20 @@ func (s *ReturnStep) SetOpts(o opts.ExecutionOpts) {
 	return
 }
 
-func (s *ReturnStep) GetResult() Result {
-	return Result{}
+func (s *ReturnStep) ResultNames() []string {
+	return []string{}
 }
 
-func (s *ReturnStep) RunStep(ctx tcontext.Context, vt vartable.VarTable) error {
-	return nil
+func (s *ReturnStep) RunStep(ctx tcontext.Context, vt vartable.VarTable) ([]interface{}, int, error) {
+	rvs := []interface{}{}
+	for _, retDef := range s.Return {
+		rv, err := vt.ResolveValue(retDef)
+		if err != nil {
+			return rvs, 1, err
+		}
+		rvs = append(rvs, rv)
+	}
+	return rvs, 0, nil
 }
 
 func (s *ReturnStep) GetCalledTargetName() string {

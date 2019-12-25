@@ -10,13 +10,14 @@ import (
 	"github.com/kassybas/tame/types/steptype"
 )
 
+// TODO: constructor and make these private
 type CallStep struct {
 	Name             string
 	Arguments        []tvar.TVariable
 	Opts             opts.ExecutionOpts
-	Results          Result
 	CalledTargetName string
 	CalledTarget     Target
+	Results          []string
 }
 
 func (s CallStep) GetName() string {
@@ -31,23 +32,21 @@ func (s *CallStep) SetOpts(o opts.ExecutionOpts) {
 	s.Opts = o
 }
 
-func (s *CallStep) GetResult() Result {
+func (s *CallStep) ResultNames() []string {
 	return s.Results
 }
-func (s *CallStep) RunStep(ctx tcontext.Context, vt vartable.VarTable) error {
+
+func (s *CallStep) RunStep(ctx tcontext.Context, vt vartable.VarTable) ([]interface{}, int, error) {
 	// TODOb: resolve global variables too
 	args, err := createArgsVartable(s.Arguments, s.CalledTarget, vt)
 	if err != nil {
-		return fmt.Errorf("in step: %s\n\t%s", s.Name, err.Error())
+		return nil, 0, fmt.Errorf("in step: %s\n\t%s", s.Name, err.Error())
 	}
-	s.Results.ResultValues, s.Results.StdStatusValue, err = s.CalledTarget.Run(ctx, args)
+	resultValues, stdstatus, err := s.CalledTarget.Make(ctx, args)
 	if err != nil {
-		return fmt.Errorf("in step: %s\n\t%s", s.Name, err.Error())
+		return resultValues, stdstatus, fmt.Errorf("in step: %s\n\t%s", s.Name, err.Error())
 	}
-	if len(s.Results.ResultNames) != 0 && len(s.Results.ResultValues) != len(s.Results.ResultNames) {
-		return fmt.Errorf("mismatch count of return values and result variables: %d != %d", len(s.Results.ResultValues), len(s.Results.ResultNames))
-	}
-	return nil
+	return resultValues, stdstatus, nil
 }
 
 func createArgsVartable(argDefs []tvar.TVariable, calledTarget Target, vt vartable.VarTable) (vartable.VarTable, error) {
@@ -59,11 +58,11 @@ func createArgsVartable(argDefs []tvar.TVariable, calledTarget Target, vt vartab
 		if arg.Value() == nil {
 			return argsVarTable, fmt.Errorf("passing empty(null) argument for target %s: '%s: %v'", calledTarget.Name, arg.Name(), arg.Value())
 		}
-		argVar, err := vt.ResolveVar(arg)
+		val, err := vt.ResolveValue(arg.Value())
 		if err != nil {
 			return argsVarTable, err
 		}
-		argsVarTable.AddVar(argVar)
+		argsVarTable.Add(arg.Name(), val)
 	}
 
 	return argsVarTable, nil

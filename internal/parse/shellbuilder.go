@@ -12,42 +12,43 @@ func buildShellStep(stepDef map[string]interface{}) (step.ShellStep, error) {
 	var newStep step.ShellStep
 	newStep.Name = keywords.StepShell
 	for k, v := range stepDef {
-		if k == keywords.StepShell {
-			newStep.Script, err = ifaceToString(v)
-			if err != nil {
-				return newStep, err
+		switch k {
+		case keywords.StepShell:
+			{
+				newStep.Script, err = ifaceToString(v)
+				if err != nil {
+					return newStep, err
+				}
 			}
-			continue
-		}
-		if k == keywords.ShellOutResult {
-			newStep.Results.StdoutVar, err = getVarNameFromIface(v)
-			if err != nil {
-				return newStep, fmt.Errorf("failed to parse step variable: '%s: %v'\n\t%s", k, v, err)
+		case keywords.ShellErrResult:
+			{
+				switch v.(type) {
+				case string:
+					{
+						newStep.Results = []string{v.(string)}
+					}
+				case []interface{}:
+					{
+						ifaceSliceToStringSlice(v.([]interface{}))
+					}
+				default:
+					{
+						return newStep, fmt.Errorf("unknown type in shell step: %s: %s", k, v)
+					}
+				}
 			}
-			continue
-		}
-		if k == keywords.ShellErrResult {
-			newStep.Results.StderrVar, err = getVarNameFromIface(v)
-			if err != nil {
-				return newStep, fmt.Errorf("failed to parse step variable: '%s: %v'\n\t%s", k, v, err)
+		case keywords.Opts:
+			{
+				newStep.Opts, err = parseOpts(v)
+				if err != nil {
+					return newStep, err
+				}
 			}
-			continue
-		}
-		if k == keywords.ShellStatusResult {
-			newStep.Results.StdStatusVar, err = getVarNameFromIface(v)
-			if err != nil {
-				return newStep, fmt.Errorf("failed to parse step variable: '%s: %v'\n\t%s", k, v, err)
+		default:
+			{
+				return newStep, fmt.Errorf("unknown key in shell step: %s: %s", k, v)
 			}
-			continue
 		}
-		if k == keywords.Opts {
-			newStep.Opts, err = parseOpts(v)
-			if err != nil {
-				return newStep, err
-			}
-			continue
-		}
-		return newStep, fmt.Errorf("unknown key in shell step: %s: %s", k, v)
 	}
 	return newStep, nil
 }
