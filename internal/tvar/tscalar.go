@@ -32,11 +32,26 @@ func (v TScalar) Value() interface{} {
 }
 
 func (v TScalar) SetValue(fields []dotref.RefField, value interface{}) (TVariable, error) {
-	if len(fields) != 0 {
-		return nil, fmt.Errorf("setting value of scalar variable with fields: %s %v", v.name, fields)
+	if len(fields) == 0 {
+		// this should never happen, since this would mean that dotref field was called empty
+		return nil, fmt.Errorf("internal error: empty reference")
+	}
+	if len(fields) > 1 {
+		return nil, fmt.Errorf("field reference on scalar variable (only allowed on map or list): '%s'.'%v'", v.name, fields[1].FieldName)
 	}
 	v.value = value
 	return v, nil
+}
+
+func (v TScalar) GetInnerValue(fields []dotref.RefField) (interface{}, error) {
+	if len(fields) == 0 {
+		// this should never happen, since this would mean that dotref field was called empty
+		return nil, fmt.Errorf("internal error: empty reference")
+	}
+	if len(fields) != 1 {
+		return nil, fmt.Errorf("field reference on scalar variable (only allowed on map or list): '%s'.'%v'", v.name, fields[1].FieldName)
+	}
+	return v.value, nil
 }
 
 func (v TScalar) ToStr() string {

@@ -74,20 +74,51 @@ func (v TMap) Value() interface{} {
 
 func (v TMap) SetValue(fields []dotref.RefField, value interface{}) (TVariable, error) {
 	var err error
-	if len(fields) < 2 {
-		return nil, fmt.Errorf("setting scalar on a map: [%s] %v ", v.name, fields)
+	if len(fields) == 0 {
+		// this should never happen, since this would mean that dotref field was called with empty string
+		return nil, fmt.Errorf("internal error: getting member with a non-reference field")
 	}
-	field := fields[0]
+	if len(fields) == 1 {
+		// cast value of map to different value
+		return NewVariable(fields[0].FieldName, value), nil
+	}
+	// Field 0 is the name of the variable
+	field := fields[1]
 	if field.FieldName == "" {
-		return nil, fmt.Errorf("empty field name: %s%s", v.name, keywords.TameFieldSeparator)
+		return nil, fmt.Errorf("empty field name -- indexing not allowed on map type: %s index: %d", v.name, field.Index)
 	}
 	// Map field
-	val, exists := v.values[field]
-	if !exists {
-		return nil, fmt.Errorf("field does not exist in map: %s%s%s ", v.name, keywords.TameFieldSeparator, field)
+	if !v.IsMember(field.FieldName) {
+		if len(fields) == 2 {
+			// last field's key's can be extended
+			v.values[fields[1].FieldName] = NewVariable(fields[1].FieldName, value)
+			return v, nil
+		}
+		return nil, fmt.Errorf("field does not exist in map: %s: %s.%s ", v.name, fields[0].FieldName, fields[1].FieldName)
 	}
-	v.values[field.FieldName], err = val.SetValue(fields[1:], value)
+	// Setting an existing member
+	v.values[field.FieldName], err = v.values[field.FieldName].SetValue(fields[1:], value)
 	return v, err
+}
+
+func (v TMap) GetInnerValue(fields []dotref.RefField) (interface{}, error) {
+	if len(fields) == 0 {
+		// this should never happen, since this would mean that dotref field was called empty
+		return nil, fmt.Errorf("internal error: empty reference")
+	}
+	if len(fields) == 1 {
+		// field[0] is the variable name
+		return v.Value(), nil
+	}
+	// field[1] is the first actual field
+	field := fields[1]
+	if field.FieldName == "" {
+		return nil, fmt.Errorf("empty field name -- indexing not allowed on map type: %s index: %d", v.name, field.Index)
+	}
+	if !v.IsMember(field.FieldName) {
+		return nil, fmt.Errorf("field does not exist %s.%s", v.name, field.FieldName)
+	}
+	return v.values[field.FieldName].GetInnerValue(fields[1:])
 }
 
 func (v TMap) ToEnvVars(ShellFieldSeparator string) []string {

@@ -65,13 +65,42 @@ func (v TList) ToEnvVars(ShellFieldSeparator string) []string {
 
 func (v TList) SetValue(fields []dotref.RefField, value interface{}) (TVariable, error) {
 	var err error
-	field := fields[0]
-	if field.FieldName != "" {
-		return nil, fmt.Errorf("setting map on a list: [%s] %v ", v.name, fields)
+	if len(fields) == 0 {
+		// this should never happen, since this would mean that dotref field was called empty
+		return nil, fmt.Errorf("internal error: empty reference")
 	}
-	if field.Index >= len(v.values) {
+	if len(fields) == 1 {
+		// overdefine list with different type
+		// if no fieldname??
+		return NewVariable(fields[0].FieldName, value), nil
+	}
+	field := fields[1]
+	if field.FieldName != "" {
+		return nil, fmt.Errorf("referencing field on a list: %s %v ", v.name, fields)
+	}
+	if field.Index >= len(v.values) || field.Index < 0 {
 		return nil, fmt.Errorf("index out-of-range: %s[%d]", v.name, field.Index)
 	}
 	v.values[field.Index], err = v.values[field.Index].SetValue(fields[1:], value)
 	return v, err
+}
+
+func (v TList) GetInnerValue(fields []dotref.RefField) (interface{}, error) {
+	if len(fields) == 0 {
+		// this should never happen, since this would mean that dotref field was called empty
+		return nil, fmt.Errorf("internal error: empty reference")
+	}
+	if len(fields) == 1 {
+		// field[0] is the variable name
+		return v.Value(), nil
+	}
+	// field[1] is the first actual field, should be the index
+	field := fields[1]
+	if field.FieldName != "" {
+		return nil, fmt.Errorf("referencing field on a list: %s %v ", v.name, fields)
+	}
+	if field.Index >= len(v.values) || field.Index < 0 {
+		return nil, fmt.Errorf("index out-of-range: %s[%d]", v.name, field.Index)
+	}
+	return v.values[field.Index].GetInnerValue(fields[1:])
 }

@@ -1,6 +1,8 @@
 
 # TODOs
 
+- test if sh fails when non-exit, even with empty stdstatus
+
 - vartable creates env_vars even if nothing has changes (should reuse previous one)
 - document variables and conversions
 - make append to list possible

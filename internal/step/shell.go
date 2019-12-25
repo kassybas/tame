@@ -14,8 +14,8 @@ import (
 type ShellStep struct {
 	Name    string
 	Opts    opts.ExecutionOpts
-	Results Result
 	Script  string
+	Results []string
 }
 
 func (s *ShellStep) GetOpts() opts.ExecutionOpts {
@@ -38,7 +38,7 @@ func (s *ShellStep) GetCalledTargetName() string {
 	return "shell"
 }
 
-func (s *ShellStep) GetResult() Result {
+func (s *ShellStep) ResultNames() []string {
 	return s.Results
 }
 
@@ -46,10 +46,11 @@ func (s *ShellStep) SetCalledTarget(t Target) {
 	logrus.Fatal("internal error: calling target in shell")
 }
 
-func (s *ShellStep) RunStep(ctx tcontext.Context, vt vartable.VarTable) error {
+func (s *ShellStep) RunStep(ctx tcontext.Context, vt vartable.VarTable) ([]interface{}, int, error) {
 	var err error
 	// ignore result if it is not caputered
-	ignoreResult := s.Results.StderrVar == "" && s.Results.StdoutVar == "" && s.Results.StdStatusVar == ""
+	// TODO: fix regression
+	ignoreResult := len(s.ResultNames()) > 0
 	opts := exec.Options{
 		Silent:       s.Opts.Silent,
 		ShellPath:    ctx.Settings.UsedShell,
@@ -58,6 +59,6 @@ func (s *ShellStep) RunStep(ctx tcontext.Context, vt vartable.VarTable) error {
 	}
 	envVars := vt.GetAllEnvVars(ctx.Settings.ShellFieldSeparator)
 	prefixedScript := fmt.Sprintf("%s\n%s", ctx.Settings.InitScript, s.Script)
-	s.Results.StdoutValue, s.Results.StderrValue, s.Results.StdStatusValue, err = exec.ShellExec(prefixedScript, envVars, opts)
-	return err
+	stdoutValue, stderrValue, stdStatusValue, err := exec.ShellExec(prefixedScript, envVars, opts)
+	return []interface{}{stdoutValue, stderrValue, stdStatusValue}, stdStatusValue, err
 }

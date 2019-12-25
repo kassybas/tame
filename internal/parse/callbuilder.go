@@ -100,7 +100,7 @@ func buildCallStep(stepDef map[string]interface{}) (step.CallStep, error) {
 			continue
 		}
 		if k == keywords.StepCallResult {
-			newStep.Results.ResultNames, err = parseCallStepResults(v)
+			newStep.Results, err = parseCallStepResults(v)
 			if err != nil {
 				return newStep, err
 			}

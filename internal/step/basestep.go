@@ -11,21 +11,29 @@ import (
 type Step interface {
 	GetName() string
 	Kind() steptype.Steptype
-	GetResult() Result
+	ResultNames() []string
 	GetOpts() opts.ExecutionOpts
 	SetOpts(opts.ExecutionOpts)
-	RunStep(tcontext.Context, vartable.VarTable) error
+	RunStep(tcontext.Context, vartable.VarTable) ([]interface{}, int, error)
 	GetCalledTargetName() string
 	SetCalledTarget(Target)
 }
 
-type Result struct {
-	StdoutVar      string
-	StdoutValue    string
-	StderrVar      string
-	StderrValue    string
-	StdStatusVar   string
-	StdStatusValue int
-	ResultNames    []string
-	ResultValues   []interface{}
-}
+// type BaseStep struct {
+// 	name    string
+// 	kind    steptype.Steptype
+// 	results []string
+// 	opts    opts.ExecutionOpts
+// }
+
+// TODO: cleanup
+// type Result struct {
+// 	StdoutVar      string
+// 	StdoutValue    string
+// 	StderrVar      string
+// 	StderrValue    string
+// 	StdStatusVar   string
+// 	StdStatusValue int
+// 	ResultNames    []string
+// 	ResultValues   []interface{}
+// }

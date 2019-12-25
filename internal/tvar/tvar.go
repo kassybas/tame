@@ -14,6 +14,7 @@ type TVariable interface {
 	Value() interface{}
 	ToEnvVars(string) []string
 	SetValue([]dotref.RefField, interface{}) (TVariable, error)
+	GetInnerValue([]dotref.RefField) (interface{}, error)
 }
 
 func NewVariable(name string, value interface{}) TVariable {
@@ -39,8 +40,4 @@ func NewVariable(name string, value interface{}) TVariable {
 
 	}
 	return newVar
-}
-
-func CopyVariable(newName string, sourceVar TVariable) TVariable {
-	return NewVariable(newName, sourceVar.Value())
 }
