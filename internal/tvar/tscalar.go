@@ -33,7 +33,8 @@ func (v TScalar) Value() interface{} {
 
 func (v TScalar) SetValue(fields []dotref.RefField, value interface{}) (TVariable, error) {
 	if len(fields) == 0 {
-		// this should never happen, since this would mean that dotref field was called empty
+		// this should never happen, since this would mean that dotref field was called with empty string
+		// which is an invalid variable name, which fails at parsing
 		return nil, fmt.Errorf("internal error: empty reference")
 	}
 	if len(fields) > 1 {
@@ -45,7 +46,8 @@ func (v TScalar) SetValue(fields []dotref.RefField, value interface{}) (TVariabl
 
 func (v TScalar) GetInnerValue(fields []dotref.RefField) (interface{}, error) {
 	if len(fields) == 0 {
-		// this should never happen, since this would mean that dotref field was called empty
+		// this should never happen, since this would mean that dotref field was called with empty string
+		// which is an invalid variable name, which fails at parsing
 		return nil, fmt.Errorf("internal error: empty reference")
 	}
 	if len(fields) != 1 {

@@ -65,7 +65,12 @@ func (t Target) Make(ctx tcontext.Context, vt vartable.VarTable) ([]interface{},
 			logrus.Errorf("execution failed: status %d\n\ttarget: %s", stdstatus, t.Name)
 			return nil, stdstatus, nil
 		}
-		vt, err = updateVarsWithResultVariables(vt, s.ResultNames(), results)
+		// Only shell step is allowed to have less results
+		allowedLessResults := false
+		if s.Kind() == steptype.Shell {
+			allowedLessResults = true
+		}
+		vt, err = updateVarsWithResultVariables(vt, s.ResultNames(), results, allowedLessResults)
 		if err != nil {
 			return nil, stdstatus, fmt.Errorf("in step: %s\n\t%s", s.GetName(), err)
 		}
@@ -76,13 +81,17 @@ func (t Target) Make(ctx tcontext.Context, vt vartable.VarTable) ([]interface{},
 	return returnValues, 0, nil
 }
 
-func updateVarsWithResultVariables(vt vartable.VarTable, resultVarNames []string, resultValues []interface{}) (vartable.VarTable, error) {
+func updateVarsWithResultVariables(vt vartable.VarTable, resultVarNames []string, resultValues []interface{}, allowedLessResults bool) (vartable.VarTable, error) {
 	if len(resultVarNames) == 0 {
 		return vt, nil
 	}
-	if len(resultVarNames) != len(resultValues) {
+	if len(resultVarNames) > len(resultValues) {
+		return vt, fmt.Errorf("too many results expected, too little returned: %d > %d", len(resultVarNames), len(resultValues))
+	}
+	if len(resultVarNames) != len(resultValues) && !allowedLessResults {
 		return vt, fmt.Errorf("return and result variables do not match: %d != %d", len(resultVarNames), len(resultValues))
 	}
+	// append iterates thorugh names, not values
 	err := vt.Append(resultVarNames, resultValues)
 	return vt, err
 }

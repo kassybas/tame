@@ -49,6 +49,10 @@ func (vt *VarTable) Add(name string, value interface{}) error {
 
 func (vt *VarTable) Append(names []string, values []interface{}) error {
 	for i := range names {
+		if names[i] == "" {
+			// ignored
+			continue
+		}
 		oldVar, err := vt.GetVar(names[i])
 		if err != nil {
 			return err

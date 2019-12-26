@@ -24,7 +24,7 @@ func NewVariable(name string, value interface{}) TVariable {
 		{
 			newVar = NewList(name, value.([]interface{}))
 		}
-	case bool, int, float64, string:
+	case bool, int, float64, string, nil:
 		{
 			newVar = NewScalar(name, value)
 		}

@@ -19,17 +19,29 @@ func buildShellStep(stepDef map[string]interface{}) (step.ShellStep, error) {
 				if err != nil {
 					return newStep, err
 				}
+				continue
 			}
-		case keywords.ShellErrResult:
+		case keywords.StepCallResult:
 			{
 				switch v.(type) {
 				case string:
 					{
 						newStep.Results = []string{v.(string)}
+						continue
+					}
+				case nil:
+					{
+						newStep.Results = []string{""}
+						continue
 					}
 				case []interface{}:
 					{
-						ifaceSliceToStringSlice(v.([]interface{}))
+						var err error
+						newStep.Results, err = ifaceSliceToStringSlice(v.([]interface{}))
+						if err != nil {
+							return newStep, err
+						}
+						continue
 					}
 				default:
 					{
@@ -43,6 +55,7 @@ func buildShellStep(stepDef map[string]interface{}) (step.ShellStep, error) {
 				if err != nil {
 					return newStep, err
 				}
+				continue
 			}
 		default:
 			{

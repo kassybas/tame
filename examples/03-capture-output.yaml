@@ -11,16 +11,16 @@ targets:
   ShellErr:
    run:
     - sh: echo "hello std error" >&2  # redirect output to stderr
-      err$: $welcome  # save stderr to $welcome variable
+      $: [null, $welcome]  # save stderr to $welcome variable
     - sh: echo "welcome ${welcome}"
   
 # tame -f examples/03-capture-output.yaml ShellStatus
   ShellStatus:
     run:
     - sh: exit 42
-      status$: $exit_code  # save return code to $exit-code
-      opts: allowed-fail   # allowing failure: because of exit code 42, the execution would halt by default
-    - sh: echo "process exited with ${exit_code}"  # dash converts to underscore
+      $: [null, null, $exit_code]  # save return code to $exit_code
+      opts: allowed-fail   # allowing failure because exit status 42 would halt execution by default
+    - sh: echo "the previous process exited with ${exit_code}"  # dash converts to underscore
 
 
   

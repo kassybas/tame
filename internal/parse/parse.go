@@ -190,6 +190,11 @@ func ifaceSliceToStringSlice(v []interface{}) ([]string, error) {
 			{
 				res = append(res, v[i].(string))
 			}
+		case nil:
+			{
+				// stdout and stderr can be ignored via nil
+				res = append(res, "")
+			}
 		default:
 			return res, fmt.Errorf("non-string type: %v (type %T)", v[i], v[i])
 		}

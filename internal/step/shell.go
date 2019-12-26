@@ -46,15 +46,30 @@ func (s *ShellStep) SetCalledTarget(t Target) {
 	logrus.Fatal("internal error: calling target in shell")
 }
 
+func (s *ShellStep) shouldIgnoreResults() bool {
+	if len(s.Results) == 0 {
+		return true
+	}
+	if len(s.Results) == 1 {
+		if s.Results[0] != "" {
+			return false
+		}
+		return true
+	}
+	if s.Results[0] == "" && s.Results[1] == "" {
+		return true
+	}
+	return false
+}
+
 func (s *ShellStep) RunStep(ctx tcontext.Context, vt vartable.VarTable) ([]interface{}, int, error) {
 	var err error
 	// ignore result if it is not caputered
 	// TODO: fix regression
-	ignoreResult := len(s.ResultNames()) > 0
 	opts := exec.Options{
 		Silent:       s.Opts.Silent,
 		ShellPath:    ctx.Settings.UsedShell,
-		IgnoreResult: ignoreResult,
+		IgnoreResult: s.shouldIgnoreResults(),
 		ShieldEnv:    ctx.Settings.ShieldEnv,
 	}
 	envVars := vt.GetAllEnvVars(ctx.Settings.ShellFieldSeparator)
