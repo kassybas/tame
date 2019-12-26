@@ -15,6 +15,7 @@ targets:
         listy:
         - one
         - two
+        - three
     - return: $config
   
   Build:
@@ -41,3 +42,12 @@ targets:
       $: $macConfig
     - sh: env
 
+  IndexAList:
+    run:
+    - var $myList:
+      - darkness
+      - my old
+      - friend
+    - var $i: 2
+    - var $line: $myList[$i]
+    - sh: echo "line is '${line}'"

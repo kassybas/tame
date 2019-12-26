@@ -140,7 +140,6 @@ func (vt VarTable) resolveEachField(fields []dotref.RefField) ([]dotref.RefField
 		}
 
 		resolvedField, err := vt.ResolveValue(fields[i].FieldName)
-		fmt.Println("RESOLVED TO", resolvedField)
 		if err != nil {
 			return nil, err
 		}

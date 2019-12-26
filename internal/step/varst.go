@@ -1,6 +1,8 @@
 package step
 
 import (
+	"fmt"
+
 	"github.com/kassybas/tame/internal/tcontext"
 	"github.com/kassybas/tame/internal/vartable"
 	"github.com/kassybas/tame/types/opts"
@@ -32,7 +34,11 @@ func (s *VarStep) ResultNames() []string {
 
 func (s *VarStep) RunStep(ctx tcontext.Context, vt vartable.VarTable) ([]interface{}, int, error) {
 	// TODO: eval variables
-	return []interface{}{s.Definition}, 0, nil
+	value, err := vt.ResolveValue(s.Definition)
+	if err != nil {
+		return nil, 0, fmt.Errorf("step: %s\n\t%s", s.Name, err.Error())
+	}
+	return []interface{}{value}, 0, nil
 }
 
 func (s *VarStep) GetCalledTargetName() string {
