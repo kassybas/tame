@@ -70,7 +70,7 @@ func Make(path, targetName string, targetArgs []string) {
 	// TODO: put cli args in here
 	_, stdstatus, err := root.RunStep(ctx, vartable.NewVarTable())
 	if err != nil {
-		logrus.Fatal("error during execution:\n\t", err.Error())
+		logrus.Fatal("error:\n\t", err.Error())
 	}
 	// pass through the status code
 	if stdstatus != 0 {

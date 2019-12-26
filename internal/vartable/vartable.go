@@ -110,6 +110,11 @@ func (vt VarTable) ResolveValue(val interface{}) (interface{}, error) {
 			if err != nil {
 				return nil, err
 			}
+			// resolve each field
+			fields, err = vt.resolveEachField(fields)
+			if err != nil {
+				return nil, err
+			}
 			return valueVar.GetInnerValue(fields)
 		}
 	default:
@@ -117,4 +122,43 @@ func (vt VarTable) ResolveValue(val interface{}) (interface{}, error) {
 			return val, nil
 		}
 	}
+}
+
+func (vt VarTable) resolveEachField(fields []dotref.RefField) ([]dotref.RefField, error) {
+	if len(fields) < 2 {
+		// single field does not need resolve
+		return fields, nil
+	}
+	for i := range fields {
+		if i == 0 {
+			// field 0 is the variable name, it would resolve to itself
+			continue
+		}
+		if !strings.HasPrefix(fields[i].FieldName, keywords.PrefixReference) {
+			// No resolution needed for constant value
+			continue
+		}
+
+		resolvedField, err := vt.ResolveValue(fields[i].FieldName)
+		fmt.Println("RESOLVED TO", resolvedField)
+		if err != nil {
+			return nil, err
+		}
+		switch resolvedField.(type) {
+		case int:
+			{
+				fields[i].FieldName = ""
+				fields[i].Index = resolvedField.(int)
+			}
+		case string:
+			{
+				fields[i].FieldName = resolvedField.(string)
+			}
+		default:
+			{
+				return nil, fmt.Errorf("unknown field reference or index variable type: can only be string or int, got: %v :: %T", resolvedField, resolvedField)
+			}
+		}
+	}
+	return fields, nil
 }

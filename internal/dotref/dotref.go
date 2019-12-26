@@ -2,9 +2,8 @@ package dotref
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
-
-	"github.com/kassybas/tame/internal/helpers"
 
 	"github.com/kassybas/tame/internal/keywords"
 )
@@ -48,15 +47,31 @@ func ParseFields(dotName string) ([]RefField, error) {
 			return fields, err
 		}
 		if hasIndex {
-			index, f, err := helpers.ParseIndex(field)
+			index, f, indexRef, err := parseIndex(field)
 			if err != nil {
 				return fields, err
 			}
 			fields = append(fields, RefField{FieldName: f})
-			fields = append(fields, RefField{Index: index})
-		} else {
-			fields = append(fields, RefField{FieldName: field})
+			fields = append(fields, RefField{Index: index, FieldName: indexRef})
+			continue
 		}
+		fields = append(fields, RefField{FieldName: field})
 	}
 	return fields, nil
+}
+
+// returns the index and variable name and index variable if exists
+// if index is a variable reference, -1 is returned
+func parseIndex(name string) (int, string, string, error) {
+	lBr := strings.Index(name, keywords.IndexingSeparatorL) + 1
+	rBr := strings.Index(name, keywords.IndexingSeparatorR)
+	if strings.HasPrefix(name[lBr:rBr], keywords.PrefixReference) {
+		// variable index
+		return -1, name[0 : lBr-1], name[lBr:rBr], nil
+	}
+	index, err := strconv.Atoi(name[lBr:rBr])
+	if err != nil {
+		return 0, "", "", fmt.Errorf("not integer index or variable index: %s %s", name, name[lBr:rBr])
+	}
+	return index, name[0 : lBr-1], "", nil
 }

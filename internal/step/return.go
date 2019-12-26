@@ -1,6 +1,9 @@
 package step
 
 import (
+	"fmt"
+	"log"
+
 	"github.com/kassybas/tame/internal/tcontext"
 	"github.com/kassybas/tame/internal/tvar"
 	"github.com/kassybas/tame/internal/vartable"
@@ -9,13 +12,12 @@ import (
 )
 
 type ReturnStep struct {
-	Name      string
 	Arguments []tvar.TVariable
 	Return    []string
 }
 
 func (s ReturnStep) GetName() string {
-	return s.Name
+	return "return"
 }
 
 func (s *ReturnStep) Kind() steptype.Steptype {
@@ -35,7 +37,7 @@ func (s *ReturnStep) RunStep(ctx tcontext.Context, vt vartable.VarTable) ([]inte
 	for _, retDef := range s.Return {
 		rv, err := vt.ResolveValue(retDef)
 		if err != nil {
-			return rvs, 1, err
+			return rvs, 1, fmt.Errorf("step: %s %v\n\t%s", s.GetName(), s.Return, err.Error())
 		}
 		rvs = append(rvs, rv)
 	}
@@ -51,5 +53,5 @@ func (s *ReturnStep) GetOpts() opts.ExecutionOpts {
 }
 
 func (s *ReturnStep) SetCalledTarget(t Target) {
-	panic("calling target in return")
+	log.Fatal("calling target in return")
 }

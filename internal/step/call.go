@@ -40,11 +40,11 @@ func (s *CallStep) RunStep(ctx tcontext.Context, vt vartable.VarTable) ([]interf
 	// TODOb: resolve global variables too
 	args, err := createArgsVartable(s.Arguments, s.CalledTarget, vt)
 	if err != nil {
-		return nil, 0, fmt.Errorf("in step: %s\n\t%s", s.Name, err.Error())
+		return nil, 0, fmt.Errorf("step: %s\n\t%s", s.Name, err.Error())
 	}
 	resultValues, stdstatus, err := s.CalledTarget.Make(ctx, args)
 	if err != nil {
-		return resultValues, stdstatus, fmt.Errorf("in step: %s\n\t%s", s.Name, err.Error())
+		return resultValues, stdstatus, fmt.Errorf("step: %s\n\t%s", s.Name, err.Error())
 	}
 	return resultValues, stdstatus, nil
 }

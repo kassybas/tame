@@ -2,7 +2,6 @@ package helpers
 
 import (
 	"fmt"
-	"strconv"
 	"strings"
 
 	"github.com/kassybas/tame/internal/keywords"
@@ -38,15 +37,4 @@ func BuildOpts(optsDef []string) (opts.ExecutionOpts, error) {
 		}
 	}
 	return opts, nil
-}
-
-// returns the index and variable name
-func ParseIndex(name string) (int, string, error) {
-	lBr := strings.Index(name, keywords.IndexingSeparatorL) + 1
-	rBr := strings.Index(name, keywords.IndexingSeparatorR)
-	index, err := strconv.Atoi(name[lBr:rBr])
-	if err != nil {
-		return 0, "", fmt.Errorf("not integer index: %s %s", name, name[lBr:rBr])
-	}
-	return index, name[0 : lBr-1], nil
 }

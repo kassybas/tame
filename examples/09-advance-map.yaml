@@ -3,7 +3,7 @@ settings:
 
 targets:
 
-  createMap:
+  CreateMap:
     run:
     - var $config:
         linux:
@@ -15,17 +15,29 @@ targets:
         listy:
         - one
         - two
-    - return: $config.mac
+    - return: $config
   
-  build:
+  Build:
     run:
     - var $all:
       - this
       - is 
       - a
       - foo
-    - call createMap: {}
+    - call CreateMap: {}
       $: $result
     - sh: env
       
+  GetPlatformConfig:
+    args: {$platform}
+    run:
+    - call CreateMap: {}
+      $: $config
+    - return: $config.$platform
+  
+  PrintVars:
+    run:
+    - call GetPlatformConfig: {$platform: "mac"}
+      $: $macConfig
+    - sh: env
 

@@ -12,7 +12,7 @@ settings:
 
   # when maps are flattened and injected to a shell step as environment variable, the fields of the map are separated by the configured string
   # default: "_" (since "." does not work in sh only in bash)
-  # See 07-maps-in-shell.yaml for more
+  # see 07-maps-in-shell.yaml for more
   shellFieldSeparator: "-"
 
 

@@ -54,7 +54,7 @@ func (t Target) Make(ctx tcontext.Context, vt vartable.VarTable) ([]interface{},
 		// Run
 		results, stdstatus, err := s.RunStep(newCtx, vt)
 		if err != nil {
-			return nil, stdstatus, fmt.Errorf("%s\n[target: %s, step: %s]", err.Error(), t.Name, s.GetName())
+			return nil, stdstatus, fmt.Errorf("[target: %s]:: %s", t.Name, err.Error())
 		}
 		if s.Kind() == steptype.Return {
 			// if return step, break execution
