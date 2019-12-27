@@ -10,9 +10,11 @@ import (
 )
 
 type VarStep struct {
-	Definition interface{}
-	Opts       opts.ExecutionOpts
-	Name       string
+	Definition  interface{}
+	Opts        opts.ExecutionOpts
+	Name        string
+	IteratorVar string
+	IterableVar string
 }
 
 func (s VarStep) GetName() string {
@@ -32,13 +34,13 @@ func (s *VarStep) ResultNames() []string {
 	return []string{s.Name}
 }
 
-func (s *VarStep) RunStep(ctx tcontext.Context, vt vartable.VarTable) ([]interface{}, int, error) {
+func (s *VarStep) RunStep(ctx tcontext.Context, vt vartable.VarTable) StepStatus {
 	// TODO: eval variables
 	value, err := vt.ResolveValue(s.Definition)
 	if err != nil {
-		return nil, 0, fmt.Errorf("step: %s\n\t%s", s.Name, err.Error())
+		return StepStatus{Err: fmt.Errorf("step: %s\n\t%s", s.Name, err.Error())}
 	}
-	return []interface{}{value}, 0, nil
+	return StepStatus{Results: []interface{}{value}}
 }
 
 func (s *VarStep) GetCalledTargetName() string {
@@ -51,4 +53,12 @@ func (s *VarStep) GetOpts() opts.ExecutionOpts {
 
 func (s *VarStep) SetCalledTarget(t Target) {
 
+}
+
+func (s *VarStep) GetIteratorVar() string {
+	return s.IteratorVar
+}
+
+func (s *VarStep) GetIterableVar() string {
+	return s.IterableVar
 }

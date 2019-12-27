@@ -18,6 +18,8 @@ type CallStep struct {
 	CalledTargetName string
 	CalledTarget     Target
 	Results          []string
+	IteratorVar      string
+	IterableVar      string
 }
 
 func (s CallStep) GetName() string {
@@ -36,17 +38,17 @@ func (s *CallStep) ResultNames() []string {
 	return s.Results
 }
 
-func (s *CallStep) RunStep(ctx tcontext.Context, vt vartable.VarTable) ([]interface{}, int, error) {
+func (s *CallStep) RunStep(ctx tcontext.Context, vt vartable.VarTable) StepStatus {
 	// TODOb: resolve global variables too
 	args, err := createArgsVartable(s.Arguments, s.CalledTarget, vt)
 	if err != nil {
-		return nil, 0, fmt.Errorf("step: %s\n\t%s", s.Name, err.Error())
+		return StepStatus{Err: fmt.Errorf("step: %s\n\t%s", s.Name, err.Error())}
 	}
-	resultValues, stdstatus, err := s.CalledTarget.Make(ctx, args)
-	if err != nil {
-		return resultValues, stdstatus, fmt.Errorf("step: %s\n\t%s", s.Name, err.Error())
+	status := s.CalledTarget.Make(ctx, args)
+	if status.Err != nil {
+		return StepStatus{Err: fmt.Errorf("step: %s\n\t%s", s.Name, status.Err.Error())}
 	}
-	return resultValues, stdstatus, nil
+	return status
 }
 
 func createArgsVartable(argDefs []tvar.TVariable, calledTarget Target, vt vartable.VarTable) (vartable.VarTable, error) {
@@ -78,4 +80,12 @@ func (s *CallStep) GetOpts() opts.ExecutionOpts {
 
 func (s *CallStep) SetCalledTarget(t Target) {
 	s.CalledTarget = t
+}
+
+func (s *CallStep) GetIteratorVar() string {
+	return s.IteratorVar
+}
+
+func (s *CallStep) GetIterableVar() string {
+	return s.IterableVar
 }

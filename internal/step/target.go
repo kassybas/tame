@@ -2,6 +2,9 @@ package step
 
 import (
 	"fmt"
+	"strings"
+
+	"github.com/kassybas/tame/internal/keywords"
 
 	"github.com/kassybas/tame/types/steptype"
 
@@ -11,7 +14,6 @@ import (
 	"github.com/kassybas/tame/internal/tvar"
 	"github.com/kassybas/tame/types/opts"
 	"github.com/kassybas/tame/types/settings"
-	"github.com/sirupsen/logrus"
 )
 
 type Param struct {
@@ -37,48 +39,70 @@ func mergeOpts(globalOpts, targetOpts, stepOpts opts.ExecutionOpts) opts.Executi
 	}
 }
 
-func (t Target) Make(ctx tcontext.Context, vt vartable.VarTable) ([]interface{}, int, error) {
+func (t Target) runStep(s Step, ctx tcontext.Context, vt vartable.VarTable) StepStatus {
+	// Opts
+	// TODO: straighten out this mess
+	s.SetOpts(mergeOpts(ctx.Settings.GlobalOpts, t.Opts, s.GetOpts()))
+	newCtx := ctx
+	newCtx.Settings.GlobalOpts = s.GetOpts()
+	// Run
+	status := s.RunStep(ctx, vt)
+	if status.Err != nil {
+		return StepStatus{Err: fmt.Errorf("[target: %s]:: %s", t.Name, status.Err.Error())}
+	}
+	// Breaking if it was breaking (return step) or the called step exec failed with non-zero exit
+	status.IsBreaking = status.IsBreaking || (s.GetOpts().CanFail == false && status.Stdstatus != 0)
+	return status
+}
+
+func getIters(vt vartable.VarTable, s Step) (string, []tvar.TVariable, error) {
+	if s.GetIterableVar() == "" {
+		return "", nil, nil
+	}
+	if !strings.HasPrefix(s.GetIteratorVar(), keywords.PrefixReference) {
+		return "", nil, fmt.Errorf("iterator variable wrong format: %s (should be: %s%s)", s.GetIteratorVar(), keywords.PrefixReference, s.GetIteratorVar())
+	}
+	iterable, err := vt.GetVar(s.GetIterableVar())
+	v, isList := iterable.(tvar.TList)
+	if !isList {
+		return "", nil, fmt.Errorf("iterable variable %s is not list (type: %T)", iterable.Name(), iterable)
+	}
+	return s.GetIteratorVar(), v.Value().([]tvar.TVariable), err
+}
+
+func (t Target) Make(ctx tcontext.Context, vt vartable.VarTable) StepStatus {
 	vt.AddVariables(ctx.Globals)
 	vt, err := resolveParams(vt, t.Params)
 	if err != nil {
-		return nil, 0, fmt.Errorf("could not resolve parameters in target: %s\n\t%s", t.Name, err)
+		return StepStatus{Err: fmt.Errorf("could not resolve parameters in target: %s\n\t%s", t.Name, err)}
 	}
-	var returnValues []interface{}
 	for _, s := range t.Steps {
-		// Opts
-		// TODO: straighten out this mess
-		s.SetOpts(mergeOpts(ctx.Settings.GlobalOpts, t.Opts, s.GetOpts()))
-		newCtx := ctx
-		newCtx.Settings.GlobalOpts = s.GetOpts()
-
-		// Run
-		results, stdstatus, err := s.RunStep(newCtx, vt)
-		if err != nil {
-			return nil, stdstatus, fmt.Errorf("[target: %s]:: %s", t.Name, err.Error())
-		}
-		if s.Kind() == steptype.Return {
-			// if return step, break execution
-			return results, stdstatus, err
-		}
-		// Check result status
-		if s.GetOpts().CanFail == false && stdstatus != 0 {
-			logrus.Errorf("execution failed: status %d\n\ttarget: %s", stdstatus, t.Name)
-			return nil, stdstatus, nil
-		}
-		// Only shell step is allowed to have less results
-		allowedLessResults := false
-		if s.Kind() == steptype.Shell {
-			allowedLessResults = true
-		}
-		vt, err = updateVarsWithResultVariables(vt, s.ResultNames(), results, allowedLessResults)
-		if err != nil {
-			return nil, stdstatus, fmt.Errorf("in step: %s\n\t%s", s.GetName(), err)
+		// TODO: refactor to more SOLID
+		if s.GetIterableVar() == "" && s.GetIteratorVar() == "" {
+			status := t.runStep(s, ctx, vt)
+			if status.IsBreaking {
+				return status
+			}
+			vt, err = updateVarsWithResultVariables(vt, s.ResultNames(), status.Results, s.Kind() == steptype.Shell)
+			if err != nil {
+				return StepStatus{Err: fmt.Errorf("in step: %s\n\t%s", s.GetName(), err)}
+			}
+		} else {
+			iterator, iterable, err := getIters(vt, s)
+			for _, itVar := range iterable {
+				vt.Add(iterator, itVar.Value())
+				status := t.runStep(s, ctx, vt)
+				if status.IsBreaking {
+					return status
+				}
+				vt, err = updateVarsWithResultVariables(vt, s.ResultNames(), status.Results, s.Kind() == steptype.Shell)
+				if err != nil {
+					return StepStatus{Err: fmt.Errorf("in step: %s\n\t%s", s.GetName(), err)}
+				}
+			}
 		}
 	}
-	if err != nil {
-		return nil, 0, fmt.Errorf("%s\n\ttarget: %s", err.Error(), t.Name)
-	}
-	return returnValues, 0, nil
+	return StepStatus{}
 }
 
 func updateVarsWithResultVariables(vt vartable.VarTable, resultVarNames []string, resultValues []interface{}, allowedLessResults bool) (vartable.VarTable, error) {

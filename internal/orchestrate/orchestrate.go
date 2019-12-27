@@ -68,14 +68,14 @@ func Make(path, targetName string, targetArgs []string) {
 	}
 
 	// TODO: put cli args in here
-	_, stdstatus, err := root.RunStep(ctx, vartable.NewVarTable())
-	if err != nil {
-		logrus.Fatal("error:\n\t", err.Error())
+	status := root.RunStep(ctx, vartable.NewVarTable())
+	if status.Err != nil {
+		logrus.Fatal("error:\n\t", status.Err.Error())
 	}
 	// pass through the status code
-	if stdstatus != 0 {
-		fmt.Fprintf(os.Stdout, "tame: *** [%s] Error %d\n", targetName, stdstatus)
+	if status.Stdstatus != 0 {
+		fmt.Fprintf(os.Stdout, "tame: *** [%s] Error %d\n", targetName, status.Stdstatus)
 	}
 
-	os.Exit(stdstatus)
+	os.Exit(status.Stdstatus)
 }

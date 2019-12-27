@@ -32,16 +32,16 @@ func (s *ReturnStep) ResultNames() []string {
 	return []string{}
 }
 
-func (s *ReturnStep) RunStep(ctx tcontext.Context, vt vartable.VarTable) ([]interface{}, int, error) {
+func (s *ReturnStep) RunStep(ctx tcontext.Context, vt vartable.VarTable) StepStatus {
 	rvs := []interface{}{}
 	for _, retDef := range s.Return {
 		rv, err := vt.ResolveValue(retDef)
 		if err != nil {
-			return rvs, 1, fmt.Errorf("step: %s %v\n\t%s", s.GetName(), s.Return, err.Error())
+			return StepStatus{Err: fmt.Errorf("step: %s %v\n\t%s", s.GetName(), s.Return, err.Error())}
 		}
 		rvs = append(rvs, rv)
 	}
-	return rvs, 0, nil
+	return StepStatus{Results: rvs, Stdstatus: 0, Err: nil, IsBreaking: true}
 }
 
 func (s *ReturnStep) GetCalledTargetName() string {
@@ -54,4 +54,12 @@ func (s *ReturnStep) GetOpts() opts.ExecutionOpts {
 
 func (s *ReturnStep) SetCalledTarget(t Target) {
 	log.Fatal("calling target in return")
+}
+
+func (s *ReturnStep) GetIteratorVar() string {
+	return ""
+}
+
+func (s *ReturnStep) GetIterableVar() string {
+	return ""
 }

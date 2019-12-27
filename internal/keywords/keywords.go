@@ -17,15 +17,9 @@ var (
 
 	OptsNotSet = "not-set"
 
-	OptsDefaultValues = []string{OptStdRc, OptStderr, OptStdout}
-
 	PossibleOpts = []string{
-		OptCanFail, OptSilent, OptStderr, OptStdout, OptStdRc, OptOnce, OptParallel,
+		OptCanFail, OptSilent, OptOnce, OptParallel,
 	}
-
-	PrefixOut = ""
-	PrefixErr = "err_"
-	PrefixRc  = "rc_"
 
 	ShellFieldSeparator = "_"
 	TameFieldSeparator  = "."
@@ -40,8 +34,10 @@ var (
 	StepCall   = "call"
 	StepReturn = "return"
 
-	StepCallResult    = "$"
-	ShellOutResult    = "$"
-	ShellErrResult    = "err$"
-	ShellStatusResult = "status$"
+	StepFor         = "for"
+	StepForIterable = "in"
+	StepForIterator = "$"
+
+	StepCallResult = "$"
+	ShellOutResult = "$"
 )

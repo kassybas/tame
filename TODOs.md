@@ -16,3 +16,4 @@
 - check variable names at creation
 - make all field separators configurable
 - non-string map keys
+- oneliner tag

@@ -21,6 +21,11 @@ func buildShellStep(stepDef map[string]interface{}) (step.ShellStep, error) {
 				}
 				continue
 			}
+		case keywords.StepFor:
+			{
+				newStep.IteratorVar, newStep.IterableVar, err = parseForLoop(v)
+				continue
+			}
 		case keywords.StepCallResult:
 			{
 				switch v.(type) {
@@ -64,6 +69,27 @@ func buildShellStep(stepDef map[string]interface{}) (step.ShellStep, error) {
 		}
 	}
 	return newStep, nil
+}
+
+func parseForLoop(forDef interface{}) (string, string, error) {
+	f, ok := forDef.(map[interface{}]interface{})
+	iterator, ok := f[keywords.StepForIterator]
+	if !ok {
+		return "", "", fmt.Errorf("missing interator variable in for loop")
+	}
+	iteratorStr, ok := iterator.(string)
+	if !ok {
+		return "", "", fmt.Errorf("non-string iterable variable: %v", iterator)
+	}
+	iterable, ok := f[keywords.StepForIterable]
+	if !ok {
+		return "", "", fmt.Errorf("missing iterable variable in for loop")
+	}
+	iterableStr, ok := iterable.(string)
+	if !ok {
+		return "", "", fmt.Errorf("non-string iterable variable: %v", iterable)
+	}
+	return iteratorStr, iterableStr, nil
 }
 
 func getVarNameFromIface(v interface{}) (string, error) {

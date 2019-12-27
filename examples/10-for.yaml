@@ -1,0 +1,24 @@
+
+
+settings:
+  shieldEnv: true
+
+globals:
+  $tags:
+  - latest
+  - 2020.01
+  - release
+
+# tame -f examples/10-for.yaml Builder
+targets:
+  Builder:
+    run:
+    - for: 
+        $: $tag
+        in: $tags
+      call DockerTag: {$tag: $tag}
+
+  DockerTag:
+    args: {$tag}
+    run:
+    - sh: echo "docker tag myimage myimage:${tag}"

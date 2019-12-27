@@ -113,6 +113,10 @@ func buildCallStep(stepDef map[string]interface{}) (step.CallStep, error) {
 			}
 			continue
 		}
+		if k == keywords.StepFor {
+			newStep.IteratorVar, newStep.IterableVar, err = parseForLoop(v)
+			continue
+		}
 		return newStep, fmt.Errorf("unknown field in call step: %s", k)
 	}
 	return newStep, nil

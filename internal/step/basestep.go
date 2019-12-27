@@ -14,9 +14,18 @@ type Step interface {
 	ResultNames() []string
 	GetOpts() opts.ExecutionOpts
 	SetOpts(opts.ExecutionOpts)
-	RunStep(tcontext.Context, vartable.VarTable) ([]interface{}, int, error)
+	RunStep(tcontext.Context, vartable.VarTable) StepStatus
 	GetCalledTargetName() string
 	SetCalledTarget(Target)
+	GetIteratorVar() string
+	GetIterableVar() string
+}
+
+type StepStatus struct {
+	Results    []interface{}
+	IsBreaking bool
+	Stdstatus  int
+	Err        error
 }
 
 // type BaseStep struct {

@@ -12,10 +12,12 @@ import (
 )
 
 type ShellStep struct {
-	Name    string
-	Opts    opts.ExecutionOpts
-	Script  string
-	Results []string
+	Name        string
+	Opts        opts.ExecutionOpts
+	Script      string
+	Results     []string
+	IteratorVar string
+	IterableVar string
 }
 
 func (s *ShellStep) GetOpts() opts.ExecutionOpts {
@@ -62,7 +64,7 @@ func (s *ShellStep) shouldIgnoreResults() bool {
 	return false
 }
 
-func (s *ShellStep) RunStep(ctx tcontext.Context, vt vartable.VarTable) ([]interface{}, int, error) {
+func (s *ShellStep) RunStep(ctx tcontext.Context, vt vartable.VarTable) StepStatus {
 	var err error
 	// ignore result if it is not caputered
 	// TODO: fix regression
@@ -75,5 +77,17 @@ func (s *ShellStep) RunStep(ctx tcontext.Context, vt vartable.VarTable) ([]inter
 	envVars := vt.GetAllEnvVars(ctx.Settings.ShellFieldSeparator)
 	prefixedScript := fmt.Sprintf("%s\n%s", ctx.Settings.InitScript, s.Script)
 	stdoutValue, stderrValue, stdStatusValue, err := exec.ShellExec(prefixedScript, envVars, opts)
-	return []interface{}{stdoutValue, stderrValue, stdStatusValue}, stdStatusValue, err
+	return StepStatus{
+		Results:   []interface{}{stdoutValue, stderrValue, stdStatusValue},
+		Stdstatus: stdStatusValue,
+		Err:       err,
+	}
+}
+
+func (s *ShellStep) GetIteratorVar() string {
+	return s.IteratorVar
+}
+
+func (s *ShellStep) GetIterableVar() string {
+	return s.IterableVar
 }
