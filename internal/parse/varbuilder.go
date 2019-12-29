@@ -5,11 +5,11 @@ import (
 	"strings"
 
 	"github.com/kassybas/tame/internal/keywords"
-	"github.com/kassybas/tame/internal/step"
+	"github.com/kassybas/tame/internal/step/varstep"
 )
 
-func buildVarStep(stepDef map[string]interface{}) (step.VarStep, error) {
-	var newStep step.VarStep
+func buildVarStep(stepDef map[string]interface{}) (varstep.VarStep, error) {
+	var newStep varstep.VarStep
 	if len(stepDef) > 1 {
 		return newStep, fmt.Errorf("multiple variables defined in step, only one allowed: %v", stepDef)
 	}
@@ -27,7 +27,7 @@ func buildVarStep(stepDef map[string]interface{}) (step.VarStep, error) {
 			newStep.Definition = v
 			continue
 		}
-		return step.VarStep{}, fmt.Errorf("unknown field in var step: %v", k)
+		return varstep.VarStep{}, fmt.Errorf("unknown field in var step: %v", k)
 	}
 	return newStep, nil
 }

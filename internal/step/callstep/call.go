@@ -1,8 +1,10 @@
-package step
+package callstep
 
 import (
 	"fmt"
 
+	"github.com/kassybas/tame/internal/step"
+	"github.com/kassybas/tame/internal/target"
 	"github.com/kassybas/tame/internal/tcontext"
 	"github.com/kassybas/tame/internal/tvar"
 	"github.com/kassybas/tame/internal/vartable"
@@ -16,7 +18,7 @@ type CallStep struct {
 	Arguments        []tvar.TVariable
 	Opts             opts.ExecutionOpts
 	CalledTargetName string
-	CalledTarget     Target
+	CalledTarget     target.Target
 	Results          []string
 	IteratorVar      string
 	IterableVar      string
@@ -38,23 +40,23 @@ func (s *CallStep) ResultNames() []string {
 	return s.Results
 }
 
-func (s *CallStep) RunStep(ctx tcontext.Context, vt vartable.VarTable) StepStatus {
+func (s *CallStep) RunStep(ctx tcontext.Context, vt vartable.VarTable) step.StepStatus {
 	// TODOb: resolve global variables too
 	args, err := createArgsVartable(s.Arguments, s.CalledTarget, vt)
 	if err != nil {
-		return StepStatus{Err: fmt.Errorf("step: %s\n\t%s", s.Name, err.Error())}
+		return step.StepStatus{Err: fmt.Errorf("step: %s\n\t%s", s.Name, err.Error())}
 	}
 	status := s.CalledTarget.Make(ctx, args)
 	if status.Err != nil {
-		return StepStatus{Err: fmt.Errorf("step: %s\n\t%s", s.Name, status.Err.Error())}
+		return step.StepStatus{Err: fmt.Errorf("step: %s\n\t%s", s.Name, status.Err.Error())}
 	}
 	return status
 }
 
-func createArgsVartable(argDefs []tvar.TVariable, calledTarget Target, vt vartable.VarTable) (vartable.VarTable, error) {
+func createArgsVartable(argDefs []tvar.TVariable, calledTarget target.Target, vt vartable.VarTable) (vartable.VarTable, error) {
 	argsVarTable := vartable.NewVarTable()
 	for _, arg := range argDefs {
-		if !calledTarget.isParameter(arg.Name()) {
+		if !calledTarget.IsParameter(arg.Name()) {
 			return argsVarTable, fmt.Errorf("unknown parameter for target %s: '%s'", calledTarget.Name, arg.Name())
 		}
 		if arg.Value() == nil {
@@ -78,8 +80,8 @@ func (s *CallStep) GetOpts() opts.ExecutionOpts {
 	return s.Opts
 }
 
-func (s *CallStep) SetCalledTarget(t Target) {
-	s.CalledTarget = t
+func (s *CallStep) SetCalledTarget(t interface{}) {
+	s.CalledTarget = t.(target.Target)
 }
 
 func (s *CallStep) GetIteratorVar() string {

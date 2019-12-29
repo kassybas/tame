@@ -3,11 +3,11 @@ package parse
 import (
 	"fmt"
 
-	"github.com/kassybas/tame/internal/step"
+	"github.com/kassybas/tame/internal/step/returnstep"
 )
 
-func buildReturnStep(stepDef map[string]interface{}) (step.ReturnStep, error) {
-	var newStep step.ReturnStep
+func buildReturnStep(stepDef map[string]interface{}) (returnstep.ReturnStep, error) {
+	var newStep returnstep.ReturnStep
 	var err error
 	for k, v := range stepDef {
 		switch v.(type) {

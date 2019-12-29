@@ -10,12 +10,13 @@ import (
 	"github.com/kassybas/tame/internal/helpers"
 	"github.com/kassybas/tame/internal/keywords"
 	"github.com/kassybas/tame/internal/step"
+	"github.com/kassybas/tame/internal/target"
 	"github.com/kassybas/tame/schema"
 )
 
-func ParseTeafile(tf schema.Tamefile) (map[string]step.Target, error) {
+func ParseTeafile(tf schema.Tamefile) (map[string]target.Target, error) {
 
-	targets := make(map[string]step.Target)
+	targets := make(map[string]target.Target)
 	for targetKey, targetValue := range tf.Targets {
 		trg, err := buildTarget(targetKey, targetValue)
 		if err != nil {
@@ -108,9 +109,9 @@ func buildSteps(stepDefs []map[string]interface{}) ([]step.Step, error) {
 	return steps, nil
 }
 
-func buildTarget(targetKey string, targetDef schema.TargetDefinition) (step.Target, error) {
+func buildTarget(targetKey string, targetDef schema.TargetDefinition) (target.Target, error) {
 	var err error
-	newTarget := step.Target{
+	newTarget := target.Target{
 		Name: targetKey,
 	}
 
@@ -202,14 +203,14 @@ func ifaceSliceToStringSlice(v []interface{}) ([]string, error) {
 	return res, nil
 }
 
-func buildParameters(paramDefs map[string]interface{}) ([]step.Param, error) {
-	params := []step.Param{}
+func buildParameters(paramDefs map[string]interface{}) ([]target.Param, error) {
+	params := []target.Param{}
 
 	for paramKey, paramValue := range paramDefs {
 		if !strings.HasPrefix(paramKey, keywords.PrefixReference) {
 			return params, fmt.Errorf("arguments must start with '$' symbol: %s (correct: %s%s)", paramKey, keywords.PrefixReference, paramKey)
 		}
-		newParam := step.Param{
+		newParam := target.Param{
 			Name: paramKey,
 		}
 		switch paramValue.(type) {

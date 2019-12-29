@@ -1,8 +1,11 @@
-package step
+package varstep
 
 import (
 	"fmt"
 
+	"github.com/sirupsen/logrus"
+
+	"github.com/kassybas/tame/internal/step"
 	"github.com/kassybas/tame/internal/tcontext"
 	"github.com/kassybas/tame/internal/vartable"
 	"github.com/kassybas/tame/types/opts"
@@ -34,13 +37,13 @@ func (s *VarStep) ResultNames() []string {
 	return []string{s.Name}
 }
 
-func (s *VarStep) RunStep(ctx tcontext.Context, vt vartable.VarTable) StepStatus {
+func (s *VarStep) RunStep(ctx tcontext.Context, vt vartable.VarTable) step.StepStatus {
 	// TODO: eval variables
 	value, err := vt.ResolveValue(s.Definition)
 	if err != nil {
-		return StepStatus{Err: fmt.Errorf("step: %s\n\t%s", s.Name, err.Error())}
+		return step.StepStatus{Err: fmt.Errorf("step: %s\n\t%s", s.Name, err.Error())}
 	}
-	return StepStatus{Results: []interface{}{value}}
+	return step.StepStatus{Results: []interface{}{value}}
 }
 
 func (s *VarStep) GetCalledTargetName() string {
@@ -51,7 +54,8 @@ func (s *VarStep) GetOpts() opts.ExecutionOpts {
 	return s.Opts
 }
 
-func (s *VarStep) SetCalledTarget(t Target) {
+func (s *VarStep) SetCalledTarget(t interface{}) {
+	logrus.Fatal("internal error: calling target in var step")
 
 }
 

@@ -1,9 +1,10 @@
-package step
+package returnstep
 
 import (
 	"fmt"
 	"log"
 
+	"github.com/kassybas/tame/internal/step"
 	"github.com/kassybas/tame/internal/tcontext"
 	"github.com/kassybas/tame/internal/tvar"
 	"github.com/kassybas/tame/internal/vartable"
@@ -32,16 +33,16 @@ func (s *ReturnStep) ResultNames() []string {
 	return []string{}
 }
 
-func (s *ReturnStep) RunStep(ctx tcontext.Context, vt vartable.VarTable) StepStatus {
+func (s *ReturnStep) RunStep(ctx tcontext.Context, vt vartable.VarTable) step.StepStatus {
 	rvs := []interface{}{}
 	for _, retDef := range s.Return {
 		rv, err := vt.ResolveValue(retDef)
 		if err != nil {
-			return StepStatus{Err: fmt.Errorf("step: %s %v\n\t%s", s.GetName(), s.Return, err.Error())}
+			return step.StepStatus{Err: fmt.Errorf("step: %s %v\n\t%s", s.GetName(), s.Return, err.Error())}
 		}
 		rvs = append(rvs, rv)
 	}
-	return StepStatus{Results: rvs, Stdstatus: 0, Err: nil, IsBreaking: true}
+	return step.StepStatus{Results: rvs, Stdstatus: 0, Err: nil, IsBreaking: true}
 }
 
 func (s *ReturnStep) GetCalledTargetName() string {
@@ -52,7 +53,7 @@ func (s *ReturnStep) GetOpts() opts.ExecutionOpts {
 	return opts.ExecutionOpts{}
 }
 
-func (s *ReturnStep) SetCalledTarget(t Target) {
+func (s *ReturnStep) SetCalledTarget(t interface{}) {
 	log.Fatal("calling target in return")
 }
 

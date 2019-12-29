@@ -4,12 +4,12 @@ import (
 	"fmt"
 
 	"github.com/kassybas/tame/internal/keywords"
-	"github.com/kassybas/tame/internal/step"
+	"github.com/kassybas/tame/internal/step/shellstep"
 )
 
-func buildShellStep(stepDef map[string]interface{}) (step.ShellStep, error) {
+func buildShellStep(stepDef map[string]interface{}) (shellstep.ShellStep, error) {
 	var err error
-	var newStep step.ShellStep
+	var newStep shellstep.ShellStep
 	newStep.Name = keywords.StepShell
 	for k, v := range stepDef {
 		switch k {

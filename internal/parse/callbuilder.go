@@ -7,7 +7,7 @@ import (
 	"github.com/kassybas/tame/internal/tvar"
 
 	"github.com/kassybas/tame/internal/keywords"
-	"github.com/kassybas/tame/internal/step"
+	"github.com/kassybas/tame/internal/step/callstep"
 )
 
 func parseCalledTargetName(k string) (string, error) {
@@ -39,7 +39,7 @@ func parseCallStepArgs(argDefs map[interface{}]interface{}) ([]tvar.TVariable, e
 	return args, nil
 }
 
-func parseCallStepHeader(newStep *step.CallStep, header string, value interface{}) error {
+func parseCallStepHeader(newStep *callstep.CallStep, header string, value interface{}) error {
 	var err error
 	newStep.Name = header
 	newStep.CalledTargetName, err = parseCalledTargetName(header)
@@ -86,8 +86,8 @@ func parseCallStepResults(value interface{}) ([]string, error) {
 	}
 }
 
-func buildCallStep(stepDef map[string]interface{}) (step.CallStep, error) {
-	var newStep step.CallStep
+func buildCallStep(stepDef map[string]interface{}) (callstep.CallStep, error) {
+	var newStep callstep.CallStep
 	var err error
 	for k, v := range stepDef {
 		if strings.HasPrefix(k, keywords.StepCall) {

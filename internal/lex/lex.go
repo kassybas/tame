@@ -9,6 +9,8 @@ import (
 	"github.com/kassybas/tame/internal/helpscreen"
 	"github.com/kassybas/tame/internal/parse"
 	"github.com/kassybas/tame/internal/step"
+	"github.com/kassybas/tame/internal/step/callstep"
+	"github.com/kassybas/tame/internal/target"
 	"github.com/kassybas/tame/internal/tvar"
 )
 
@@ -25,8 +27,8 @@ func parseCLITargetArgs(targetArgs []string) ([]tvar.TVariable, error) {
 	return args, nil
 }
 
-func createDependencyGraph(targets map[string]step.Target, targetName string, cliVarArgs []string) (step.Step, error) {
-	var root step.CallStep
+func createDependencyGraph(targets map[string]target.Target, targetName string, cliVarArgs []string) (step.Step, error) {
+	var root callstep.CallStep
 	var err error
 	root.Name = targetName
 	root.CalledTargetName = targetName

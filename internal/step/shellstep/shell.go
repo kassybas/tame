@@ -1,9 +1,10 @@
-package step
+package shellstep
 
 import (
 	"fmt"
 
 	"github.com/kassybas/shell-exec/exec"
+	"github.com/kassybas/tame/internal/step"
 	"github.com/kassybas/tame/internal/tcontext"
 	"github.com/kassybas/tame/internal/vartable"
 	"github.com/kassybas/tame/types/opts"
@@ -44,7 +45,7 @@ func (s *ShellStep) ResultNames() []string {
 	return s.Results
 }
 
-func (s *ShellStep) SetCalledTarget(t Target) {
+func (s *ShellStep) SetCalledTarget(t interface{}) {
 	logrus.Fatal("internal error: calling target in shell")
 }
 
@@ -64,7 +65,7 @@ func (s *ShellStep) shouldIgnoreResults() bool {
 	return false
 }
 
-func (s *ShellStep) RunStep(ctx tcontext.Context, vt vartable.VarTable) StepStatus {
+func (s *ShellStep) RunStep(ctx tcontext.Context, vt vartable.VarTable) step.StepStatus {
 	var err error
 	// ignore result if it is not caputered
 	// TODO: fix regression
@@ -77,7 +78,7 @@ func (s *ShellStep) RunStep(ctx tcontext.Context, vt vartable.VarTable) StepStat
 	envVars := vt.GetAllEnvVars(ctx.Settings.ShellFieldSeparator)
 	prefixedScript := fmt.Sprintf("%s\n%s", ctx.Settings.InitScript, s.Script)
 	stdoutValue, stderrValue, stdStatusValue, err := exec.ShellExec(prefixedScript, envVars, opts)
-	return StepStatus{
+	return step.StepStatus{
 		Results:   []interface{}{stdoutValue, stderrValue, stdStatusValue},
 		Stdstatus: stdStatusValue,
 		Err:       err,

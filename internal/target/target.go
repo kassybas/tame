@@ -1,10 +1,11 @@
-package step
+package target
 
 import (
 	"fmt"
 	"strings"
 
 	"github.com/kassybas/tame/internal/keywords"
+	"github.com/kassybas/tame/internal/step"
 
 	"github.com/kassybas/tame/types/steptype"
 
@@ -21,10 +22,11 @@ type Param struct {
 	HasDefault   bool
 	DefaultValue interface{}
 }
+
 type Target struct {
 	GlobalSettings *settings.Settings
 	Name           string
-	Steps          []Step
+	Steps          []step.Step
 	Params         []Param
 	Opts           opts.ExecutionOpts
 	Variables      []tvar.TVariable
@@ -39,7 +41,7 @@ func mergeOpts(globalOpts, targetOpts, stepOpts opts.ExecutionOpts) opts.Executi
 	}
 }
 
-func (t Target) runStep(s Step, ctx tcontext.Context, vt vartable.VarTable) StepStatus {
+func (t Target) runStep(s step.Step, ctx tcontext.Context, vt vartable.VarTable) step.StepStatus {
 	// Opts
 	// TODO: straighten out this mess
 	s.SetOpts(mergeOpts(ctx.Settings.GlobalOpts, t.Opts, s.GetOpts()))
@@ -48,14 +50,14 @@ func (t Target) runStep(s Step, ctx tcontext.Context, vt vartable.VarTable) Step
 	// Run
 	status := s.RunStep(ctx, vt)
 	if status.Err != nil {
-		return StepStatus{Err: fmt.Errorf("[target: %s]:: %s", t.Name, status.Err.Error())}
+		return step.StepStatus{Err: fmt.Errorf("[target: %s]:: %s", t.Name, status.Err.Error())}
 	}
 	// Breaking if it was breaking (return step) or the called step exec failed with non-zero exit
 	status.IsBreaking = status.IsBreaking || (s.GetOpts().CanFail == false && status.Stdstatus != 0)
 	return status
 }
 
-func getIters(vt vartable.VarTable, s Step) (string, []tvar.TVariable, error) {
+func getIters(vt vartable.VarTable, s step.Step) (string, []tvar.TVariable, error) {
 	if s.GetIterableVar() == "" {
 		return "", nil, nil
 	}
@@ -70,11 +72,11 @@ func getIters(vt vartable.VarTable, s Step) (string, []tvar.TVariable, error) {
 	return s.GetIteratorVar(), v.Value().([]tvar.TVariable), err
 }
 
-func (t Target) Make(ctx tcontext.Context, vt vartable.VarTable) StepStatus {
+func (t Target) Make(ctx tcontext.Context, vt vartable.VarTable) step.StepStatus {
 	vt.AddVariables(ctx.Globals)
 	vt, err := resolveParams(vt, t.Params)
 	if err != nil {
-		return StepStatus{Err: fmt.Errorf("could not resolve parameters in target: %s\n\t%s", t.Name, err)}
+		return step.StepStatus{Err: fmt.Errorf("could not resolve parameters in target: %s\n\t%s", t.Name, err)}
 	}
 	for _, s := range t.Steps {
 		// TODO: refactor to more dry
@@ -87,7 +89,7 @@ func (t Target) Make(ctx tcontext.Context, vt vartable.VarTable) StepStatus {
 			}
 			vt, err = updateVarsWithResultVariables(vt, s.ResultNames(), status.Results, s.Kind() == steptype.Shell)
 			if err != nil {
-				return StepStatus{Err: fmt.Errorf("in step: %s\n\t%s", s.GetName(), err)}
+				return step.StepStatus{Err: fmt.Errorf("in step: %s\n\t%s", s.GetName(), err)}
 			}
 		} else {
 			iterator, iterable, err := getIters(vt, s)
@@ -101,12 +103,12 @@ func (t Target) Make(ctx tcontext.Context, vt vartable.VarTable) StepStatus {
 				}
 				vt, err = updateVarsWithResultVariables(vt, s.ResultNames(), status.Results, s.Kind() == steptype.Shell)
 				if err != nil {
-					return StepStatus{Err: fmt.Errorf("in step: %s\n\t%s", s.GetName(), err)}
+					return step.StepStatus{Err: fmt.Errorf("in step: %s\n\t%s", s.GetName(), err)}
 				}
 			}
 		}
 	}
-	return StepStatus{}
+	return step.StepStatus{}
 }
 
 func updateVarsWithResultVariables(vt vartable.VarTable, resultVarNames []string, resultValues []interface{}, allowedLessResults bool) (vartable.VarTable, error) {
@@ -144,7 +146,7 @@ func resolveParams(vt vartable.VarTable, params []Param) (vartable.VarTable, err
 	return vt, nil
 }
 
-func (t Target) isParameter(name string) bool {
+func (t Target) IsParameter(name string) bool {
 	for _, p := range t.Params {
 		if p.Name == name {
 			return true
