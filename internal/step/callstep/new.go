@@ -1,7 +1,12 @@
 package callstep
 
-import "github.com/mitchellh/mapstructure"
+import (
+	"fmt"
+
+	"github.com/mitchellh/mapstructure"
+)
 
 func NewStep(map[string]interface{}) {
-	mapstructure.Decode()
+	var ok mapstructure.DecodeHookFunc
+	fmt.Println(ok)
 }
