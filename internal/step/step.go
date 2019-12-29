@@ -29,12 +29,7 @@ type StepStatus struct {
 	Err        error
 }
 
-// type BaseStep struct {
-// 	name    string
-// 	kind    steptype.Steptype
-// 	results []string
-// 	opts    opts.ExecutionOpts
-// }
+
 
 // TODO: cleanup
 // type Result struct {
