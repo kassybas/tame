@@ -77,10 +77,12 @@ func (t Target) Make(ctx tcontext.Context, vt vartable.VarTable) StepStatus {
 		return StepStatus{Err: fmt.Errorf("could not resolve parameters in target: %s\n\t%s", t.Name, err)}
 	}
 	for _, s := range t.Steps {
-		// TODO: refactor to more SOLID
+		// TODO: refactor to more dry
 		if s.GetIterableVar() == "" && s.GetIteratorVar() == "" {
 			status := t.runStep(s, ctx, vt)
 			if status.IsBreaking {
+				// setting the false so caller does not break
+				status.IsBreaking = false
 				return status
 			}
 			vt, err = updateVarsWithResultVariables(vt, s.ResultNames(), status.Results, s.Kind() == steptype.Shell)
@@ -93,6 +95,8 @@ func (t Target) Make(ctx tcontext.Context, vt vartable.VarTable) StepStatus {
 				vt.Add(iterator, itVar.Value())
 				status := t.runStep(s, ctx, vt)
 				if status.IsBreaking {
+					// setting the false so does not break
+					status.IsBreaking = false
 					return status
 				}
 				vt, err = updateVarsWithResultVariables(vt, s.ResultNames(), status.Results, s.Kind() == steptype.Shell)
