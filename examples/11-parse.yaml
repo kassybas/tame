@@ -1,0 +1,22 @@
+
+
+settings:
+  shieldEnv: true
+
+globals:
+  $tags:
+  - latest
+  - 2020.01
+  - release
+
+# tame -f examples/10-for.yaml Builder
+targets:
+  Echo:
+    args: {$msg: "OK"}
+    run:
+    - call yoyoy: {$yo: yo}
+    - sh: echo $msg
+
+  Caller:
+    run:
+    - call Echo: {$msg: "yoyoyo"}

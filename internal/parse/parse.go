@@ -2,14 +2,17 @@ package parse
 
 import (
 	"fmt"
+	"os"
 	"strings"
 
 	"github.com/kassybas/tame/types/opts"
 	"github.com/kassybas/tame/types/steptype"
+	"github.com/sirupsen/logrus"
 
 	"github.com/kassybas/tame/internal/helpers"
 	"github.com/kassybas/tame/internal/keywords"
 	"github.com/kassybas/tame/internal/step"
+	"github.com/kassybas/tame/internal/step/callstep"
 	"github.com/kassybas/tame/internal/target"
 	"github.com/kassybas/tame/schema"
 )
@@ -66,7 +69,44 @@ func determineStepType(stepDef map[string]interface{}) (steptype.Steptype, error
 	return sType, nil
 }
 
-func buildStep(stepDef map[string]interface{}) (step.Step, error) {
+func buildStep(rawStep map[string]interface{}) (step.Step, error) {
+	stepDef, stepType, err := ParseStepSchema(rawStep)
+	fmt.Printf("%+v\n", stepDef)
+	if err != nil {
+		fmt.Println(err.Error())
+		return nil, err
+	}
+	os.Exit(0)
+	switch stepType {
+	case steptype.Call:
+		{
+			return callstep.NewCallStep(rawStep)
+		}
+	case steptype.Shell:
+		{
+			newStep, err := buildShellStep(rawStep)
+			return &newStep, err
+		}
+	case steptype.Var:
+		{
+			newStep, err := buildVarStep(rawStep)
+			return &newStep, err
+		}
+	case steptype.Return:
+		{
+			newStep, err := buildReturnStep(rawStep)
+			return &newStep, err
+		}
+	default:
+		{
+			logrus.Fatal("unknown step type")
+		}
+	}
+	return nil, nil
+}
+
+// TODO: cleanup
+func buildStepBK(stepDef map[string]interface{}) (step.Step, error) {
 	stepType, err := determineStepType(stepDef)
 	if err != nil {
 		return nil, err
@@ -109,7 +149,7 @@ func buildSteps(stepDefs []map[string]interface{}) ([]step.Step, error) {
 	return steps, nil
 }
 
-func buildTarget(targetKey string, targetDef schema.TargetDefinition) (target.Target, error) {
+func buildTarget(targetKey string, targetDef schema.TargetSchema) (target.Target, error) {
 	var err error
 	newTarget := target.Target{
 		Name: targetKey,

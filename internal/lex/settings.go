@@ -7,7 +7,7 @@ import (
 	"github.com/kassybas/tame/types/settings"
 )
 
-func BuildSettings(tfs schema.SettingsDefintion) (settings.Settings, error) {
+func BuildSettings(tfs schema.SettingsShema) (settings.Settings, error) {
 	opts, err := helpers.BuildOpts(tfs.GlobalOpts)
 	if err != nil {
 		return settings.Settings{}, err

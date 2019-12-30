@@ -18,8 +18,8 @@ type Step interface {
 	GetCalledTargetName() string
 	// SetCalledTarget(Target)
 	SetCalledTarget(interface{})
-	GetIteratorVar() string
-	GetIterableVar() string
+	GetIteratorName() string
+	GetIterableName() string
 }
 
 type StepStatus struct {
@@ -28,8 +28,6 @@ type StepStatus struct {
 	Stdstatus  int
 	Err        error
 }
-
-
 
 // TODO: cleanup
 // type Result struct {

@@ -3,11 +3,6 @@ package parse
 import (
 	"fmt"
 	"strings"
-
-	"github.com/kassybas/tame/internal/tvar"
-
-	"github.com/kassybas/tame/internal/keywords"
-	"github.com/kassybas/tame/internal/step/callstep"
 )
 
 func parseCalledTargetName(k string) (string, error) {
@@ -21,48 +16,49 @@ func parseCalledTargetName(k string) (string, error) {
 	return fields[1], nil
 }
 
-func parseCallStepArgs(argDefs map[interface{}]interface{}) ([]tvar.TVariable, error) {
-	args := []tvar.TVariable{}
-	for argKey, argValue := range argDefs {
-
-		varName, err := ifaceToString(argKey)
-		if err != nil {
-			return nil, fmt.Errorf("failed to parse arguments %s\n\t%s", argKey, err)
+func parseCallStepArgs(argDefs interface{}) (map[string]interface{}, error) {
+	argMap, ok := argDefs.(map[interface{}]interface{})
+	if !ok {
+		return nil, fmt.Errorf("call step must have map as value, got: %T", argDefs)
+	}
+	args := make(map[string]interface{}, len(argMap))
+	for argKey, argValue := range argMap {
+		argName, ok := argKey.(string)
+		if !ok {
+			fmt.Errorf("non-string argument variable name: %v (type %T)", argKey, argKey)
 		}
-		if err := validateVariableName(varName); err != nil {
+		if err := validateVariableName(argName); err != nil {
 			return nil, err
 		}
-		// TODO: hanlde nonstring argKeys
-		newArg := tvar.NewVariable(tvar.ConvertKeyToString(argKey), argValue)
-		args = append(args, newArg)
+		args[argName] = argValue
 	}
 	return args, nil
 }
 
-func parseCallStepHeader(newStep *callstep.CallStep, header string, value interface{}) error {
-	var err error
-	newStep.Name = header
-	newStep.CalledTargetName, err = parseCalledTargetName(header)
-	if err != nil {
-		return err
-	}
-	if value != nil {
-		switch value.(type) {
-		case map[interface{}]interface{}:
-			{
-				newStep.Arguments, err = parseCallStepArgs(value.(map[interface{}]interface{}))
-				if err != nil {
-					return err
-				}
-			}
-		default:
-			{
-				return fmt.Errorf("unknown argument type in %s: %v (type %T)", header, value, value)
-			}
-		}
-	}
-	return nil
-}
+// func parseCallStepHeader(newStep *callstep.CallStep, header string, value interface{}) error {
+// 	var err error
+// 	newStep.Name = header
+// 	newStep.CalledTargetName, err = parseCalledTargetName(header)
+// 	if err != nil {
+// 		return err
+// 	}
+// 	if value != nil {
+// 		switch value.(type) {
+// 		case map[interface{}]interface{}:
+// 			{
+// 				// newStep.Arguments, err = parseCallStepArgs(value.(map[interface{}]interface{}))
+// 				// if err != nil {
+// 				// 	return err
+// 				// }
+// 			}
+// 		default:
+// 			{
+// 				return fmt.Errorf("unknown argument type in %s: %v (type %T)", header, value, value)
+// 			}
+// 		}
+// 	}
+// 	return nil
+// }
 
 func parseCallStepResults(value interface{}) ([]string, error) {
 	switch value.(type) {
@@ -86,38 +82,38 @@ func parseCallStepResults(value interface{}) ([]string, error) {
 	}
 }
 
-func buildCallStep(stepDef map[string]interface{}) (callstep.CallStep, error) {
-	var newStep callstep.CallStep
-	var err error
-	for k, v := range stepDef {
-		if strings.HasPrefix(k, keywords.StepCall) {
-			if newStep.CalledTargetName != "" {
-				return newStep, fmt.Errorf("multiple call defined in a single step: 'call %s' and '%s'", newStep.CalledTargetName, k)
-			}
-			if err = parseCallStepHeader(&newStep, k, v); err != nil {
-				return newStep, err
-			}
-			continue
-		}
-		if k == keywords.StepCallResult {
-			newStep.Results, err = parseCallStepResults(v)
-			if err != nil {
-				return newStep, err
-			}
-			continue
-		}
-		if k == keywords.Opts {
-			newStep.Opts, err = parseOpts(v)
-			if err != nil {
-				return newStep, err
-			}
-			continue
-		}
-		if k == keywords.StepFor {
-			newStep.IteratorVar, newStep.IterableVar, err = parseForLoop(v)
-			continue
-		}
-		return newStep, fmt.Errorf("unknown field in call step: %s", k)
-	}
-	return newStep, nil
-}
+// func buildCallStep(stepDef map[string]interface{}) (callstep.CallStep, error) {
+// 	var newStep callstep.CallStep
+// 	var err error
+// 	for k, v := range stepDef {
+// 		if strings.HasPrefix(k, keywords.StepCall) {
+// 			if newStep.CalledTargetName != "" {
+// 				return newStep, fmt.Errorf("multiple call defined in a single step: 'call %s' and '%s'", newStep.CalledTargetName, k)
+// 			}
+// 			if err = parseCallStepHeader(&newStep, k, v); err != nil {
+// 				return newStep, err
+// 			}
+// 			continue
+// 		}
+// 		if k == keywords.StepCallResult {
+// 			newStep.Results, err = parseCallStepResults(v)
+// 			if err != nil {
+// 				return newStep, err
+// 			}
+// 			continue
+// 		}
+// 		if k == keywords.Opts {
+// 			newStep.Opts, err = parseOpts(v)
+// 			if err != nil {
+// 				return newStep, err
+// 			}
+// 			continue
+// 		}
+// 		if k == keywords.StepFor {
+// 			newStep.IteratorVar, newStep.IterableVar, err = parseForLoop(v)
+// 			continue
+// 		}
+// 		return newStep, fmt.Errorf("unknown field in call step: %s", k)
+// 	}
+// 	return newStep, nil
+// }
