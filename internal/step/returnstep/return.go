@@ -57,10 +57,10 @@ func (s *ReturnStep) SetCalledTarget(t interface{}) {
 	log.Fatal("calling target in return")
 }
 
-func (s *ReturnStep) GetIteratorVar() string {
+func (s *ReturnStep) GetIteratorName() string {
 	return ""
 }
 
-func (s *ReturnStep) GetIterableVar() string {
+func (s *ReturnStep) GetIterableName() string {
 	return ""
 }

@@ -85,10 +85,10 @@ func (s *ShellStep) RunStep(ctx tcontext.Context, vt vartable.VarTable) step.Ste
 	}
 }
 
-func (s *ShellStep) GetIteratorVar() string {
+func (s *ShellStep) GetIteratorName() string {
 	return s.IteratorVar
 }
 
-func (s *ShellStep) GetIterableVar() string {
+func (s *ShellStep) GetIterableName() string {
 	return s.IterableVar
 }

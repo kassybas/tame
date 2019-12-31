@@ -58,18 +58,18 @@ func (t Target) runStep(s step.Step, ctx tcontext.Context, vt vartable.VarTable)
 }
 
 func getIters(vt vartable.VarTable, s step.Step) (string, []tvar.TVariable, error) {
-	if s.GetIterableVar() == "" {
+	if s.GetIterableName() == "" {
 		return "", nil, nil
 	}
-	if !strings.HasPrefix(s.GetIteratorVar(), keywords.PrefixReference) {
-		return "", nil, fmt.Errorf("iterator variable wrong format: %s (should be: %s%s)", s.GetIteratorVar(), keywords.PrefixReference, s.GetIteratorVar())
+	if !strings.HasPrefix(s.GetIteratorName(), keywords.PrefixReference) {
+		return "", nil, fmt.Errorf("iterator variable wrong format: %s (should be: %s%s)", s.GetIteratorName(), keywords.PrefixReference, s.GetIteratorName())
 	}
-	iterable, err := vt.GetVar(s.GetIterableVar())
+	iterable, err := vt.GetVar(s.GetIterableName())
 	v, isList := iterable.(tvar.TList)
 	if !isList {
 		return "", nil, fmt.Errorf("iterable variable %s is not list (type: %T)", iterable.Name(), iterable)
 	}
-	return s.GetIteratorVar(), v.Value().([]tvar.TVariable), err
+	return s.GetIteratorName(), v.Value().([]tvar.TVariable), err
 }
 
 func (t Target) Make(ctx tcontext.Context, vt vartable.VarTable) step.StepStatus {
@@ -80,7 +80,7 @@ func (t Target) Make(ctx tcontext.Context, vt vartable.VarTable) step.StepStatus
 	}
 	for _, s := range t.Steps {
 		// TODO: refactor to more dry
-		if s.GetIterableVar() == "" && s.GetIteratorVar() == "" {
+		if s.GetIterableName() == "" && s.GetIteratorName() == "" {
 			status := t.runStep(s, ctx, vt)
 			if status.IsBreaking {
 				// setting the false so caller does not break

@@ -59,10 +59,10 @@ func (s *VarStep) SetCalledTarget(t interface{}) {
 
 }
 
-func (s *VarStep) GetIteratorVar() string {
+func (s *VarStep) GetIteratorName() string {
 	return s.IteratorVar
 }
 
-func (s *VarStep) GetIterableVar() string {
+func (s *VarStep) GetIterableName() string {
 	return s.IterableVar
 }
