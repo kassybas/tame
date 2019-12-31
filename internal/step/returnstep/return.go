@@ -9,10 +9,6 @@ import (
 	"github.com/kassybas/tame/internal/vartable"
 )
 
-func (s ReturnStep) GetName() string {
-	return "return"
-}
-
 func (s *ReturnStep) RunStep(ctx tcontext.Context, vt vartable.VarTable) step.StepStatus {
 	rvs := []interface{}{}
 	for _, retDef := range s.returnNames {

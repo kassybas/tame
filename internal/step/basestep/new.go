@@ -6,7 +6,7 @@ import (
 	"github.com/kassybas/tame/types/steptype"
 )
 
-func NewBaseStep(stepDef schema.MergedStepSchema, stepType steptype.Steptype) (BaseStep, error) {
+func NewBaseStep(stepDef schema.MergedStepSchema, stepType steptype.Steptype, name string) (BaseStep, error) {
 	var newStep BaseStep
 	var err error
 	newStep.kind = stepType
@@ -28,5 +28,6 @@ func NewBaseStep(stepDef schema.MergedStepSchema, stepType steptype.Steptype) (B
 	if stepDef.ForLoop.Iterable != "" {
 		newStep.iterableName = stepDef.ForLoop.Iterable
 	}
+	newStep.name = name
 	return newStep, err
 }

@@ -19,6 +19,6 @@ func NewReturnStep(stepDef schema.MergedStepSchema) (*ReturnStep, error) {
 	} else {
 		newStep.returnNames = []string{}
 	}
-	newStep.BaseStep, err = basestep.NewBaseStep(stepDef, steptype.Return)
+	newStep.BaseStep, err = basestep.NewBaseStep(stepDef, steptype.Return, "return")
 	return &newStep, err
 }

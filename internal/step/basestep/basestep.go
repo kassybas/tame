@@ -6,6 +6,7 @@ import (
 )
 
 type BaseStep struct {
+	name         string
 	kind         steptype.Steptype
 	resultNames  []string
 	opts         opts.ExecutionOpts
@@ -34,4 +35,8 @@ func (s *BaseStep) GetIteratorName() string {
 
 func (s *BaseStep) GetIterableName() string {
 	return s.iterableName
+}
+
+func (s *BaseStep) GetName() string {
+	return s.name
 }

@@ -13,6 +13,7 @@ import (
 	"github.com/kassybas/tame/internal/step"
 	"github.com/kassybas/tame/internal/step/callstep"
 	"github.com/kassybas/tame/internal/step/returnstep"
+	"github.com/kassybas/tame/internal/step/shellstep"
 	"github.com/kassybas/tame/internal/target"
 	"github.com/kassybas/tame/schema"
 )
@@ -82,8 +83,7 @@ func buildStep(rawStep map[string]interface{}) (step.Step, error) {
 		}
 	case steptype.Shell:
 		{
-			newStep, err := buildShellStep(rawStep)
-			return &newStep, err
+			return shellstep.NewShellStep(stepDef)
 		}
 	case steptype.Var:
 		{

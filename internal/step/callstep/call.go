@@ -3,17 +3,12 @@ package callstep
 import (
 	"fmt"
 
-	"github.com/kassybas/tame/internal/keywords"
 	"github.com/kassybas/tame/internal/step"
 	"github.com/kassybas/tame/internal/target"
 	"github.com/kassybas/tame/internal/tcontext"
 	"github.com/kassybas/tame/internal/tvar"
 	"github.com/kassybas/tame/internal/vartable"
 )
-
-func (s CallStep) GetName() string {
-	return fmt.Sprintf("%s %s", keywords.StepCall, s.calledTargetName)
-}
 
 func (s *CallStep) RunStep(ctx tcontext.Context, vt vartable.VarTable) step.StepStatus {
 	// TODOb: resolve global variables too

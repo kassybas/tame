@@ -3,6 +3,7 @@ package callstep
 import (
 	"fmt"
 
+	"github.com/kassybas/tame/internal/keywords"
 	"github.com/kassybas/tame/internal/step/basestep"
 	"github.com/kassybas/tame/internal/target"
 	"github.com/kassybas/tame/internal/tvar"
@@ -30,6 +31,7 @@ func NewCallStep(stepDef schema.MergedStepSchema) (*CallStep, error) {
 	for k, v := range stepDef.CallArgumentsPassed {
 		newStep.arguments = append(newStep.arguments, tvar.NewVariable(k, v))
 	}
-	newStep.BaseStep, err = basestep.NewBaseStep(stepDef, steptype.Call)
+	name := fmt.Sprintf("%s %s", keywords.StepCall, newStep.calledTargetName)
+	newStep.BaseStep, err = basestep.NewBaseStep(stepDef, steptype.Call, name)
 	return &newStep, err
 }
