@@ -7,16 +7,7 @@ import (
 	"github.com/kassybas/tame/internal/step"
 	"github.com/kassybas/tame/internal/tcontext"
 	"github.com/kassybas/tame/internal/vartable"
-	"github.com/sirupsen/logrus"
 )
-
-func (s *ShellStep) GetCalledTargetName() string {
-	return "shell"
-}
-
-func (s *ShellStep) SetCalledTarget(t interface{}) {
-	logrus.Fatal("internal error: calling target in shell")
-}
 
 func (s *ShellStep) shouldIgnoreResults() bool {
 	if len(s.BaseStep.ResultNames()) == 0 {

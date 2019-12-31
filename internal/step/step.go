@@ -15,8 +15,6 @@ type Step interface {
 	GetOpts() opts.ExecutionOpts
 	SetOpts(opts.ExecutionOpts)
 	RunStep(tcontext.Context, vartable.VarTable) StepStatus
-	GetCalledTargetName() string
-	SetCalledTarget(interface{})
 	GetIteratorName() string
 	GetIterableName() string
 }

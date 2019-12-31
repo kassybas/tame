@@ -15,7 +15,7 @@ type BaseStep struct {
 }
 
 func (s *BaseStep) Kind() steptype.Steptype {
-	return steptype.Call
+	return s.kind
 }
 func (s *BaseStep) SetOpts(o opts.ExecutionOpts) {
 	s.opts = o

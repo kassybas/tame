@@ -42,10 +42,6 @@ func createArgsVartable(argDefs []tvar.TVariable, calledTarget target.Target, vt
 	return argsVarTable, nil
 }
 
-func (s *CallStep) GetCalledTargetName() string {
-	return s.calledTargetName
-}
-
 func (s *CallStep) SetCalledTarget(t interface{}) {
 	s.calledTarget = t.(target.Target)
 }

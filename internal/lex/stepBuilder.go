@@ -3,6 +3,7 @@ package lex
 import (
 	"fmt"
 
+	"github.com/kassybas/tame/internal/step/callstep"
 	"github.com/kassybas/tame/internal/target"
 	"github.com/kassybas/tame/types/steptype"
 )
@@ -18,7 +19,7 @@ func findCalledTarget(name, caller string, targets map[string]target.Target) (ta
 func populateSteps(trg *target.Target, targets map[string]target.Target) error {
 	for i := range trg.Steps {
 		if trg.Steps[i].Kind() == steptype.Call {
-			calledTarget, err := findCalledTarget(trg.Steps[i].GetCalledTargetName(), trg.Name, targets)
+			calledTarget, err := findCalledTarget(trg.Steps[i].GetName(), trg.Name, targets)
 			if err != nil {
 				return err
 			}
@@ -26,7 +27,7 @@ func populateSteps(trg *target.Target, targets map[string]target.Target) error {
 			if err != nil {
 				return err
 			}
-			trg.Steps[i].SetCalledTarget(calledTarget)
+			trg.Steps[i].(*callstep.CallStep).SetCalledTarget(calledTarget)
 		}
 	}
 	return nil
