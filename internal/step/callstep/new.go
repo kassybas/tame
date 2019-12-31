@@ -22,7 +22,7 @@ func NewCallStep(stepDef schema.MergedStepSchema) (*CallStep, error) {
 	var newStep CallStep
 	// Called target
 	if stepDef.CalledTargetName == nil {
-		return newStep, fmt.Errorf("missing called target name in call step")
+		return &newStep, fmt.Errorf("missing called target name in call step")
 	}
 	newStep.calledTargetName = *stepDef.CalledTargetName
 	// Args

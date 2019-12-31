@@ -9,6 +9,35 @@ import (
 	"strings"
 )
 
+func loadCallStepSchema(raw map[string]interface{}, dynamicKey string, result *schema.MergedStepSchema) error {
+	ct, err := parseCalledTargetName(dynamicKey)
+	if err != nil {
+		return err
+	}
+	result.CalledTargetName = &ct
+	result.CallArgumentsPassed, err = parseCallStepArgs(raw[dynamicKey])
+	return err
+}
+
+func loadVarStepSchema(raw map[string]interface{}, dynamicKey string, result *schema.MergedStepSchema) {
+	result.VarName = &dynamicKey
+	result.VarValue = raw[dynamicKey]
+}
+
+func loadDynamicKey(raw map[string]interface{}, dynamicKey string, result *schema.MergedStepSchema) error {
+	if strings.HasPrefix(dynamicKey, keywords.StepCall) {
+		err := loadCallStepSchema(raw, dynamicKey, result)
+		if err != nil {
+			return err
+		}
+	} else if strings.HasPrefix(dynamicKey, keywords.StepVar) {
+		loadVarStepSchema(raw, dynamicKey, result)
+	} else {
+		return fmt.Errorf("unknown key in step: %s", dynamicKey)
+	}
+	return nil
+}
+
 func loadMergedStepSchema(raw map[string]interface{}) (schema.MergedStepSchema, error) {
 	var result schema.MergedStepSchema
 	var md mapstructure.Metadata
@@ -20,23 +49,9 @@ func loadMergedStepSchema(raw map[string]interface{}) (schema.MergedStepSchema, 
 		return result, fmt.Errorf("multiple dyanmic keys found in step, only one allowed (var ... or call ...), got: %v", md.Unused)
 	}
 	if len(md.Unused) == 1 {
-		dynamicKey := md.Unused[0]
-		if strings.HasPrefix(dynamicKey, keywords.StepCall) {
-			ct, err := parseCalledTargetName(dynamicKey)
-			if err != nil {
-				return result, err
-			}
-			result.CalledTargetName = &ct
-
-			result.CallArgumentsPassed, err = parseCallStepArgs(raw[dynamicKey])
-			if err != nil {
-				return result, err
-			}
-		} else if strings.HasPrefix(dynamicKey, keywords.StepVar) {
-			result.VarName = &dynamicKey
-			result.VarValue = raw[dynamicKey]
-		} else {
-			return result, fmt.Errorf("unknown key in step: %s", dynamicKey)
+		err = loadDynamicKey(raw, md.Unused[0], &result)
+		if err != nil {
+			return result, err
 		}
 	}
 	return result, err

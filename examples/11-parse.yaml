@@ -14,7 +14,6 @@ targets:
   Echo:
     args: {$msg: "OK"}
     run:
-    - call yoyoy: {$yo: yo}
     - sh: echo $msg
 
   Caller:

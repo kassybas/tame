@@ -2,7 +2,6 @@ package parse
 
 import (
 	"fmt"
-	"os"
 	"strings"
 
 	"github.com/kassybas/tame/types/opts"
@@ -13,6 +12,7 @@ import (
 	"github.com/kassybas/tame/internal/keywords"
 	"github.com/kassybas/tame/internal/step"
 	"github.com/kassybas/tame/internal/step/callstep"
+	"github.com/kassybas/tame/internal/step/returnstep"
 	"github.com/kassybas/tame/internal/target"
 	"github.com/kassybas/tame/schema"
 )
@@ -71,16 +71,14 @@ func determineStepType(stepDef map[string]interface{}) (steptype.Steptype, error
 
 func buildStep(rawStep map[string]interface{}) (step.Step, error) {
 	stepDef, stepType, err := ParseStepSchema(rawStep)
-	fmt.Printf("%+v\n", stepDef)
 	if err != nil {
 		fmt.Println(err.Error())
 		return nil, err
 	}
-	os.Exit(0)
 	switch stepType {
 	case steptype.Call:
 		{
-			return callstep.NewCallStep(rawStep)
+			return callstep.NewCallStep(stepDef)
 		}
 	case steptype.Shell:
 		{
@@ -94,8 +92,7 @@ func buildStep(rawStep map[string]interface{}) (step.Step, error) {
 		}
 	case steptype.Return:
 		{
-			newStep, err := buildReturnStep(rawStep)
-			return &newStep, err
+			return returnstep.NewReturnStep(stepDef)
 		}
 	default:
 		{
@@ -103,38 +100,6 @@ func buildStep(rawStep map[string]interface{}) (step.Step, error) {
 		}
 	}
 	return nil, nil
-}
-
-// TODO: cleanup
-func buildStepBK(stepDef map[string]interface{}) (step.Step, error) {
-	stepType, err := determineStepType(stepDef)
-	if err != nil {
-		return nil, err
-	}
-	switch stepType {
-	case steptype.Call:
-		{
-			newStep, err := buildCallStep(stepDef)
-			return &newStep, err
-		}
-	case steptype.Shell:
-		{
-			newStep, err := buildShellStep(stepDef)
-			return &newStep, err
-		}
-	case steptype.Var:
-		{
-			newStep, err := buildVarStep(stepDef)
-			return &newStep, err
-		}
-	case steptype.Return:
-		{
-			newStep, err := buildReturnStep(stepDef)
-			return &newStep, err
-		}
-	}
-
-	return nil, fmt.Errorf("internal parsing error: parsing did not finish succesfully")
 }
 
 func buildSteps(stepDefs []map[string]interface{}) ([]step.Step, error) {
