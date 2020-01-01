@@ -3,6 +3,7 @@ module github.com/kassybas/tame
 go 1.13
 
 require (
+	github.com/antonmedv/expr v1.4.2
 	github.com/kassybas/shell-exec v0.1.0
 	github.com/mitchellh/mapstructure v1.1.2
 	github.com/sirupsen/logrus v1.4.2

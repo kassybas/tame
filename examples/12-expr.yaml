@@ -9,7 +9,7 @@ targets:
   IsRequestOK:
     args: {$requestsMade: 100, $requestsSucceeded: 100}
     run:
-      - expr: ($requestsMade * $requestsSucceeded / 100) >= 90
+      - expr: $requestsMade >= 90
         $: $res
       - sh: echo "done"
 
