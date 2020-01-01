@@ -14,10 +14,9 @@ targets:
   Echo:
     args: {$msg: "OK"}
     run:
-    - var $msg: "nope" ## TODO: fix this is not working
-    - var $okok: "nope" ## TODO: fix this is not working
+    - var $msg: "changed!!!!" 
+    # - var $okok: "nope" ## TODO: fix this is not working
     - sh: echo $msg
-    - sh: echo $okok
 
   Caller:
     run:

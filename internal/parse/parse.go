@@ -20,7 +20,6 @@ import (
 )
 
 func ParseTeafile(tf schema.Tamefile) (map[string]target.Target, error) {
-
 	targets := make(map[string]target.Target)
 	for targetKey, targetValue := range tf.Targets {
 		trg, err := buildTarget(targetKey, targetValue)
@@ -32,49 +31,9 @@ func ParseTeafile(tf schema.Tamefile) (map[string]target.Target, error) {
 	return targets, nil
 }
 
-func determineStepType(stepDef map[string]interface{}) (steptype.Steptype, error) {
-	multiDefError := fmt.Errorf("type of step cannot be determined: more than on of: (var|sh|call|return) only one should be defined in each step")
-	sType := steptype.Unset
-	for k := range stepDef {
-		if k == keywords.StepShell {
-			if sType != steptype.Unset {
-				return sType, multiDefError
-			}
-			sType = steptype.Shell
-			continue
-		}
-		if strings.HasPrefix(k, keywords.StepVar) {
-			if sType != steptype.Unset {
-				return sType, multiDefError
-			}
-			sType = steptype.Var
-			continue
-		}
-		if strings.HasPrefix(k, keywords.StepCall) {
-			if sType != steptype.Unset {
-				return sType, multiDefError
-			}
-			sType = steptype.Call
-			continue
-		}
-		if k == keywords.StepReturn {
-			if sType != steptype.Unset {
-				return sType, multiDefError
-			}
-			sType = steptype.Return
-			continue
-		}
-	}
-	if sType == steptype.Unset {
-		return sType, fmt.Errorf("undeterminable step type: must be (var|sh|call|return)")
-	}
-	return sType, nil
-}
-
 func buildStep(rawStep map[string]interface{}) (step.Step, error) {
 	stepDef, stepType, err := ParseStepSchema(rawStep)
 	if err != nil {
-		fmt.Println(err.Error())
 		return nil, err
 	}
 	switch stepType {

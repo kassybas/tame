@@ -25,7 +25,8 @@ func loadVarStepSchema(raw map[string]interface{}, dynamicKey string, result *sc
 		return err
 	}
 	result.VarName = &vn
-	result.VarValue = raw[vn]
+	result.ResultContainers = &[]string{vn}
+	result.VarValue = raw[dynamicKey]
 	return err
 }
 
@@ -103,6 +104,9 @@ func ParseStepSchema(raw map[string]interface{}) (schema.MergedStepSchema, stept
 		if err != nil {
 			return mergedSchema, 0, err
 		}
+	}
+	if stepType == steptype.Unset {
+		return mergedSchema, stepType, fmt.Errorf("could not determine step type: %+v", mergedSchema)
 	}
 	return mergedSchema, stepType, err
 }
