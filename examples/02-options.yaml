@@ -5,12 +5,12 @@ targets:
   SoundOfSilence:
     run:
     - sh: echo "hello darkness"
-      opts: silent # stdout and sterr is not printed
+      opts: silent # stdout and stderr is not printed
     - sh: |
-        echo "i fail"
+        echo "i fail but.."
         exit 66
       opts: allowed-fail # allow non-zero return codes and continue execution
-    - sh: echo "target execution finished"
+    - sh: echo "target execution still finished"
   
 # tame -f examples/02-options.yaml MultipleOpts
   MultipleOpts:

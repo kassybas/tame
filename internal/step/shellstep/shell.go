@@ -47,8 +47,6 @@ func (s *ShellStep) shouldIgnoreResults() bool {
 
 func (s *ShellStep) RunStep(ctx tcontext.Context, vt vartable.VarTable) step.StepStatus {
 	var err error
-	// ignore result if it is not caputered
-	// TODO: fix regression
 	opts := exec.Options{
 		Silent:       s.BaseStep.GetOpts().Silent,
 		ShellPath:    ctx.Settings.UsedShell,
