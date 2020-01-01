@@ -3,18 +3,17 @@ settings:
 
 globals:
   $config:
-    build: "OKOKOK"
+    build: "foo"
 
 targets:
-  testVar:
+  TestVar:
     run:
     - sh: echo "config is ${config_build}" 
-    - sh: echo "${config_12}"
-    - call returnMap: {}
+    - call ReturnMap: {}
       $: date
     - sh: echo "${date_day}"
 
-  returnMap:
+  ReturnMap:
     run:
     - var $mymap:
         date:

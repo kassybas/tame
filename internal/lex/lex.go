@@ -44,7 +44,7 @@ func createDependencyGraph(targets map[string]target.Target, targetName string, 
 	}
 	calledTarget, err := findCalledTarget(targetName, "cli root", targets)
 	if err != nil {
-		return &callstep.CallStep{}, nil
+		return &callstep.CallStep{}, err
 	}
 	err = populateSteps(&calledTarget, targets)
 	rootStep.SetCalledTarget(calledTarget)
