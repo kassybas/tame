@@ -8,6 +8,7 @@ const (
 	Shell
 	Var
 	Return
+	Expr
 )
 
 func (t Steptype) ToStr() string {
@@ -22,6 +23,8 @@ func (t Steptype) ToStr() string {
 		return "var"
 	case Return:
 		return "return"
+	case Expr:
+		return "expr"
 	default:
 		panic("internal error: non-steptype steptype")
 	}

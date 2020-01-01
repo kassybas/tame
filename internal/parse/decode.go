@@ -81,6 +81,13 @@ func ParseStepSchema(raw map[string]interface{}) (schema.MergedStepSchema, stept
 	}
 	// Determine step type
 	var stepType steptype.Steptype
+
+	if mergedSchema.Expr != nil {
+		stepType, err = setStepType(stepType, steptype.Expr)
+		if err != nil {
+			return mergedSchema, 0, err
+		}
+	}
 	if mergedSchema.Return != nil {
 		stepType, err = setStepType(stepType, steptype.Return)
 		if err != nil {

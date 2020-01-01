@@ -1,0 +1,18 @@
+
+
+settings:
+  shieldEnv: true
+
+
+# tame -f examples/10-for.yaml Builder
+targets:
+  IsRequestOK:
+    args: {$requestsMade: 100, $requestsSucceeded: 100}
+    run:
+      - expr: ($requestsMade * $requestsSucceeded / 100) >= 90
+        $: $res
+      - sh: echo "done"
+
+  Caller:
+    run:
+    - call Echo: {$msg: "yoyoyo"}

@@ -20,11 +20,6 @@ targets:
   
   Build:
     run:
-    - var $all:
-      - this
-      - is 
-      - a
-      - foo
     - call CreateMap: {}
       $: $result
     - sh: env
@@ -34,20 +29,10 @@ targets:
     run:
     - call CreateMap: {}
       $: $config
-    - return: $config.$platform
+    - return: $config.$platform   # you can access the fields dynamically
   
   PrintVars:
     run:
     - call GetPlatformConfig: {$platform: "mac"}
       $: $macConfig
     - sh: env
-
-  IndexAList:
-    run:
-    - var $myList:
-      - darkness
-      - my old
-      - friend
-    - var $i: 2
-    - var $line: $myList[$i]
-    - sh: echo "line is '${line}'"

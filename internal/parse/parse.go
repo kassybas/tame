@@ -12,6 +12,7 @@ import (
 	"github.com/kassybas/tame/internal/keywords"
 	"github.com/kassybas/tame/internal/step"
 	"github.com/kassybas/tame/internal/step/callstep"
+	"github.com/kassybas/tame/internal/step/exprstep"
 	"github.com/kassybas/tame/internal/step/returnstep"
 	"github.com/kassybas/tame/internal/step/shellstep"
 	"github.com/kassybas/tame/internal/step/varstep"
@@ -53,9 +54,13 @@ func buildStep(rawStep map[string]interface{}) (step.Step, error) {
 		{
 			return returnstep.NewReturnStep(stepDef)
 		}
+	case steptype.Expr:
+		{
+			return exprstep.NewExprStep(stepDef)
+		}
 	default:
 		{
-			logrus.Fatal("unknown step type")
+			logrus.Fatal("unknown step type: ", rawStep)
 		}
 	}
 	return nil, nil
