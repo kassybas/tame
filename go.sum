@@ -2,6 +2,8 @@ github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/kassybas/shell-exec v0.1.0 h1:qDovju2auESQ4pVI0KbnuJr8zX5Dfn7MnGGSGe8Fhys=
 github.com/kassybas/shell-exec v0.1.0/go.mod h1:rhOHllEmvN2Tg5VGpJQToZ3XzYkwbTfG0alXTRR81O8=
+github.com/kassybas/shell-exec v0.1.2 h1:7Nj4dyduhvzQGjNr+IUYD2lHg4CYWbo7tqWRyT1e6vI=
+github.com/kassybas/shell-exec v0.1.2/go.mod h1:XR3I+wNqpAuWdPqYUwIqee05+xxjO3hgLeLy/eWtEcI=
 github.com/konsorten/go-windows-terminal-sequences v1.0.1 h1:mweAR1A6xJ3oS2pRaGiHgQ4OO8tzTaLawm8vnODuwDk=
 github.com/konsorten/go-windows-terminal-sequences v1.0.1/go.mod h1:T0+1ngSBFLxvqU3pZ+m/2kptfBszLMUkC4ZK/EgS/cQ=
 github.com/mitchellh/mapstructure v1.1.2 h1:fmNYVwqnSfB9mZU6OS2O6GsXM+wcskZDuKQzvN1EDeE=

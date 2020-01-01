@@ -25,17 +25,21 @@ type Options struct {
 const DefaultShellCmdFlag = "-c"
 const DefaultShell = "sh"
 
-func copyAndCapture(w io.Writer, r io.Reader) ([]byte, error) {
+func copyAndCapture(w io.Writer, r io.Reader, copy, capture bool) ([]byte, error) {
 	var out []byte
 	buf := make([]byte, 1024, 1024)
 	for {
 		n, err := r.Read(buf[:])
 		if n > 0 {
 			d := buf[:n]
-			out = append(out, d...)
-			_, err := w.Write(d)
-			if err != nil {
-				return out, err
+			if capture {
+				out = append(out, d...)
+			}
+			if copy {
+				_, err := w.Write(d)
+				if err != nil {
+					return out, err
+				}
 			}
 		}
 		if err != nil {
@@ -69,6 +73,7 @@ func createCommand(script string, envVars []string, opts Options) *exec.Cmd {
 
 func getOutputFileDescriptors(silent bool) (*os.File, *os.File) {
 	if silent {
+		fmt.Println("SIIIILENCE", silent)
 		devNull := os.NewFile(0, os.DevNull)
 		return devNull, devNull
 	}
@@ -79,8 +84,6 @@ func ShellExec(script string, envVars []string, opts Options) (string, string, i
 	var stdout, stderr []byte
 	var errStdout, errStderr error
 
-	targetStdout, targetStderr := getOutputFileDescriptors(opts.Silent)
-
 	cmd := createCommand(script, envVars, opts)
 
 	stdoutIn, _ := cmd.StdoutPipe()
@@ -90,19 +93,22 @@ func ShellExec(script string, envVars []string, opts Options) (string, string, i
 	if err != nil {
 		return "", "", -1, err
 	}
-	var wg sync.WaitGroup
-	// cmd.Wait() should be called only after we finish reading
-	// from stdoutIn and stderrIn.
-	// wg ensures that we finish
-	wg.Add(1)
-	go func() {
-		stdout, errStdout = copyAndCapture(targetStdout, stdoutIn)
-		wg.Done()
-	}()
 
-	stderr, errStderr = copyAndCapture(targetStderr, stderrIn)
+	if !opts.Silent || !opts.IgnoreResult {
+		var wg sync.WaitGroup
+		// cmd.Wait() should be called only after we finish reading
+		// from stdoutIn and stderrIn.
+		// wg ensures that we finish
+		wg.Add(1)
+		go func() {
+			stdout, errStdout = copyAndCapture(os.Stdout, stdoutIn, !opts.Silent, !opts.IgnoreResult)
+			wg.Done()
+		}()
 
-	wg.Wait()
+		stderr, errStderr = copyAndCapture(os.Stderr, stderrIn, !opts.Silent, !opts.IgnoreResult)
+
+		wg.Wait()
+	}
 	var exitCode int
 	err = cmd.Wait()
 	if err != nil {
