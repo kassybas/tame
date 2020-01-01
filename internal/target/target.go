@@ -43,11 +43,10 @@ func mergeOpts(globalOpts, targetOpts, stepOpts opts.ExecutionOpts) opts.Executi
 
 func (t Target) runStep(s step.Step, ctx tcontext.Context, vt vartable.VarTable) step.StepStatus {
 	// Opts
-	// TODO: straighten out this mess
 	s.SetOpts(mergeOpts(ctx.Settings.GlobalOpts, t.Opts, s.GetOpts()))
-	newCtx := ctx
-	newCtx.Settings.GlobalOpts = s.GetOpts()
-	// Run
+	// to inherit the parent setting, we inject it in place of the global opts
+	ctx.Settings.GlobalOpts = s.GetOpts()
+
 	status := s.RunStep(ctx, vt)
 	if status.Err != nil {
 		return step.StepStatus{Err: fmt.Errorf("[target: %s]:: %s", t.Name, status.Err.Error())}

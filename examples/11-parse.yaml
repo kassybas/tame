@@ -14,9 +14,7 @@ targets:
   Echo:
     args: {$msg: "OK"}
     run:
-    - var $msg: "changed!!!!" 
-    # - var $okok: "nope" ## TODO: fix this is not working
-    - sh: echo $msg
+      - sh: printf "."
 
   Caller:
     run:
