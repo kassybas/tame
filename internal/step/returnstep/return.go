@@ -5,9 +5,29 @@ import (
 	"log"
 
 	"github.com/kassybas/tame/internal/step"
+	"github.com/kassybas/tame/internal/step/basestep"
 	"github.com/kassybas/tame/internal/tcontext"
 	"github.com/kassybas/tame/internal/vartable"
+	"github.com/kassybas/tame/schema"
+	"github.com/kassybas/tame/types/steptype"
 )
+
+type ReturnStep struct {
+	basestep.BaseStep
+	returnNames []string
+}
+
+func NewReturnStep(stepDef schema.MergedStepSchema) (*ReturnStep, error) {
+	var newStep ReturnStep
+	var err error
+	if stepDef.Return != nil {
+		newStep.returnNames = *stepDef.Return
+	} else {
+		newStep.returnNames = []string{}
+	}
+	newStep.BaseStep, err = basestep.NewBaseStep(stepDef, steptype.Return, "return")
+	return &newStep, err
+}
 
 func (s *ReturnStep) RunStep(ctx tcontext.Context, vt vartable.VarTable) step.StepStatus {
 	rvs := []interface{}{}
