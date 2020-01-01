@@ -69,7 +69,11 @@ func (v TMap) Type() vartype.TVarType {
 }
 
 func (v TMap) Value() interface{} {
-	return v.values
+	ifValues := make(map[interface{}]interface{})
+	for k, v := range v.values {
+		ifValues[k] = v.Value()
+	}
+	return ifValues
 }
 
 func (v TMap) SetValue(fields []dotref.RefField, value interface{}) (TVariable, error) {

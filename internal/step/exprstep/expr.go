@@ -30,17 +30,12 @@ func NewExprStep(stepDef schema.MergedStepSchema) (*ExprStep, error) {
 
 func (s *ExprStep) RunStep(ctx tcontext.Context, vt vartable.VarTable) step.StepStatus {
 	var err error
-	fmt.Println("Expression is", s.expr)
-	env := map[string]interface{}{
-		"$requestsMade": 100,
-	}
+	env := vt.GetAllValues()
+	// fmt.Println(env)
 	program, err := expr.Compile(s.expr, expr.Env(env))
 	result, err := expr.Run(program, env)
-	// TODO: continue
-	fmt.Println("OUT:", result)
-
 	return step.StepStatus{
-		Results:   []interface{}{"YO"},
+		Results:   []interface{}{result},
 		Stdstatus: 0,
 		Err:       err,
 	}

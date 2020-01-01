@@ -7,12 +7,10 @@ settings:
 # tame -f examples/10-for.yaml Builder
 targets:
   IsRequestOK:
-    args: {$requestsMade: 100, $requestsSucceeded: 100}
+    args: {$requestsMade: 100, $requestsSucceeded: 90}
     run:
-      - expr: $requestsMade >= 90
-        $: $res
-      - sh: echo "done"
+      # expressions use library: https://github.com/antonmedv/expr
+      - expr: $requestsMade <= $requestsSucceeded
+        $: $failed
+      - sh: echo "result is $failed"
 
-  Caller:
-    run:
-    - call Echo: {$msg: "yoyoyo"}
