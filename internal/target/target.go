@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/antonmedv/expr"
 	"github.com/kassybas/tame/internal/keywords"
 	"github.com/kassybas/tame/internal/step"
 
@@ -41,7 +42,32 @@ func mergeOpts(globalOpts, targetOpts, stepOpts opts.ExecutionOpts) opts.Executi
 	}
 }
 
+func evalConditionExpression(vt vartable.VarTable, s step.Step) (bool, error) {
+	if s.GetCondition() == "" {
+		return true, nil
+	}
+	env := vt.GetAllValues()
+	program, err := expr.Compile(s.GetCondition(), expr.Env(env))
+	if err != nil {
+		return false, err
+	}
+	result, err := expr.Run(program, env)
+	resBool, isBool := result.(bool)
+	if !isBool {
+		return false, fmt.Errorf("if condition expression is not bool: %s -> %s ", s.GetCondition(), result)
+	}
+	return resBool, nil
+}
+
 func (t Target) runStep(s step.Step, ctx tcontext.Context, vt vartable.VarTable) step.StepStatus {
+	// Check if condition
+	resIf, err := evalConditionExpression(vt, s)
+	if err != nil {
+		return step.StepStatus{Err: fmt.Errorf("[target: %s]:: %s", t.Name, err.Error())}
+	}
+	if !resIf {
+		return step.StepStatus{}
+	}
 	// Opts
 	s.SetOpts(mergeOpts(ctx.Settings.GlobalOpts, t.Opts, s.GetOpts()))
 	// to inherit the parent setting, we inject it in place of the global opts

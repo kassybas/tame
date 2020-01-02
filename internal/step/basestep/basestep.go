@@ -12,6 +12,7 @@ type BaseStep struct {
 	opts         opts.ExecutionOpts
 	iteratorName string
 	iterableName string
+	ifCondition  string
 }
 
 func (s *BaseStep) Kind() steptype.Steptype {
@@ -39,4 +40,8 @@ func (s *BaseStep) GetIterableName() string {
 
 func (s *BaseStep) GetName() string {
 	return s.name
+}
+
+func (s *BaseStep) GetCondition() string {
+	return s.ifCondition
 }

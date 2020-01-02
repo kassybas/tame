@@ -12,5 +12,6 @@ targets:
       # expressions use library: https://github.com/antonmedv/expr
       - expr: $requestsMade <= $requestsSucceeded
         $: $failed
-      - sh: echo "result is $failed"
+      - if: "10 > 100"  # only runs if true
+        sh: echo "result is $failed"
 

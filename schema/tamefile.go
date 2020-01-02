@@ -32,14 +32,10 @@ type ForLoopSchema struct {
 	Iterable string `mapstructure:"in"`
 }
 
-type ConditionSchema struct {
-	Condition string `mapstructure:"if"`
-}
-
 // MergedStepSchema is the base format of step
 type MergedStepSchema struct {
 	ForLoop          ForLoopSchema   `mapstructure:"for"`
-	Condition        ConditionSchema `mapstructure:"if"`
+	Condition        *string         `mapstructure:"if"`
 	Return           *[]string       `mapstructure:"return"` // string is allowed due to weak decode
 	Opts             *[]string       `mapstructure:"opts"`   // string is allowed due to weak decode
 	ResultContainers *[]string       `mapstructure:"$"`      // string is allowed due to weak decode
