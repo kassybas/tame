@@ -81,7 +81,7 @@ func (t Target) runStep(s step.Step, ctx tcontext.Context, vt vartable.VarTable)
 		return step.StepStatus{Err: fmt.Errorf("[target: %s]:: %s", t.Name, status.Err.Error())}
 	}
 	// Breaking if it was breaking (return step) or the called step exec failed with non-zero exit
-	status.IsBreaking = status.IsBreaking || (s.GetOpts().CanFail == false && status.Stdstatus != 0)
+	status.IsBreaking = status.IsBreaking || (!s.GetOpts().CanFail && status.Stdstatus != 0)
 	return status
 }
 
@@ -121,6 +121,9 @@ func (t Target) Make(ctx tcontext.Context, vt vartable.VarTable) step.StepStatus
 			}
 		} else {
 			iterator, iterable, err := getIters(vt, s)
+			if err != nil {
+				return step.StepStatus{Err: fmt.Errorf("in step: %s\n\t%s", s.GetName(), err)}
+			}
 			for _, itVar := range iterable {
 				vt.Add(iterator, itVar.Value())
 				status := t.runStep(s, ctx, vt)
