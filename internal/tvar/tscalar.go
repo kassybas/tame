@@ -18,8 +18,9 @@ type TScalar struct {
 
 func NewScalar(name string, value interface{}) TScalar {
 	return TScalar{
-		name:  name,
-		value: value,
+		name:    name,
+		value:   value,
+		varType: vartype.TScalarType,
 	}
 }
 

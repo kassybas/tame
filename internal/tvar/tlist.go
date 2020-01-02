@@ -36,7 +36,11 @@ func (v TList) ToStr() string {
 }
 
 func (v TList) Value() interface{} {
-	return v.values
+	ifValues := []interface{}{}
+	for i := range v.values {
+		ifValues = append(ifValues, v.values[i].Value())
+	}
+	return ifValues
 }
 
 func (v TList) Type() vartype.TVarType {

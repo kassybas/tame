@@ -9,39 +9,47 @@ import (
 	"github.com/kassybas/tame/internal/helpscreen"
 	"github.com/kassybas/tame/internal/parse"
 	"github.com/kassybas/tame/internal/step"
-	"github.com/kassybas/tame/internal/tvar"
+	"github.com/kassybas/tame/internal/step/callstep"
+	"github.com/kassybas/tame/internal/target"
 )
 
-func parseCLITargetArgs(targetArgs []string) ([]tvar.TVariable, error) {
-	var args []tvar.TVariable
+func parseCLITargetArgs(targetArgs []string) (map[string]interface{}, error) {
+	var args map[string]interface{}
 	for _, argStr := range targetArgs {
 		k, v, err := helpers.GetKeyValueFromEnvString(argStr)
 		if err != nil {
 			return nil, err
 		}
-		newArg := tvar.NewVariable(k, v)
-		args = append(args, newArg)
+		args[k] = v
 	}
 	return args, nil
 }
 
-func createDependencyGraph(targets map[string]step.Target, targetName string, cliVarArgs []string) (step.Step, error) {
-	var root step.CallStep
+func getRootStepSchema(targetName string, cliVarArgs []string) (schema.MergedStepSchema, error) {
+	var root schema.MergedStepSchema
 	var err error
-	root.Name = targetName
-	root.CalledTargetName = targetName
-	root.Arguments, err = parseCLITargetArgs(cliVarArgs)
+	root.CalledTargetName = &targetName
+	root.CallArgumentsPassed, err = parseCLITargetArgs(cliVarArgs)
 	if err != nil {
-		return &root, err
+		return root, err
 	}
-	root.CalledTarget, err = findCalledTarget(targetName, "cli root", targets)
+	return root, err
+}
+
+func createDependencyGraph(targets map[string]target.Target, targetName string, cliVarArgs []string) (step.Step, error) {
+	rootSchema, err := getRootStepSchema(targetName, cliVarArgs)
+	rootStep, err := callstep.NewCallStep(rootSchema)
 	if err != nil {
-		return &root, err
+		return &callstep.CallStep{}, err
 	}
+	calledTarget, err := findCalledTarget(targetName, "cli root", targets)
+	if err != nil {
+		return &callstep.CallStep{}, err
+	}
+	err = populateSteps(&calledTarget, targets)
+	rootStep.SetCalledTarget(calledTarget)
 
-	err = populateSteps(&root.CalledTarget, targets)
-
-	return &root, err
+	return rootStep, err
 }
 
 // Analyse creates the internal representation

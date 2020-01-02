@@ -6,16 +6,22 @@ import (
 
 	"github.com/kassybas/tame/types/opts"
 	"github.com/kassybas/tame/types/steptype"
+	"github.com/sirupsen/logrus"
 
 	"github.com/kassybas/tame/internal/helpers"
 	"github.com/kassybas/tame/internal/keywords"
 	"github.com/kassybas/tame/internal/step"
+	"github.com/kassybas/tame/internal/step/callstep"
+	"github.com/kassybas/tame/internal/step/exprstep"
+	"github.com/kassybas/tame/internal/step/returnstep"
+	"github.com/kassybas/tame/internal/step/shellstep"
+	"github.com/kassybas/tame/internal/step/varstep"
+	"github.com/kassybas/tame/internal/target"
 	"github.com/kassybas/tame/schema"
 )
 
-func ParseTeafile(tf schema.Tamefile) (map[string]step.Target, error) {
-
-	targets := make(map[string]step.Target)
+func ParseTeafile(tf schema.Tamefile) (map[string]target.Target, error) {
+	targets := make(map[string]target.Target)
 	for targetKey, targetValue := range tf.Targets {
 		trg, err := buildTarget(targetKey, targetValue)
 		if err != nil {
@@ -26,74 +32,38 @@ func ParseTeafile(tf schema.Tamefile) (map[string]step.Target, error) {
 	return targets, nil
 }
 
-func determineStepType(stepDef map[string]interface{}) (steptype.Steptype, error) {
-	multiDefError := fmt.Errorf("type of step cannot be determined: more than on of: (var|sh|call|return) only one should be defined in each step")
-	sType := steptype.Unset
-	for k := range stepDef {
-		if k == keywords.StepShell {
-			if sType != steptype.Unset {
-				return sType, multiDefError
-			}
-			sType = steptype.Shell
-			continue
-		}
-		if strings.HasPrefix(k, keywords.StepVar) {
-			if sType != steptype.Unset {
-				return sType, multiDefError
-			}
-			sType = steptype.Var
-			continue
-		}
-		if strings.HasPrefix(k, keywords.StepCall) {
-			if sType != steptype.Unset {
-				return sType, multiDefError
-			}
-			sType = steptype.Call
-			continue
-		}
-		if k == keywords.StepReturn {
-			if sType != steptype.Unset {
-				return sType, multiDefError
-			}
-			sType = steptype.Return
-			continue
-		}
-	}
-	if sType == steptype.Unset {
-		return sType, fmt.Errorf("undeterminable step type: must be (var|sh|call|return)")
-	}
-	return sType, nil
-}
-
-func buildStep(stepDef map[string]interface{}) (step.Step, error) {
-	stepType, err := determineStepType(stepDef)
+func buildStep(rawStep map[string]interface{}) (step.Step, error) {
+	stepDef, stepType, err := ParseStepSchema(rawStep)
 	if err != nil {
 		return nil, err
 	}
 	switch stepType {
 	case steptype.Call:
 		{
-			newStep, err := buildCallStep(stepDef)
-			return &newStep, err
+			return callstep.NewCallStep(stepDef)
 		}
 	case steptype.Shell:
 		{
-			newStep, err := buildShellStep(stepDef)
-			return &newStep, err
+			return shellstep.NewShellStep(stepDef)
 		}
 	case steptype.Var:
 		{
-			newStep, err := buildVarStep(stepDef)
-			return &newStep, err
+			return varstep.NewVarStep(stepDef)
 		}
 	case steptype.Return:
 		{
-			newStep, err := buildReturnStep(stepDef)
-			return &newStep, err
+			return returnstep.NewReturnStep(stepDef)
+		}
+	case steptype.Expr:
+		{
+			return exprstep.NewExprStep(stepDef)
+		}
+	default:
+		{
+			logrus.Fatal("unknown step type: ", rawStep)
 		}
 	}
-
-	return nil, fmt.Errorf("internal parsing error: parsing did not finish succesfully")
+	return nil, nil
 }
 
 func buildSteps(stepDefs []map[string]interface{}) ([]step.Step, error) {
@@ -108,9 +78,9 @@ func buildSteps(stepDefs []map[string]interface{}) ([]step.Step, error) {
 	return steps, nil
 }
 
-func buildTarget(targetKey string, targetDef schema.TargetDefinition) (step.Target, error) {
+func buildTarget(targetKey string, targetDef schema.TargetSchema) (target.Target, error) {
 	var err error
-	newTarget := step.Target{
+	newTarget := target.Target{
 		Name: targetKey,
 	}
 
@@ -202,14 +172,14 @@ func ifaceSliceToStringSlice(v []interface{}) ([]string, error) {
 	return res, nil
 }
 
-func buildParameters(paramDefs map[string]interface{}) ([]step.Param, error) {
-	params := []step.Param{}
+func buildParameters(paramDefs map[string]interface{}) ([]target.Param, error) {
+	params := []target.Param{}
 
 	for paramKey, paramValue := range paramDefs {
 		if !strings.HasPrefix(paramKey, keywords.PrefixReference) {
 			return params, fmt.Errorf("arguments must start with '$' symbol: %s (correct: %s%s)", paramKey, keywords.PrefixReference, paramKey)
 		}
-		newParam := step.Param{
+		newParam := target.Param{
 			Name: paramKey,
 		}
 		switch paramValue.(type) {

@@ -27,4 +27,4 @@ targets:
  # tame -f examples/01-hello-world.yaml HelloCall 
   HelloCall:
     run:
-    - call hello-arg: {$name: "passing an argument"}
+    - call HelloArg: {$name: "passing an argument"}

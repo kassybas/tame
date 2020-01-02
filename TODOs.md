@@ -14,6 +14,6 @@
 - cli
 - logging
 - check variable names at creation
-- resolve $values in variable names: make $config.$os resolve
 - make all field separators configurable
 - non-string map keys
+- oneliner tag

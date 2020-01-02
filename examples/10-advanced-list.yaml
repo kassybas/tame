@@ -1,0 +1,13 @@
+settings:
+  shieldEnv: true
+
+targets:
+  IndexAList:
+    run:
+    - var $myList:
+      - darkness
+      - my old
+      - friend
+    - var $i: 2
+    - var $line: $myList[$i]
+    - sh: echo "line is '${line}'"

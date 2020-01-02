@@ -1,0 +1,17 @@
+
+
+settings:
+  shieldEnv: true
+
+
+# tame -f examples/10-for.yaml Builder
+targets:
+  IsRequestOK:
+    args: {$requestsMade: 100, $requestsSucceeded: 90}
+    run:
+      # expressions use library: https://github.com/antonmedv/expr
+      - expr: $requestsMade <= $requestsSucceeded
+        $: $failed
+      - if: "10 > 100"  # only runs if true
+        sh: echo "result is $failed"
+

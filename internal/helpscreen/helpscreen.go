@@ -3,10 +3,10 @@ package helpscreen
 import (
 	"fmt"
 
-	"github.com/kassybas/tame/internal/step"
+	"github.com/kassybas/tame/internal/target"
 )
 
-func PrintTeafileDescription(targets map[string]step.Target) {
+func PrintTeafileDescription(targets map[string]target.Target) {
 	fmt.Println("Available targets:")
 	for k, v := range targets {
 		fmt.Printf("- %s", k)

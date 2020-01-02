@@ -90,6 +90,14 @@ func (vt *VarTable) GetAllEnvVars(ShellFieldSeparator string) []string {
 	return formattedVars
 }
 
+func (vt *VarTable) GetAllValues() map[string]interface{} {
+	vars := make(map[string]interface{})
+	for k, v := range vt.vars {
+		vars[k] = v.Value()
+	}
+	return vars
+}
+
 func (vt VarTable) ResolveValue(val interface{}) (interface{}, error) {
 	switch val.(type) {
 	case string:
