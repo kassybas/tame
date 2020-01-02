@@ -31,8 +31,10 @@ func NewExprStep(stepDef schema.MergedStepSchema) (*ExprStep, error) {
 func (s *ExprStep) RunStep(ctx tcontext.Context, vt vartable.VarTable) step.StepStatus {
 	var err error
 	env := vt.GetAllValues()
-	// fmt.Println(env)
 	program, err := expr.Compile(s.expr, expr.Env(env))
+	if err != nil {
+		return step.StepStatus{Err: err}
+	}
 	result, err := expr.Run(program, env)
 	return step.StepStatus{
 		Results:   []interface{}{result},
