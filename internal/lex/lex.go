@@ -14,7 +14,7 @@ import (
 )
 
 func parseCLITargetArgs(targetArgs []string) (map[string]interface{}, error) {
-	var args map[string]interface{}
+	args := make(map[string]interface{}, len(targetArgs))
 	for _, argStr := range targetArgs {
 		k, v, err := helpers.GetKeyValueFromEnvString(argStr)
 		if err != nil {
@@ -38,6 +38,9 @@ func getRootStepSchema(targetName string, cliVarArgs []string) (schema.MergedSte
 
 func createDependencyGraph(targets map[string]target.Target, targetName string, cliVarArgs []string) (step.Step, error) {
 	rootSchema, err := getRootStepSchema(targetName, cliVarArgs)
+	if err != nil {
+		return &callstep.CallStep{}, err
+	}
 	rootStep, err := callstep.NewCallStep(rootSchema)
 	if err != nil {
 		return &callstep.CallStep{}, err

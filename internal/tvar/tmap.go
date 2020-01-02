@@ -26,11 +26,11 @@ func NewMap(name string, value interface{}) TMap {
 		name:   name,
 		values: make(map[interface{}]TVariable),
 	}
-	switch value.(type) {
+	switch value := value.(type) {
 	case map[interface{}]interface{}:
 		{
 			// create map
-			for k, v := range value.(map[interface{}]interface{}) {
+			for k, v := range value {
 				// original type of key is converted to string in the name
 				stringKey := ConvertKeyToString(k)
 				tm.values[k] = NewVariable(stringKey, v)
@@ -38,12 +38,12 @@ func NewMap(name string, value interface{}) TMap {
 		}
 	case map[interface{}]TVariable:
 		{
-			tm.values = value.(map[interface{}]TVariable)
+			tm.values = value
 		}
 	case TVariable:
 		{
 			// encapsulate var to map
-			innerVar := value.(TVariable)
+			innerVar := value
 			tm.values[innerVar.Name()] = tm
 
 		}
