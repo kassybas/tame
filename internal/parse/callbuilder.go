@@ -25,7 +25,7 @@ func parseCallStepArgs(argDefs interface{}) (map[string]interface{}, error) {
 	for argKey, argValue := range argMap {
 		argName, ok := argKey.(string)
 		if !ok {
-			fmt.Errorf("non-string argument variable name: %v (type %T)", argKey, argKey)
+			return nil, fmt.Errorf("non-string argument variable name: %v (type %T)", argKey, argKey)
 		}
 		if err := validateVariableName(argName); err != nil {
 			return nil, err

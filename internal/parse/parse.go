@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/kassybas/tame/types/opts"
 	"github.com/kassybas/tame/types/steptype"
 	"github.com/sirupsen/logrus"
 
@@ -110,66 +109,6 @@ func validateVariableName(name string) error {
 		return fmt.Errorf("variables and arguments must start with '$' symbol: %s (correct: %s%s)", name, keywords.PrefixReference, name)
 	}
 	return nil
-}
-
-func parseOpts(v interface{}) (opts.ExecutionOpts, error) {
-	var o opts.ExecutionOpts
-	var err error
-	switch v.(type) {
-	case string:
-		{
-			o, err = helpers.BuildOpts([]string{v.(string)})
-			if err != nil {
-				return o, err
-			}
-		}
-	case []interface{}:
-		{
-			optsSlice, err := ifaceSliceToStringSlice(v.([]interface{}))
-			if err != nil {
-				return o, err
-			}
-			o, err = helpers.BuildOpts(optsSlice)
-			if err != nil {
-				return o, err
-			}
-		}
-	default:
-		{
-			return o, fmt.Errorf("unknown opts: %s (type %T)", v, v)
-		}
-	}
-	return o, nil
-}
-
-func ifaceToString(v interface{}) (string, error) {
-	switch v.(type) {
-	case string:
-		{
-			return v.(string), nil
-		}
-	}
-	return "", fmt.Errorf("non-string type: %v (type %T)", v, v)
-}
-
-func ifaceSliceToStringSlice(v []interface{}) ([]string, error) {
-	res := []string{}
-	for i := range v {
-		switch v[i].(type) {
-		case string:
-			{
-				res = append(res, v[i].(string))
-			}
-		case nil:
-			{
-				// stdout and stderr can be ignored via nil
-				res = append(res, "")
-			}
-		default:
-			return res, fmt.Errorf("non-string type: %v (type %T)", v[i], v[i])
-		}
-	}
-	return res, nil
 }
 
 func buildParameters(paramDefs map[string]interface{}) ([]target.Param, error) {
