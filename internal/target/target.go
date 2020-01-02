@@ -52,6 +52,9 @@ func evalConditionExpression(vt vartable.VarTable, s step.Step) (bool, error) {
 		return false, err
 	}
 	result, err := expr.Run(program, env)
+	if err != nil {
+		return false, err
+	}
 	resBool, isBool := result.(bool)
 	if !isBool {
 		return false, fmt.Errorf("if condition expression is not bool: %s -> %s ", s.GetCondition(), result)

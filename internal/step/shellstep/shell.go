@@ -34,15 +34,10 @@ func (s *ShellStep) shouldIgnoreResults() bool {
 		return true
 	}
 	if len(s.BaseStep.ResultNames()) == 1 {
-		if s.BaseStep.ResultNames()[0] != "" {
-			return false
-		}
-		return true
+		// igrnore if empty
+		return s.BaseStep.ResultNames()[0] == ""
 	}
-	if s.BaseStep.ResultNames()[0] == "" && s.BaseStep.ResultNames()[1] == "" {
-		return true
-	}
-	return false
+	return s.BaseStep.ResultNames()[0] == "" && s.BaseStep.ResultNames()[1] == ""
 }
 
 func (s *ShellStep) RunStep(ctx tcontext.Context, vt vartable.VarTable) step.StepStatus {
