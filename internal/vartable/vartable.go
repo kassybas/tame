@@ -99,22 +99,21 @@ func (vt *VarTable) GetAllValues() map[string]interface{} {
 }
 
 func (vt VarTable) ResolveValue(val interface{}) (interface{}, error) {
-	switch val.(type) {
+	switch val := val.(type) {
 	case string:
 		{
-			s := val.(string)
-			if !strings.HasPrefix(s, keywords.PrefixReference) {
+			if !strings.HasPrefix(val, keywords.PrefixReference) {
 				// No resolution needed for constant value
 				return val, nil
 			}
-			valueVar, err := vt.GetVar(s)
+			valueVar, err := vt.GetVar(val)
 			if err != nil {
 				return nil, err
 			}
-			if !dotref.IsDotRef(s) {
+			if !dotref.IsDotRef(val) {
 				return valueVar.Value(), nil
 			}
-			fields, err := dotref.ParseFields(s)
+			fields, err := dotref.ParseFields(val)
 			if err != nil {
 				return nil, err
 			}
@@ -151,15 +150,15 @@ func (vt VarTable) resolveEachField(fields []dotref.RefField) ([]dotref.RefField
 		if err != nil {
 			return nil, err
 		}
-		switch resolvedField.(type) {
+		switch resolvedField := resolvedField.(type) {
 		case int:
 			{
 				fields[i].FieldName = ""
-				fields[i].Index = resolvedField.(int)
+				fields[i].Index = resolvedField
 			}
 		case string:
 			{
-				fields[i].FieldName = resolvedField.(string)
+				fields[i].FieldName = resolvedField
 			}
 		default:
 			{
