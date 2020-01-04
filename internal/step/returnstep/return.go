@@ -14,7 +14,7 @@ import (
 
 type ReturnStep struct {
 	basestep.BaseStep
-	returnNames []string
+	returnNames []interface{}
 }
 
 func NewReturnStep(stepDef schema.MergedStepSchema) (*ReturnStep, error) {
@@ -23,7 +23,7 @@ func NewReturnStep(stepDef schema.MergedStepSchema) (*ReturnStep, error) {
 	if stepDef.Return != nil {
 		newStep.returnNames = *stepDef.Return
 	} else {
-		newStep.returnNames = []string{}
+		newStep.returnNames = []interface{}{}
 	}
 	newStep.BaseStep, err = basestep.NewBaseStep(stepDef, steptype.Return, "return")
 	return &newStep, err

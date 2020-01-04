@@ -18,10 +18,14 @@ func (vt VarTable) GetVar(fullName string) (tvar.TVariable, error) {
 	if err != nil || fields[0].FieldName == "" {
 		return nil, fmt.Errorf("failed to parse variable name:%s\n%s", fullName, err)
 	}
+	return vt.GetVarByFields(fields)
+}
+
+func (vt VarTable) GetVarByFields(fields []dotref.RefField) (tvar.TVariable, error) {
 	name := fields[0].FieldName
 	val, exists := vt.vars[name]
 	if !exists {
-		return nil, nil
+		return nil, fmt.Errorf("variable '%s' does not exist", name)
 	}
 	return val, nil
 }
@@ -53,17 +57,21 @@ func (vt *VarTable) Append(names []string, values []interface{}) error {
 			// ignored
 			continue
 		}
-		oldVar, err := vt.GetVar(names[i])
+		nameFields, err := dotref.ParseFields(names[i])
 		if err != nil {
 			return err
 		}
-		fields, err := dotref.ParseFields(names[i])
+		nameFields, err = vt.resolveEachField(nameFields)
 		if err != nil {
-			return err
+			return fmt.Errorf("could not resolve variable names in fields: %s\n\t%s", names[i], err.Error())
 		}
-		if oldVar != nil {
+		if vt.Exists(nameFields[0].FieldName) {
 			// variable exists
-			newVar, err := oldVar.SetValue(fields, values[i])
+			oldVar, err := vt.GetVarByFields(nameFields)
+			if err != nil {
+				return err
+			}
+			newVar, err := oldVar.SetValue(nameFields, values[i])
 			if err != nil {
 				return err
 			}

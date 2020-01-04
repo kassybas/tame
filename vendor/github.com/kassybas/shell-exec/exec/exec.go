@@ -73,7 +73,6 @@ func createCommand(script string, envVars []string, opts Options) *exec.Cmd {
 
 func getOutputFileDescriptors(silent bool) (*os.File, *os.File) {
 	if silent {
-		fmt.Println("SIIIILENCE", silent)
 		devNull := os.NewFile(0, os.DevNull)
 		return devNull, devNull
 	}

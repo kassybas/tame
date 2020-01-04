@@ -85,7 +85,7 @@ func (t Target) runStep(s step.Step, ctx tcontext.Context, vt vartable.VarTable)
 	return status
 }
 
-func getIters(vt vartable.VarTable, s step.Step) (string, []tvar.TVariable, error) {
+func getIters(vt vartable.VarTable, s step.Step) (string, []interface{}, error) {
 	if s.GetIterableName() == "" {
 		return "", nil, nil
 	}
@@ -93,11 +93,14 @@ func getIters(vt vartable.VarTable, s step.Step) (string, []tvar.TVariable, erro
 		return "", nil, fmt.Errorf("iterator variable wrong format: %s (should be: %s%s)", s.GetIteratorName(), keywords.PrefixReference, s.GetIteratorName())
 	}
 	iterable, err := vt.GetVar(s.GetIterableName())
-	v, isList := iterable.(tvar.TList)
-	if !isList {
-		return "", nil, fmt.Errorf("iterable variable %s is not list (type: %T)", iterable.Name(), iterable)
+	if err != nil {
+		return "", nil, err
 	}
-	return s.GetIteratorName(), v.Value().([]tvar.TVariable), err
+	iterableIf, isList := iterable.Value().([]interface{})
+	if !isList {
+		return "", nil, fmt.Errorf("variable %s is not list (type: %T)", iterable.Name(), iterable)
+	}
+	return s.GetIteratorName(), iterableIf, err
 }
 
 func (t Target) Make(ctx tcontext.Context, vt vartable.VarTable) step.StepStatus {
@@ -124,8 +127,8 @@ func (t Target) Make(ctx tcontext.Context, vt vartable.VarTable) step.StepStatus
 			if err != nil {
 				return step.StepStatus{Err: fmt.Errorf("in step: %s\n\t%s", s.GetName(), err)}
 			}
-			for _, itVar := range iterable {
-				vt.Add(iterator, itVar.Value())
+			for _, itVal := range iterable {
+				vt.Add(iterator, itVal)
 				status := t.runStep(s, ctx, vt)
 				if status.IsBreaking {
 					// setting the false so does not break
@@ -152,12 +155,11 @@ func updateVarsWithResultVariables(vt vartable.VarTable, resultVarNames []string
 	if len(resultVarNames) != len(resultValues) && !allowedLessResults {
 		return vt, fmt.Errorf("return and result variables do not match: %d != %d", len(resultVarNames), len(resultValues))
 	}
-	// append iterates thorugh names, not values
+
 	err := vt.Append(resultVarNames, resultValues)
 	return vt, err
 }
 
-// TODO: unify variable resolution
 func resolveParams(vt vartable.VarTable, params []Param) (vartable.VarTable, error) {
 	for _, p := range params {
 		if vt.Exists(p.Name) {

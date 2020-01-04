@@ -2,11 +2,12 @@ package parse
 
 import (
 	"fmt"
+	"strings"
+
 	"github.com/kassybas/tame/internal/keywords"
 	"github.com/kassybas/tame/schema"
 	"github.com/kassybas/tame/types/steptype"
 	"github.com/mitchellh/mapstructure"
-	"strings"
 )
 
 func loadCallStepSchema(raw map[string]interface{}, dynamicKey string, result *schema.MergedStepSchema) error {
@@ -16,13 +17,16 @@ func loadCallStepSchema(raw map[string]interface{}, dynamicKey string, result *s
 	}
 	result.CalledTargetName = &ct
 	result.CallArgumentsPassed, err = parseCallStepArgs(raw[dynamicKey])
+	if err != nil {
+		return fmt.Errorf("error while parsing arguments of call step [%s]\n\t%s", result.CallArgumentsPassed, err.Error())
+	}
 	return err
 }
 
 func loadVarStepSchema(raw map[string]interface{}, dynamicKey string, result *schema.MergedStepSchema) error {
 	vn, err := parseVariableName(dynamicKey)
 	if err != nil {
-		return err
+		return fmt.Errorf("error while parsing step '%s'\n\t%s", dynamicKey, err.Error())
 	}
 	result.VarName = &vn
 	result.ResultContainers = &[]string{vn}

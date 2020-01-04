@@ -1,0 +1,55 @@
+
+
+settings:
+  shieldEnv: true
+
+globals:
+  $ok: "ok"
+  $users:
+  - Arthur
+  - Dent
+  - Doctor
+  - Who
+
+
+# Expressions in if statements use antonmedv/expr library
+# See Docs: https://github.com/antonmedv/expr/blob/master/docs/Language-Definition.md
+
+
+targets:
+  IsUser:
+    args: {$userName}
+    run:
+      - if: $userName in $users
+        return: true
+      - return: false
+
+  IsItOk:
+    args: {$status}
+    run:
+    - if: $status == $ok
+      sh: echo "all is well"
+
+  ExampleFoo:
+    run:
+    - call IsItOk: {$status: "ok"} ## -> prints
+    - call IsItOk: {$status: "foo"} ## -> finishes empty
+    - var $userName: "John"
+    - call IsUser: {$userName: $userName} ## -> finishes returns false
+      $: $isUser
+
+    - var $userMap: {}
+    - var $testUsers: ["Kate", "Pierre", "Arthur"]
+    - for: {$: $user, in: $testUsers}
+      expr: $user in $users
+      $: $userMap.$user
+    - sh: env | sort
+
+  TestMap:
+    run:
+    - var $userName: "John"
+    - var $userMap: {}
+    - var $userMap.OK: $userName
+    - sh: env
+
+

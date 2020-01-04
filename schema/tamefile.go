@@ -34,13 +34,13 @@ type ForLoopSchema struct {
 
 // MergedStepSchema is the base format of step
 type MergedStepSchema struct {
-	ForLoop          ForLoopSchema   `mapstructure:"for"`
-	Condition        *string         `mapstructure:"if"`
-	Return           *[]string       `mapstructure:"return"` // string is allowed due to weak decode
-	Opts             *[]string       `mapstructure:"opts"`   // string is allowed due to weak decode
-	ResultContainers *[]string       `mapstructure:"$"`      // string is allowed due to weak decode
-	Script           *[]string       `mapstructure:"sh"`     // string is allowed due to weak decode
-	Expr             *string         `mapstructure:"expr"`
+	ForLoop          ForLoopSchema  `mapstructure:"for"`
+	Condition        *string        `mapstructure:"if"`
+	Return           *[]interface{} `mapstructure:"return"` // string is allowed due to weak decode
+	Opts             *[]string      `mapstructure:"opts"`   // string is allowed due to weak decode
+	ResultContainers *[]string      `mapstructure:"$"`      // string is allowed due to weak decode
+	Script           *[]string      `mapstructure:"sh"`     // string is allowed due to weak decode
+	Expr             *string        `mapstructure:"expr"`
 
 	// Name is a dynamic key can be either (but only one of):
 	CalledTargetName    *string                `mapstructure:"-"` // loaded dynamically since the key is the called target

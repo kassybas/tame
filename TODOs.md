@@ -2,6 +2,7 @@
 # TODOs
 
 - vartable creates env_vars even if nothing has changes (should reuse previous one)
+- iterate through map
 - create extensive documentation
 - make append to list possible
 - load

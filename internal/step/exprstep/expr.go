@@ -24,7 +24,7 @@ func NewExprStep(stepDef schema.MergedStepSchema) (*ExprStep, error) {
 		return &newStep, fmt.Errorf("missing called script in shell step")
 	}
 	newStep.expr = *stepDef.Expr
-	newStep.BaseStep, err = basestep.NewBaseStep(stepDef, steptype.Expr, "expr")
+	newStep.BaseStep, err = basestep.NewBaseStep(stepDef, steptype.Expr, newStep.expr)
 	return &newStep, err
 }
 
