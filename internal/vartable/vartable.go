@@ -3,6 +3,7 @@ package vartable
 import (
 	"fmt"
 	"strings"
+	"sync"
 
 	"github.com/kassybas/tame/internal/dotref"
 	"github.com/kassybas/tame/internal/keywords"
@@ -10,10 +11,11 @@ import (
 )
 
 type VarTable struct {
+	sync.RWMutex
 	vars map[string]tvar.TVariable
 }
 
-func (vt VarTable) GetVar(fullName string) (tvar.TVariable, error) {
+func (vt *VarTable) GetVar(fullName string) (tvar.TVariable, error) {
 	fields, err := dotref.ParseFields(fullName)
 	if err != nil || fields[0].FieldName == "" {
 		return nil, fmt.Errorf("failed to parse variable name:%s\n%s", fullName, err)
@@ -21,17 +23,21 @@ func (vt VarTable) GetVar(fullName string) (tvar.TVariable, error) {
 	return vt.GetVarByFields(fields)
 }
 
-func (vt VarTable) GetVarByFields(fields []dotref.RefField) (tvar.TVariable, error) {
+func (vt *VarTable) GetVarByFields(fields []dotref.RefField) (tvar.TVariable, error) {
 	name := fields[0].FieldName
+	vt.RLock()
 	val, exists := vt.vars[name]
+	vt.RUnlock()
 	if !exists {
 		return nil, fmt.Errorf("variable '%s' does not exist", name)
 	}
 	return val, nil
 }
 
-func (vt VarTable) Exists(name string) bool {
+func (vt *VarTable) Exists(name string) bool {
+	vt.RLock()
 	_, exists := vt.vars[name]
+	vt.RUnlock()
 	return exists
 }
 
@@ -42,12 +48,17 @@ func NewVarTable() VarTable {
 }
 
 func (vt *VarTable) AddVar(v tvar.TVariable) error {
+	vt.Lock()
 	vt.vars[v.Name()] = v
+	vt.Unlock()
 	return nil
 }
 
 func (vt *VarTable) Add(name string, value interface{}) error {
-	vt.vars[name] = tvar.NewVariable(name, value)
+	newVar := tvar.NewVariable(name, value)
+	vt.Lock()
+	vt.vars[name] = newVar
+	vt.Unlock()
 	return nil
 }
 
@@ -86,13 +97,16 @@ func (vt *VarTable) Append(names []string, values []interface{}) error {
 
 func (vt *VarTable) AddVariables(newVars []tvar.TVariable) {
 	for _, v := range newVars {
-		vt.vars[v.Name()] = v
+		vt.AddVar(v)
 	}
 }
 
 func (vt *VarTable) GetAllEnvVars(ShellFieldSeparator string) []string {
 	formattedVars := []string{}
-	for _, v := range vt.vars {
+	vt.RLock()
+	allVars := vt.vars
+	vt.RUnlock()
+	for _, v := range allVars {
 		formattedVars = append(formattedVars, v.ToEnvVars(ShellFieldSeparator)...)
 	}
 	return formattedVars
@@ -100,13 +114,16 @@ func (vt *VarTable) GetAllEnvVars(ShellFieldSeparator string) []string {
 
 func (vt *VarTable) GetAllValues() map[string]interface{} {
 	vars := make(map[string]interface{})
-	for k, v := range vt.vars {
+	vt.RLock()
+	allVars := vt.vars
+	vt.RUnlock()
+	for k, v := range allVars {
 		vars[k] = v.Value()
 	}
 	return vars
 }
 
-func (vt VarTable) ResolveValue(val interface{}) (interface{}, error) {
+func (vt *VarTable) ResolveValue(val interface{}) (interface{}, error) {
 	switch val := val.(type) {
 	case string:
 		{
@@ -139,7 +156,7 @@ func (vt VarTable) ResolveValue(val interface{}) (interface{}, error) {
 	}
 }
 
-func (vt VarTable) resolveEachField(fields []dotref.RefField) ([]dotref.RefField, error) {
+func (vt *VarTable) resolveEachField(fields []dotref.RefField) ([]dotref.RefField, error) {
 	if len(fields) < 2 {
 		// single field does not need resolve
 		return fields, nil
