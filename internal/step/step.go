@@ -21,10 +21,12 @@ type Step interface {
 }
 
 type StepStatus struct {
-	Results    []interface{}
-	IsBreaking bool
-	Stdstatus  int
-	Err        error
+	Results            []interface{}
+	ResultNames        []string
+	Stdstatus          int
+	IsBreaking         bool
+	AllowedLessResults bool
+	Err                error
 }
 
 // TODO: cleanup

@@ -3,11 +3,31 @@ settings:
 targets:
   foo:
     run:
-    - sh: |
-        for i in {1..180}; do
-          echo Waiting... $i
-          sleep 1
-        done
-      opts: async
-    - sh: echo This runs in parallel
+      - sh: |
+          for i in {1..180}; do
+            echo Waiting... $i
+            sleep 1
+          done
+        opts: async
+      - sh: sleep 1 && echo "this runs async too"
+        opts: async
+      - sh: echo This runs in in async && sleep 5
 
+  for:
+    run:
+      - sh: |
+          for i in {1..180}; do
+            echo Waiting in background... $i
+            sleep 1
+          done
+        opts: async
+      - for: { $: $i, in: ["x", "y", "z"] }
+        sh: sleep 1 && echo "this runs async too $i"
+        opts: async
+      - sh: echo 1 sync && sleep 1
+      - sh: echo 2 sync && sleep 1
+      - sh: echo 3 sync && sleep 1
+      - sh: echo This runs in sync
+      - sh: echo good bye with 2 && exit 2
+      - sh: echo This SHOULD NOT RUN since we exited with 2
+      - sh: echo "THIS SHOULDNT RUN EITHER"

@@ -42,7 +42,7 @@ func mergeOpts(globalOpts, targetOpts, stepOpts opts.ExecutionOpts) opts.Executi
 	}
 }
 
-func evalConditionExpression(vt vartable.VarTable, s step.Step) (bool, error) {
+func evalConditionExpression(vt *vartable.VarTable, s step.Step) (bool, error) {
 	if s.GetCondition() == "" {
 		return true, nil
 	}
@@ -62,24 +62,18 @@ func evalConditionExpression(vt vartable.VarTable, s step.Step) (bool, error) {
 	return resBool, nil
 }
 
-func getIters(vt *vartable.VarTable, s step.Step) (string, []interface{}, error) {
-	iterableIf := s.GetIterable()
-	if iterableIf == nil {
-		return "", nil, nil
-	}
-	if !strings.HasPrefix(s.GetIteratorName(), keywords.PrefixReference) {
-		return "", nil, fmt.Errorf("iterator variable wrong format: %s (should be: %s%s)", s.GetIteratorName(), keywords.PrefixReference, s.GetIteratorName())
-	}
+func getIterableValues(iterableIf interface{}, vt *vartable.VarTable) ([]interface{}, error) {
+
 	var iterableVal []interface{}
 	switch iterableIf := iterableIf.(type) {
 	case string:
 		{
 			iterable, err := vt.GetVar(iterableIf)
 			if err != nil {
-				return "", nil, fmt.Errorf("defined iterable cannot be resolved\n\t%s", err.Error())
+				return nil, fmt.Errorf("defined iterable cannot be resolved\n\t%s", err.Error())
 			}
 			if iterable.Type() != vartype.TListType && iterable.Type() != vartype.TMapType {
-				return "", nil, fmt.Errorf("variable %s is not list or map (type: %T)", iterable.Name(), iterable)
+				return nil, fmt.Errorf("variable %s is not list or map (type: %T)", iterable.Name(), iterable)
 			}
 			var isList bool
 			iterableVal, isList = iterable.Value().([]interface{})
@@ -102,6 +96,33 @@ func getIters(vt *vartable.VarTable, s step.Step) (string, []interface{}, error)
 				iterableVal = append(iterableVal, k)
 			}
 		}
+	default:
+		{
+			return nil, fmt.Errorf("unknown iterable")
+		}
+	}
+	return iterableVal, nil
+}
+
+func getIters(vt *vartable.VarTable, s step.Step) (string, []interface{}, error) {
+	if s.GetIteratorName() == "" && s.GetIterable() == nil {
+		// No iterator and iterable -> no for loop, run once
+		return "", []interface{}{""}, nil
+	}
+	// Iterable
+	iterableIf := s.GetIterable()
+	if iterableIf == nil {
+		// nothing to iterate over -> run zero times
+		return "", []interface{}{}, nil
+	}
+	iterableVal, err := getIterableValues(iterableIf, vt)
+	if err != nil {
+		return "", nil, err
+	}
+	// Iterator
+	// validate iterator name
+	if !strings.HasPrefix(s.GetIteratorName(), keywords.PrefixReference) {
+		return "", nil, fmt.Errorf("iterator variable wrong format: %s (should be: %s%s)", s.GetIteratorName(), keywords.PrefixReference, s.GetIteratorName())
 	}
 	return s.GetIteratorName(), iterableVal, nil
 }

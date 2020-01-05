@@ -15,12 +15,16 @@ type VarTable struct {
 	vars map[string]tvar.TVariable
 }
 
-func CopyVarTable(vt *VarTable) *VarTable {
-	newVt := VarTable{}
+func CopyVarTable(vt *VarTable) VarTable {
+	newVt := VarTable{
+		vars: make(map[string]tvar.TVariable),
+	}
 	vt.RLock()
-	newVt.vars = vt.vars
+	for k, v := range vt.vars {
+		newVt.vars[k] = v
+	}
 	vt.RUnlock()
-	return &newVt
+	return newVt
 }
 
 func NewVarTable() *VarTable {
@@ -63,6 +67,9 @@ func (vt *VarTable) AddVar(v tvar.TVariable) error {
 }
 
 func (vt *VarTable) Add(name string, value interface{}) error {
+	if name == "" {
+		return nil
+	}
 	newVar := tvar.NewVariable(name, value)
 	vt.Lock()
 	vt.vars[name] = newVar
