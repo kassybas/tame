@@ -8,17 +8,30 @@ globals:
   - latest
   - 2020.01
   - release
+  $config:
+    mac:
+      os: darwin
+      arch: amd64
+    linux:
+      os: linux
+      arch: amd64
+
 
 # tame -f examples/10-for.yaml Builder
 targets:
   Builder:
     run:
+    - for: {$: $platform, in: $config}
+      call BuildBin: {$os: $platform.os, $arch: $platform.arch}
     - for: {$: $tag, in: $tags}
       call DockerTag: {$tag: $tag}
-    - for: {$: $tag, in: $tags}
-      sh: echo "DONE ${tag}"
 
   DockerTag:
     args: {$tag}
     run:
     - sh: echo "docker tag myimage myimage:${tag}"
+
+  BuildBin:
+    args: {$os, $arch}
+    run:
+    - sh: echo building $os, $arch

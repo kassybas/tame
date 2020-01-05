@@ -12,3 +12,5 @@
 - logging
 - make all field separators configurable
 - oneliner target
+- resolve expressions everywhere
+- add can-fail option to expressions

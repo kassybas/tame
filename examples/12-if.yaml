@@ -12,9 +12,9 @@ globals:
   - Who
 
 
+
 # Expressions in if statements use antonmedv/expr library
 # See Docs: https://github.com/antonmedv/expr/blob/master/docs/Language-Definition.md
-
 
 targets:
   IsUser:
@@ -30,26 +30,25 @@ targets:
     - if: $status == $ok
       sh: echo "all is well"
 
-  ExampleFoo:
+  ExampleIf:
     run:
     - call IsItOk: {$status: "ok"} ## -> prints
     - call IsItOk: {$status: "foo"} ## -> finishes empty
     - var $userName: "John"
     - call IsUser: {$userName: $userName} ## -> finishes returns false
       $: $isUser
+    - expr: $isUser ? "member":"non-member"
+      $: res
+    - sh: echo $res
 
+  ExampleExpr:
+    run:
     - var $userMap: {}
     - var $testUsers: ["Kate", "Pierre", "Arthur"]
     - for: {$: $user, in: $testUsers}
       expr: $user in $users
       $: $userMap.$user
-    - sh: env | sort
-
-  TestMap:
-    run:
-    - var $userName: "John"
-    - var $userMap: {}
-    - var $userMap.OK: $userName
     - sh: env
+
 
 

@@ -113,6 +113,9 @@ func (t Target) Make(ctx tcontext.Context, vt vartable.VarTable) step.StepStatus
 		// TODO: refactor to more dry
 		if s.GetIterableName() == "" && s.GetIteratorName() == "" {
 			status := t.runStep(s, ctx, vt)
+			if status.Err != nil {
+				return step.StepStatus{Err: fmt.Errorf("in step: %s\n\t%s", s.GetName(), status.Err.Error())}
+			}
 			if status.IsBreaking {
 				// setting the false so caller does not break
 				status.IsBreaking = false
@@ -130,6 +133,9 @@ func (t Target) Make(ctx tcontext.Context, vt vartable.VarTable) step.StepStatus
 			for _, itVal := range iterable {
 				vt.Add(iterator, itVal)
 				status := t.runStep(s, ctx, vt)
+				if status.Err != nil {
+					return step.StepStatus{Err: fmt.Errorf("in step: %s\n\t%s", s.GetName(), err)}
+				}
 				if status.IsBreaking {
 					// setting the false so does not break
 					status.IsBreaking = false
