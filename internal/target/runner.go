@@ -36,7 +36,6 @@ func (t Target) runStep(s step.Step, ctx tcontext.Context, vt *vartable.VarTable
 }
 
 func (t *Target) orchestrateStep(s step.Step, ctx tcontext.Context, vt *vartable.VarTable, wg *sync.WaitGroup, doneChan chan bool, statusChan chan step.StepStatus, isLast bool) step.StepStatus {
-	var status step.StepStatus
 	iterator, iterable, err := getIters(vt, s)
 	if err != nil {
 		return step.StepStatus{Err: fmt.Errorf("in step: %s\n\t%s", s.GetName(), err)}
@@ -51,58 +50,52 @@ func (t *Target) orchestrateStep(s step.Step, ctx tcontext.Context, vt *vartable
 			newVt := vartable.CopyVarTable(vt)
 			newVt.Add(iterator, itVal)
 			go func() {
-				status = t.runStep(sLoc, ctx, &newVt)
+				status := t.runStep(sLoc, ctx, &newVt)
 				if status.Err != nil {
 					status.Err = fmt.Errorf("in step: %s\n\t%s", s.GetName(), status.Err.Error())
 				}
 				statusChan <- status
 				if isLast || status.IsBreaking {
 					doneChan <- true
-					close(statusChan)
 				}
 			}()
 		} else {
 			vt.Add(iterator, itVal)
-			status = t.runStep(s, ctx, vt)
+			status := t.runStep(s, ctx, vt)
 			if status.Err != nil {
 				status.Err = fmt.Errorf("in step: %s\n\t%s", s.GetName(), status.Err.Error())
 			}
 			statusChan <- status
 			if isLast || status.IsBreaking {
 				doneChan <- true
-				close(statusChan)
 			}
 		}
 	}
 	if !s.GetOpts().Async {
 		wg.Done() // sync execution wait for finishing at the end
 	}
-	return status
+	return step.StepStatus{}
 }
 
 func (t *Target) runAllSteps(ctx tcontext.Context, vt *vartable.VarTable) step.StepStatus {
 	statusChan := make(chan step.StepStatus)
 	resultChan := make(chan step.StepStatus, 1)
 	doneChan := make(chan bool, 1)
+	var wg sync.WaitGroup
 	// Start reading results
 	go func() {
 		var lastStatus step.StepStatus
 		for status := range statusChan {
 			lastStatus = status
-			if status.Err != nil || status.IsBreaking {
-				// if it failed we are closing the done channel
-				doneChan <- true
-			}
-			err := updateVarsWithResultVariables(vt, status.ResultNames, status.Results, status.AllowedLessResults)
-			if err != nil {
-				lastStatus.Err = err
-				doneChan <- true
+			lastStatus.Err = updateVarsWithResultVariables(vt, status.ResultNames, status.Results, status.AllowedLessResults)
+			if lastStatus.IsBreaking {
+				resultChan <- lastStatus
+				return
 			}
 		}
 		resultChan <- lastStatus
 	}()
 	// Run steps
-	var wg sync.WaitGroup
 	for i, s := range t.Steps {
 		select {
 		case <-doneChan:
@@ -123,7 +116,6 @@ func (t *Target) runAllSteps(ctx tcontext.Context, vt *vartable.VarTable) step.S
 			}
 		}
 	}
-	<-doneChan
 	// setting it to false so it does not break the parent execution
 	status := <-resultChan
 	status.IsBreaking = false

@@ -147,7 +147,6 @@ func updateVarsWithResultVariables(vt *vartable.VarTable, resultVarNames []strin
 	if len(resultVarNames) != len(resultValues) && !allowedLessResults {
 		return fmt.Errorf("return and result variables do not match: %d != %d", len(resultVarNames), len(resultValues))
 	}
-
 	err := vt.Append(resultVarNames, resultValues)
 	return err
 }
