@@ -1,6 +1,7 @@
 
 # TODOs
 
+- parallel execution
 - separate var declaration and assignment
 - resolve expressions everywhere
 - optimizations
@@ -16,4 +17,3 @@
 - make all field separators configurable
 - oneliner target
 - add can-fail option to expressions
-- parallel execution
