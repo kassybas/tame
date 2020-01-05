@@ -24,8 +24,8 @@ targets:
       - for: { $: $i, in: ["x", "y", "z"] }
         sh: sleep 1 && echo "this runs async too $i"
         opts: async
-      - sh: echo "exiting 42" && exit 42
-        opts: async
+      # - sh: echo "exiting 42" && exit 42 #<-fix this
+      #   opts: async
       - sh: echo 1 sync && sleep 1
       - sh: echo 2 sync && sleep 1
       - sh: echo 3 sync && sleep 1

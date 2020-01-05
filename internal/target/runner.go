@@ -35,7 +35,7 @@ func (t Target) runStep(s step.Step, ctx tcontext.Context, vt *vartable.VarTable
 	return status
 }
 
-func (t *Target) orchestrateStep(s step.Step, ctx tcontext.Context, vt *vartable.VarTable, wg *sync.WaitGroup, doneChan chan bool, statusChan chan step.StepStatus, isLast bool) step.StepStatus {
+func (t *Target) orchestrateStep(s step.Step, ctx tcontext.Context, vt *vartable.VarTable, wg *sync.WaitGroup, doneChan chan bool, statusChan chan step.StepStatus) step.StepStatus {
 	iterator, iterable, err := getIters(vt, s)
 	if err != nil {
 		return step.StepStatus{Err: fmt.Errorf("in step: %s\n\t%s", s.GetName(), err)}
@@ -55,7 +55,7 @@ func (t *Target) orchestrateStep(s step.Step, ctx tcontext.Context, vt *vartable
 					status.Err = fmt.Errorf("in step: %s\n\t%s", s.GetName(), status.Err.Error())
 				}
 				statusChan <- status
-				if isLast || status.IsBreaking {
+				if status.IsBreaking {
 					doneChan <- true
 				}
 			}()
@@ -66,7 +66,7 @@ func (t *Target) orchestrateStep(s step.Step, ctx tcontext.Context, vt *vartable
 				status.Err = fmt.Errorf("in step: %s\n\t%s", s.GetName(), status.Err.Error())
 			}
 			statusChan <- status
-			if isLast || status.IsBreaking {
+			if status.IsBreaking {
 				doneChan <- true
 			}
 		}
@@ -95,8 +95,15 @@ func (t *Target) runAllSteps(ctx tcontext.Context, vt *vartable.VarTable) step.S
 		}
 		resultChan <- lastStatus
 	}()
+	taskChan := make(chan step.Step)
+	go func() {
+		for _, s := range t.Steps {
+			taskChan <- s
+		}
+		doneChan <- true
+	}()
 	// Run steps
-	for i, s := range t.Steps {
+	for {
 		select {
 		case <-doneChan:
 			{
@@ -104,20 +111,17 @@ func (t *Target) runAllSteps(ctx tcontext.Context, vt *vartable.VarTable) step.S
 				status.IsBreaking = false
 				return status
 			}
-		default:
+		case stepTask := <-taskChan:
 			{
-				if !s.GetOpts().Async {
+				if !stepTask.GetOpts().Async {
 					wg.Add(1)
 				}
-				go t.orchestrateStep(s, ctx, vt, &wg, doneChan, statusChan, i == len(t.Steps)-1)
-				if !s.GetOpts().Async {
+				go t.orchestrateStep(stepTask, ctx, vt, &wg, doneChan, statusChan)
+				if !stepTask.GetOpts().Async {
 					wg.Wait() // waits if the execution should be sync
 				}
 			}
 		}
 	}
 	// setting it to false so it does not break the parent execution
-	status := <-resultChan
-	status.IsBreaking = false
-	return status
 }
