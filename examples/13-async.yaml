@@ -1,0 +1,13 @@
+settings:
+  shell: /bin/bash
+targets:
+  foo:
+    run:
+    - sh: |
+        for i in {1..180}; do
+          echo Waiting... $i
+          sleep 1
+        done
+      opts: async
+    - sh: echo This runs in parallel
+
