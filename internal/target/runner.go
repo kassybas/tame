@@ -56,7 +56,8 @@ func (t *Target) orchestrateStep(s step.Step, ctx tcontext.Context, vt *vartable
 					status.Err = fmt.Errorf("in step: %s\n\t%s", s.GetName(), status.Err.Error())
 				}
 				statusChan <- status
-				if isLast {
+				if isLast || status.IsBreaking {
+					doneChan <- true
 					close(statusChan)
 				}
 			}()
@@ -67,7 +68,8 @@ func (t *Target) orchestrateStep(s step.Step, ctx tcontext.Context, vt *vartable
 				status.Err = fmt.Errorf("in step: %s\n\t%s", s.GetName(), status.Err.Error())
 			}
 			statusChan <- status
-			if isLast {
+			if isLast || status.IsBreaking {
+				doneChan <- true
 				close(statusChan)
 			}
 		}
@@ -80,10 +82,11 @@ func (t *Target) orchestrateStep(s step.Step, ctx tcontext.Context, vt *vartable
 
 func (t *Target) runAllSteps(ctx tcontext.Context, vt *vartable.VarTable) step.StepStatus {
 	statusChan := make(chan step.StepStatus)
+	resultChan := make(chan step.StepStatus, 1)
 	doneChan := make(chan bool, 1)
-	var lastStatus step.StepStatus
 	// Start reading results
 	go func() {
+		var lastStatus step.StepStatus
 		for status := range statusChan {
 			lastStatus = status
 			if status.Err != nil || status.IsBreaking {
@@ -92,23 +95,37 @@ func (t *Target) runAllSteps(ctx tcontext.Context, vt *vartable.VarTable) step.S
 			}
 			err := updateVarsWithResultVariables(vt, status.ResultNames, status.Results, status.AllowedLessResults)
 			if err != nil {
-				lastStatus = step.StepStatus{Err: err}
+				lastStatus.Err = err
 				doneChan <- true
 			}
 		}
-		doneChan <- true
+		resultChan <- lastStatus
 	}()
 	// Run steps
 	var wg sync.WaitGroup
 	for i, s := range t.Steps {
-		wg.Wait() // waits if the execution should be sync
-		if !s.GetOpts().Async {
-			wg.Add(1)
+		select {
+		case <-doneChan:
+			{
+				status := <-resultChan
+				status.IsBreaking = false
+				return status
+			}
+		default:
+			{
+				if !s.GetOpts().Async {
+					wg.Add(1)
+				}
+				go t.orchestrateStep(s, ctx, vt, &wg, doneChan, statusChan, i == len(t.Steps)-1)
+				if !s.GetOpts().Async {
+					wg.Wait() // waits if the execution should be sync
+				}
+			}
 		}
-		go t.orchestrateStep(s, ctx, vt, &wg, doneChan, statusChan, i == len(t.Steps)-1)
 	}
 	<-doneChan
 	// setting it to false so it does not break the parent execution
-	lastStatus.IsBreaking = false
-	return lastStatus
+	status := <-resultChan
+	status.IsBreaking = false
+	return status
 }
