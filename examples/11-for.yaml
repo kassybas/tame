@@ -19,6 +19,12 @@ globals:
 
 # tame -f examples/10-for.yaml Builder
 targets:
+
+  Foo:
+    run:
+    - for: {$: $name, in: ["john", "kate", "arthur"]}
+      sh: echo Hello $name
+
   Builder:
     run:
     - for: {$: $platform, in: $config}

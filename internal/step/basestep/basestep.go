@@ -11,7 +11,7 @@ type BaseStep struct {
 	resultNames  []string
 	opts         opts.ExecutionOpts
 	iteratorName string
-	iterableName string
+	iterable     interface{}
 	ifCondition  string
 }
 
@@ -34,8 +34,8 @@ func (s *BaseStep) GetIteratorName() string {
 	return s.iteratorName
 }
 
-func (s *BaseStep) GetIterableName() string {
-	return s.iterableName
+func (s *BaseStep) GetIterable() interface{} {
+	return s.iterable
 }
 
 func (s *BaseStep) GetName() string {

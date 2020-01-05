@@ -86,21 +86,33 @@ func (t Target) runStep(s step.Step, ctx tcontext.Context, vt vartable.VarTable)
 }
 
 func getIters(vt vartable.VarTable, s step.Step) (string, []interface{}, error) {
-	if s.GetIterableName() == "" {
+	iterableIf := s.GetIterable()
+	if iterableIf == nil {
 		return "", nil, nil
 	}
 	if !strings.HasPrefix(s.GetIteratorName(), keywords.PrefixReference) {
 		return "", nil, fmt.Errorf("iterator variable wrong format: %s (should be: %s%s)", s.GetIteratorName(), keywords.PrefixReference, s.GetIteratorName())
 	}
-	iterable, err := vt.GetVar(s.GetIterableName())
-	if err != nil {
-		return "", nil, err
+	var iterableVal []interface{}
+	switch iterableIf := iterableIf.(type) {
+	case string:
+		{
+			iterable, err := vt.GetVar(iterableIf)
+			if err != nil {
+				return "", nil, fmt.Errorf("defined iterable cannot be resolved\n\t%s", err.Error())
+			}
+			var isList bool
+			iterableVal, isList = iterable.Value().([]interface{})
+			if !isList {
+				return "", nil, fmt.Errorf("variable %s is not list (type: %T)", iterable.Name(), iterable)
+			}
+		}
+	case []interface{}:
+		{
+			iterableVal = iterableIf
+		}
 	}
-	iterableIf, isList := iterable.Value().([]interface{})
-	if !isList {
-		return "", nil, fmt.Errorf("variable %s is not list (type: %T)", iterable.Name(), iterable)
-	}
-	return s.GetIteratorName(), iterableIf, err
+	return s.GetIteratorName(), iterableVal, nil
 }
 
 func (t Target) Make(ctx tcontext.Context, vt vartable.VarTable) step.StepStatus {
@@ -111,7 +123,7 @@ func (t Target) Make(ctx tcontext.Context, vt vartable.VarTable) step.StepStatus
 	}
 	for _, s := range t.Steps {
 		// TODO: refactor to more dry
-		if s.GetIterableName() == "" && s.GetIteratorName() == "" {
+		if s.GetIterable() == nil {
 			status := t.runStep(s, ctx, vt)
 			if status.Err != nil {
 				return step.StepStatus{Err: fmt.Errorf("in step: %s\n\t%s", s.GetName(), status.Err.Error())}

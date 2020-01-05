@@ -14,3 +14,4 @@
 - oneliner target
 - resolve expressions everywhere
 - add can-fail option to expressions
+- parallel execution

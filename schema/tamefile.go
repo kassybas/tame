@@ -28,8 +28,8 @@ type SettingsShema struct {
 }
 
 type ForLoopSchema struct {
-	Iterator string `mapstructure:"$"`
-	Iterable string `mapstructure:"in"`
+	Iterator string      `mapstructure:"$"`
+	Iterable interface{} `mapstructure:"in"`
 }
 
 // MergedStepSchema is the base format of step
