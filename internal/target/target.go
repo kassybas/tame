@@ -62,7 +62,7 @@ func evalConditionExpression(vt vartable.VarTable, s step.Step) (bool, error) {
 	return resBool, nil
 }
 
-func getIters(vt vartable.VarTable, s step.Step) (string, []interface{}, error) {
+func getIters(vt *vartable.VarTable, s step.Step) (string, []interface{}, error) {
 	iterableIf := s.GetIterable()
 	if iterableIf == nil {
 		return "", nil, nil
@@ -106,9 +106,9 @@ func getIters(vt vartable.VarTable, s step.Step) (string, []interface{}, error) 
 	return s.GetIteratorName(), iterableVal, nil
 }
 
-func (t Target) Make(ctx tcontext.Context, vt vartable.VarTable) step.StepStatus {
+func (t Target) Make(ctx tcontext.Context, vt *vartable.VarTable) step.StepStatus {
 	vt.AddVariables(ctx.Globals)
-	err := resolveParams(&vt, t.Params)
+	err := resolveParams(vt, t.Params)
 	if err != nil {
 		return step.StepStatus{Err: fmt.Errorf("could not resolve parameters in target: %s\n\t%s", t.Name, err)}
 	}

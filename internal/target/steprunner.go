@@ -23,8 +23,7 @@ func (t Target) runStep(s step.Step, ctx tcontext.Context, vt *vartable.VarTable
 	// to inherit the parent setting, we inject it in place of the global opts
 	ctx.Settings.GlobalOpts = s.GetOpts()
 
-	newVt := *vt
-	status := s.RunStep(ctx, newVt)
+	status := s.RunStep(ctx, vt)
 	if status.Err != nil {
 		return step.StepStatus{Err: fmt.Errorf("[target: %s]:: %s", t.Name, status.Err.Error())}
 	}
@@ -37,20 +36,23 @@ func (t Target) runStep(s step.Step, ctx tcontext.Context, vt *vartable.VarTable
 	return status
 }
 
-func (t *Target) runAllSteps(ctx tcontext.Context, vt vartable.VarTable) step.StepStatus {
+func (t *Target) runAllSteps(ctx tcontext.Context, vt *vartable.VarTable) step.StepStatus {
 	var status step.StepStatus
 	for _, s := range t.Steps {
 		// TODO: refactor to more dry
 		if s.GetIterable() == nil {
-			status = t.runStep(s, ctx, &vt)
+			// if s.GetOpts().Async {
+			status = t.runStep(s, ctx, vt)
 			if status.Err != nil {
 				return step.StepStatus{Err: fmt.Errorf("in step: %s\n\t%s", s.GetName(), status.Err.Error())}
 			}
 			if status.IsBreaking {
+				// break # TODOb
 				// setting it to false so it does not break the parent execution
 				status.IsBreaking = false
 				return status
 			}
+			// }
 		} else {
 			iterator, iterable, err := getIters(vt, s)
 			if err != nil {
@@ -58,7 +60,7 @@ func (t *Target) runAllSteps(ctx tcontext.Context, vt vartable.VarTable) step.St
 			}
 			for _, itVal := range iterable {
 				vt.Add(iterator, itVal)
-				status = t.runStep(s, ctx, &vt)
+				status = t.runStep(s, ctx, vt)
 				if status.Err != nil {
 					return step.StepStatus{Err: fmt.Errorf("in step: %s\n\t%s", s.GetName(), status.Err.Error())}
 				}

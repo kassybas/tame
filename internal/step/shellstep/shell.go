@@ -40,7 +40,7 @@ func (s *ShellStep) shouldIgnoreResults() bool {
 	return s.BaseStep.ResultNames()[0] == "" && s.BaseStep.ResultNames()[1] == ""
 }
 
-func (s *ShellStep) RunStep(ctx tcontext.Context, vt vartable.VarTable) step.StepStatus {
+func (s *ShellStep) RunStep(ctx tcontext.Context, vt *vartable.VarTable) step.StepStatus {
 	var err error
 	opts := exec.Options{
 		Silent:       s.BaseStep.GetOpts().Silent,

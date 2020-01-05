@@ -28,7 +28,7 @@ func NewExprStep(stepDef schema.MergedStepSchema) (*ExprStep, error) {
 	return &newStep, err
 }
 
-func (s *ExprStep) RunStep(ctx tcontext.Context, vt vartable.VarTable) step.StepStatus {
+func (s *ExprStep) RunStep(ctx tcontext.Context, vt *vartable.VarTable) step.StepStatus {
 	var err error
 	env := vt.GetAllValues()
 	program, err := expr.Compile(s.expr, expr.Env(env))

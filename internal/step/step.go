@@ -14,7 +14,7 @@ type Step interface {
 	ResultNames() []string
 	GetOpts() opts.ExecutionOpts
 	SetOpts(opts.ExecutionOpts)
-	RunStep(tcontext.Context, vartable.VarTable) StepStatus
+	RunStep(tcontext.Context, *vartable.VarTable) StepStatus
 	GetIteratorName() string
 	GetIterable() interface{}
 	GetCondition() string

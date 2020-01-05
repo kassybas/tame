@@ -15,6 +15,20 @@ type VarTable struct {
 	vars map[string]tvar.TVariable
 }
 
+func CopyVarTable(vt *VarTable) *VarTable {
+	newVt := VarTable{}
+	vt.RLock()
+	newVt.vars = vt.vars
+	vt.RUnlock()
+	return &newVt
+}
+
+func NewVarTable() *VarTable {
+	vt := VarTable{}
+	vt.vars = make(map[string]tvar.TVariable)
+	return &vt
+}
+
 func (vt *VarTable) GetVar(fullName string) (tvar.TVariable, error) {
 	fields, err := dotref.ParseFields(fullName)
 	if err != nil || fields[0].FieldName == "" {
@@ -39,12 +53,6 @@ func (vt *VarTable) Exists(name string) bool {
 	_, exists := vt.vars[name]
 	vt.RUnlock()
 	return exists
-}
-
-func NewVarTable() VarTable {
-	vt := VarTable{}
-	vt.vars = make(map[string]tvar.TVariable)
-	return vt
 }
 
 func (vt *VarTable) AddVar(v tvar.TVariable) error {

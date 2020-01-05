@@ -24,7 +24,7 @@ func NewVarStep(stepDef schema.MergedStepSchema) (*VarStep, error) {
 	return &newStep, err
 }
 
-func (s *VarStep) RunStep(ctx tcontext.Context, vt vartable.VarTable) step.StepStatus {
+func (s *VarStep) RunStep(ctx tcontext.Context, vt *vartable.VarTable) step.StepStatus {
 	// TODO: eval variables
 	value, err := vt.ResolveValue(s.definition)
 	if err != nil {
