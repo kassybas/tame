@@ -9,6 +9,7 @@ import (
 	"github.com/kassybas/tame/internal/step"
 
 	"github.com/kassybas/tame/types/steptype"
+	"github.com/kassybas/tame/types/vartype"
 
 	"github.com/kassybas/tame/internal/vartable"
 
@@ -101,15 +102,29 @@ func getIters(vt vartable.VarTable, s step.Step) (string, []interface{}, error) 
 			if err != nil {
 				return "", nil, fmt.Errorf("defined iterable cannot be resolved\n\t%s", err.Error())
 			}
+			if iterable.Type() != vartype.TListType && iterable.Type() != vartype.TMapType {
+				return "", nil, fmt.Errorf("variable %s is not list or map (type: %T)", iterable.Name(), iterable)
+			}
 			var isList bool
 			iterableVal, isList = iterable.Value().([]interface{})
 			if !isList {
-				return "", nil, fmt.Errorf("variable %s is not list (type: %T)", iterable.Name(), iterable)
+				iterableMap := iterable.Value().(map[interface{}]interface{})
+				iterableVal = []interface{}{}
+				for k := range iterableMap {
+					iterableVal = append(iterableVal, k)
+				}
 			}
 		}
 	case []interface{}:
 		{
 			iterableVal = iterableIf
+		}
+	case map[interface{}]interface{}:
+		{
+			iterableVal = []interface{}{}
+			for k := range iterableIf {
+				iterableVal = append(iterableVal, k)
+			}
 		}
 	}
 	return s.GetIteratorName(), iterableVal, nil
@@ -146,7 +161,7 @@ func (t Target) Make(ctx tcontext.Context, vt vartable.VarTable) step.StepStatus
 				vt.Add(iterator, itVal)
 				status := t.runStep(s, ctx, vt)
 				if status.Err != nil {
-					return step.StepStatus{Err: fmt.Errorf("in step: %s\n\t%s", s.GetName(), err)}
+					return step.StepStatus{Err: fmt.Errorf("in step: %s\n\t%s", s.GetName(), status.Err.Error())}
 				}
 				if status.IsBreaking {
 					// setting the false so does not break
@@ -155,7 +170,7 @@ func (t Target) Make(ctx tcontext.Context, vt vartable.VarTable) step.StepStatus
 				}
 				vt, err = updateVarsWithResultVariables(vt, s.ResultNames(), status.Results, s.Kind() == steptype.Shell)
 				if err != nil {
-					return step.StepStatus{Err: fmt.Errorf("in step: %s\n\t%s", s.GetName(), err)}
+					return step.StepStatus{Err: fmt.Errorf("in step: %s\n\t%s", s.GetName(), status.Err.Error())}
 				}
 			}
 		}

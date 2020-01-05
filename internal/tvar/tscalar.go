@@ -51,7 +51,7 @@ func (v TScalar) GetInnerValue(fields []dotref.RefField) (interface{}, error) {
 		// which is an invalid variable name, which fails at parsing
 		return nil, fmt.Errorf("internal error: empty reference")
 	}
-	if len(fields) != 1 {
+	if len(fields) > 1 {
 		return nil, fmt.Errorf("field reference on scalar variable (only allowed on map or list): '%s'.'%v'", v.name, fields[1].FieldName)
 	}
 	return v.value, nil

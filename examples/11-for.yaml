@@ -28,7 +28,7 @@ targets:
   Builder:
     run:
     - for: {$: $platform, in: $config}
-      call BuildBin: {$os: $platform.os, $arch: $platform.arch}
+      call BuildBin: {$os: $config.$platform.os, $arch: $config.$platform.arch}
     - for: {$: $tag, in: $tags}
       call DockerTag: {$tag: $tag}
 
@@ -40,4 +40,4 @@ targets:
   BuildBin:
     args: {$os, $arch}
     run:
-    - sh: echo building $os, $arch
+    - sh: echo building $os - $arch

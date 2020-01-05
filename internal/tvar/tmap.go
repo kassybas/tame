@@ -65,7 +65,7 @@ func (v TMap) ToStr() string {
 }
 
 func (v TMap) Type() vartype.TVarType {
-	return vartype.TScalarType
+	return vartype.TMapType
 }
 
 func (v TMap) Value() interface{} {
