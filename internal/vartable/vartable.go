@@ -15,7 +15,7 @@ type VarTable struct {
 	vars map[string]tvar.TVariable
 }
 
-func CopyVarTable(vt *VarTable) VarTable {
+func CopyVarTable(vt *VarTable) *VarTable {
 	newVt := VarTable{
 		vars: make(map[string]tvar.TVariable),
 	}
@@ -24,7 +24,7 @@ func CopyVarTable(vt *VarTable) VarTable {
 		newVt.vars[k] = v
 	}
 	vt.RUnlock()
-	return newVt
+	return &newVt
 }
 
 func NewVarTable() *VarTable {
