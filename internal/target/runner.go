@@ -51,60 +51,50 @@ func processStatuses(statusChan chan step.StepStatus, resultChan chan step.StepS
 	for status := range statusChan {
 		lastStatus = status
 		lastStatus.Err = updateVarsWithResultVariables(vt, status.ResultNames, status.Results, status.AllowedLessResults)
-		fmt.Println("--WE RUN")
 		if lastStatus.IsBreaking {
-			fmt.Println("--WE BROKE")
 			resultChan <- lastStatus
 		}
 	}
-	fmt.Println("--WE SET THE RESULT")
 	resultChan <- lastStatus
-	fmt.Println("--WE ARE DONE SETTING THE RESULT")
 }
 
-func (t *Target) runAllSteps(ctx tcontext.Context, vt *vartable.VarTable) step.StepStatus {
-	statusChan := make(chan step.StepStatus)
-	resultChan := make(chan step.StepStatus, 1)
+func (t *Target) startIterations(statusChan chan step.StepStatus, resultChan chan step.StepStatus, ctx tcontext.Context, vt *vartable.VarTable) {
 	var wg sync.WaitGroup
-	// Start reading results
-	go processStatuses(statusChan, resultChan, vt)
-	// Run steps
 	for _, s := range t.Steps {
 		iterator, iterable, err := getIters(vt, s)
 		if err != nil {
-			return step.StepStatus{Err: fmt.Errorf("in step: %s\n\t%s", s.GetName(), err)}
+			resultChan <- step.StepStatus{Err: err, IsBreaking: true}
 		}
-		// if no for loop is defined
-		// iterable is one empty element
-		// iterator is empty string which is ignored during adding to the vartable
+		// if no for loop is defined then we iterate through one empty element
 		for _, itVal := range iterable {
-			select {
-			case status := <-resultChan:
-				{
-					// setting it to false so it does not break the parent execution
-					fmt.Println("--WE RECEIVED THE RESULT")
-					status.IsBreaking = false
-					return status
-				}
-			default:
-				{
-					wg.Add(1)
-					var newVt *vartable.VarTable
-					if s.GetOpts().Async {
-						newVt = vartable.CopyVarTable(vt)
-					} else {
-						newVt = vt
-					}
-					go t.orchestrateIteration(iterator, itVal, s, ctx, newVt, &wg, statusChan)
-					// if !s.GetOpts().Async {
-					// 	wg.Wait() // waits if the execution should be sync
-					// }
-				}
+			var newVt *vartable.VarTable
+			if s.GetOpts().Async {
+				newVt = vartable.CopyVarTable(vt)
+			} else {
+				newVt = vt
+			}
+			wg.Add(1)
+			if s.GetOpts().Async {
+				go t.orchestrateIteration(iterator, itVal, s, ctx, newVt, &wg, statusChan)
+			} else {
+				t.orchestrateIteration(iterator, itVal, s, ctx, newVt, &wg, statusChan)
 			}
 		}
 	}
 	wg.Wait()
 	close(statusChan)
-	// should never get here
-	return step.StepStatus{Err: fmt.Errorf("internal error in parallel execution")}
+}
+
+func (t *Target) runAllSteps(ctx tcontext.Context, vt *vartable.VarTable) step.StepStatus {
+	statusChan := make(chan step.StepStatus)
+	resultChan := make(chan step.StepStatus)
+	// Start reading results
+	go processStatuses(statusChan, resultChan, vt)
+	// Start creating iterations
+	go t.startIterations(statusChan, resultChan, ctx, vt)
+
+	status := <-resultChan
+	// setting it to false so it does not break the parent execution
+	status.IsBreaking = false
+	return status
 }

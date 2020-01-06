@@ -4,14 +4,16 @@ targets:
   foo:
     run:
       - sh: |
-          for i in {1..180}; do
-            echo Waiting... $i
+          for i in {1..4}; do
             sleep 1
+            echo Waiting... $i
           done
         opts: async
       - sh: sleep 1 && echo "this runs async too"
         opts: async
-      - sh: echo This runs in in async && sleep 5
+      - sh: echo this still runs && sleep 1
+      - sh: echo this finishes && sleep 5
+      - sh: exit 5
 
   for:
     run:
@@ -24,8 +26,8 @@ targets:
       - for: { $: $i, in: ["x", "y", "z"] }
         sh: sleep 1 && echo "this runs async too $i"
         opts: async
-      - sh: echo "exiting 42" && exit 42
-        opts: async
+      # - sh: sleep 1 && echo "exiting 42" && exit 42
+      #   opts: async
       - sh: echo 1 sync && sleep 1
       - sh: echo 2 sync && sleep 1
       - sh: echo 3 sync && sleep 1
@@ -33,3 +35,9 @@ targets:
       - sh: echo good bye with 2 && exit 2
       - sh: echo This SHOULD NOT RUN since we exited with 2
       - sh: echo "THIS SHOULDNT RUN EITHER"
+
+  bus:
+    run:
+      - sh: exit 45 && echo "hello again"
+        opts: async
+      - sh: echo "loveya with a 1"
