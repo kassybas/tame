@@ -1,0 +1,41 @@
+settings:
+  shell: /bin/bash
+  shieldEnv: true
+
+targets:
+ # tame -f examples/14-async-usage.yaml parallelJobsSuccess
+  parallelJobsSuccess:
+    # the second step will run without waiting for the first to finish
+    run:
+    - sh: for i in {1..4}; do echo "first job...$i"; sleep 1; done
+      opts: async
+    - sh: for i in {1..4}; do echo "second job...$i"; sleep 1; done
+      opts: async
+    # the last async opt is not actually needed, it's there to demonstrate that at the end of the target
+    # we wait for all async steps to finish, before continuing
+
+  parallelJobsFailure:
+    # the second step will run without waiting for the first to finish
+    # when the first step fails, the second step will terminate too
+    run:
+    - sh: echo "i will fail in 2 sec"; sleep 2; exit 42
+      opts: async
+    - sh: for i in {1..4}; do echo "second job...$i"; sleep 1; done
+      opts: async
+    # the execution will finish early since the first job fails
+
+  parallelJobsAllowedFailure:
+    # the second step will finish, even though the first one failed,
+    # this is due to the allowed-fail option
+    run:
+    - sh: echo "i will fail in 2 sec"; sleep 2; exit 42
+      opts: [async, allowed-fail]
+    - sh: for i in {1..4}; do echo "second job...$i"; sleep 1; done
+      opts: async
+
+  parallelForLoop:
+    run:
+    # Each step will execute in parallel
+    - for: {$: $name, in: ["Alice","Bob","Cathy"]}
+      sh: echo "Hi ${name}!"
+      opts: async

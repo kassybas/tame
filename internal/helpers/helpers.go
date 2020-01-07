@@ -30,6 +30,10 @@ func BuildOpts(optsDef []string) (opts.ExecutionOpts, error) {
 			{
 				opts.CanFail = true
 			}
+		case keywords.OptAsync:
+			{
+				opts.Async = true
+			}
 		default:
 			{
 				return opts, fmt.Errorf("unknown option: %s", opt)

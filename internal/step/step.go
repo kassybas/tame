@@ -14,17 +14,19 @@ type Step interface {
 	ResultNames() []string
 	GetOpts() opts.ExecutionOpts
 	SetOpts(opts.ExecutionOpts)
-	RunStep(tcontext.Context, vartable.VarTable) StepStatus
+	RunStep(tcontext.Context, *vartable.VarTable) StepStatus
 	GetIteratorName() string
 	GetIterable() interface{}
 	GetCondition() string
 }
 
 type StepStatus struct {
-	Results    []interface{}
-	IsBreaking bool
-	Stdstatus  int
-	Err        error
+	Results            []interface{}
+	ResultNames        []string
+	Stdstatus          int
+	IsBreaking         bool
+	AllowedLessResults bool
+	Err                error
 }
 
 // TODO: cleanup

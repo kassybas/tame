@@ -8,17 +8,12 @@ var (
 
 	OptsSeparator = " "
 	OptSilent     = "silent"
-	OptOnce       = "run-once"
 	OptCanFail    = "allowed-fail"
-	OptParallel   = "parallel"
-	OptStdout     = "out"
-	OptStderr     = "err"
-	OptStdRc      = "rc"
-
-	OptsNotSet = "not-set"
+	OptAsync      = "async"
+	OptsNotSet    = "not-set"
 
 	PossibleOpts = []string{
-		OptCanFail, OptSilent, OptOnce, OptParallel,
+		OptCanFail, OptSilent, OptAsync,
 	}
 
 	ShellFieldSeparator = "_"
