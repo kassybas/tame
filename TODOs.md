@@ -1,7 +1,7 @@
 
 # TODOs
 
-- parallel execution
+- include
 - separate var declaration and assignment
 - resolve expressions everywhere
 - optimizations
@@ -10,7 +10,6 @@
 - create extensive documentation
 - make append to list possible
 - load file or string to variables
-- include
 - docker
 - cli
 - logging
