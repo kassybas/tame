@@ -50,6 +50,9 @@ func processStatuses(statusChan chan step.StepStatus, resultChan chan step.StepS
 	var lastStatus step.StepStatus
 	for status := range statusChan {
 		lastStatus = status
+		if lastStatus.Err != nil {
+			resultChan <- lastStatus
+		}
 		lastStatus.Err = updateVarsWithResultVariables(vt, status.ResultNames, status.Results, status.AllowedLessResults)
 		if lastStatus.IsBreaking {
 			resultChan <- lastStatus
