@@ -72,3 +72,7 @@ func createArgsVartable(argDefs []tvar.TVariable, calledTarget target.Target, vt
 func (s *CallStep) SetCalledTarget(t interface{}) {
 	s.calledTarget = t.(target.Target)
 }
+
+func (s *CallStep) GetCalledTarget() target.Target {
+	return s.calledTarget
+}

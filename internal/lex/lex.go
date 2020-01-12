@@ -36,7 +36,7 @@ func getRootStepSchema(targetName string, cliVarArgs []string) (schema.MergedSte
 	return root, err
 }
 
-func createDependencyGraph(targets map[string]target.Target, targetName string, cliVarArgs []string) (step.Step, error) {
+func createDependencyGraph(targets map[string]target.Target, targetName string, cliVarArgs []string, includes []schema.IncludeSchema) (step.Step, error) {
 	rootSchema, err := getRootStepSchema(targetName, cliVarArgs)
 	if err != nil {
 		return &callstep.CallStep{}, err
@@ -45,11 +45,11 @@ func createDependencyGraph(targets map[string]target.Target, targetName string, 
 	if err != nil {
 		return &callstep.CallStep{}, err
 	}
-	calledTarget, err := findCalledTarget(targetName, "cli root", targets)
+	calledTarget, err := findCalledTarget(targetName, "[tame cli]", targets, includes)
 	if err != nil {
 		return &callstep.CallStep{}, err
 	}
-	err = populateSteps(&calledTarget, targets)
+	err = populateSteps(&calledTarget, targets, includes)
 	rootStep.SetCalledTarget(calledTarget)
 
 	return rootStep, err
@@ -62,17 +62,13 @@ func Analyse(tf schema.Tamefile, targetName string, cliVarArgs []string) (step.S
 	if err != nil {
 		return nil, nil, err
 	}
-
 	if targetName == "" {
 		helpscreen.PrintTeafileDescription(parsedTargets)
 		os.Exit(0)
 	}
-
-	// TODO: Load external files if referred
-
 	// build the dependency graph with the called target
 	var root step.Step
-	root, err = createDependencyGraph(parsedTargets, targetName, cliVarArgs)
+	root, err = createDependencyGraph(parsedTargets, targetName, cliVarArgs, tf.Includes)
 	if err != nil {
 		return root, nil, err
 	}

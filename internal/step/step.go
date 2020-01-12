@@ -26,6 +26,7 @@ type StepStatus struct {
 	Stdstatus          int
 	IsBreaking         bool
 	AllowedLessResults bool
+	IsSync             bool
 	Err                error
 }
 

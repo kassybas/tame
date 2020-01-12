@@ -39,6 +39,7 @@ func mergeOpts(globalOpts, targetOpts, stepOpts opts.ExecutionOpts) opts.Executi
 	return opts.ExecutionOpts{
 		Silent:  globalOpts.Silent || targetOpts.Silent || stepOpts.Silent,
 		CanFail: globalOpts.CanFail || targetOpts.CanFail || stepOpts.CanFail,
+		Async:   stepOpts.Async,
 	}
 }
 

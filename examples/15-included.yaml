@@ -1,0 +1,23 @@
+settings:
+  shieldEnv: true
+
+targets:
+
+  caller:
+    run:
+    - sh: echo "i will call a different target"
+    - call called: {}
+
+  log:
+    args: {$msg: "message"}
+    run:
+    - sh: date "+%T"
+      $: $timestamp
+      opts: silent
+    - sh: printf "[%s] %s\n" "${timestamp}" "${msg}"
+
+  called:
+    run:
+    - sh: echo "i was Called"
+      $: $result
+    - return: $result
