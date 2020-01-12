@@ -1,0 +1,18 @@
+
+include:
+  # path is always relative to the current file
+  - path: "examples/01-hello-world.yaml"
+    as: helloWorld
+  - path: "examples/15-included.yaml"
+    as: foo
+
+
+targets:
+  callFromOtherFile:
+    run:
+    - sh: echo "starting"
+    - call helloWorld.Hello: {}
+    - call foo.caller: {}
+      $: $result
+    - call foo.log: {$msg: "Log this for me"}
+    - sh: echo "received $result"

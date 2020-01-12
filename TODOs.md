@@ -2,6 +2,9 @@
 # TODOs
 
 - include
+- parallel wait on return
+- make ctx target dependent
+- tooling to syntaxcheck all tamefiles
 - separate var declaration and assignment
 - resolve expressions everywhere
 - optimizations
@@ -16,3 +19,4 @@
 - make all field separators configurable
 - oneliner target
 - add can-fail option to expressions
+

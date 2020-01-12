@@ -2,7 +2,7 @@ package schema
 
 type Tamefile struct {
 	TameVersion string                  `yaml:"tameVersion,omitempty"`
-	Includes    []string                `yaml:"include,omitempty"`
+	Includes    []IncludeSchema         `yaml:"include,omitempty"`
 	Loads       []string                `yaml:"load,omitempty"`
 	Sets        SettingsShema           `yaml:"settings,omitempty"`
 	Globals     map[string]interface{}  `yaml:"globals,omitempty"`
@@ -10,6 +10,11 @@ type Tamefile struct {
 
 	WorkDir        string            `yaml:"workDir,omitempty"`
 	DefaultEnvVars map[string]string `yaml:"defaults,omitempty"`
+}
+
+type IncludeSchema struct {
+	Path  string `yaml:"path,omitempty"`
+	Alias string `yaml:"as,omitempty"`
 }
 
 type TargetSchema struct {

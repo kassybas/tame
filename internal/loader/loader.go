@@ -7,13 +7,12 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-func readFile(filePath string) (string, error) {
+func readFile(filePath string) ([]byte, error) {
 	b, err := ioutil.ReadFile(filePath)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
-	fc := string(b)
-	return fc, nil
+	return b, nil
 }
 
 func Load(filePath string) (schema.Tamefile, error) {
@@ -24,6 +23,6 @@ func Load(filePath string) (schema.Tamefile, error) {
 
 	t := schema.Tamefile{}
 
-	err = yaml.UnmarshalStrict([]byte(fc), &t)
+	err = yaml.UnmarshalStrict(fc, &t)
 	return t, err
 }
