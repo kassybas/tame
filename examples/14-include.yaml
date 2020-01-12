@@ -10,7 +10,7 @@ include:
 
 
 targets:
-  callFromOtherFile:
+  CallFromOtherFile:
     run:
     - sh: echo "Shell is $0"
     - sh: echo "starting"

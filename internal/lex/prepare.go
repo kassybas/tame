@@ -51,6 +51,15 @@ func convertIncludesToRelativePath(path string, includes []schema.IncludeSchema)
 	return includes
 }
 
+func isPublic(targetName string) bool {
+	firstChar := string(targetName[0])
+	// check if first character is lowercase
+	if strings.ToLower(firstChar) == firstChar {
+		return false
+	}
+	return true
+}
+
 func PrepareStep(path, targetName string, targetArgs []string) (step.Step, tcontext.Context, error) {
 	tf, err := loader.Load(path)
 	if err != nil {
@@ -61,6 +70,9 @@ func PrepareStep(path, targetName string, targetArgs []string) (step.Step, tcont
 	root, globalDefs, err := Analyse(tf, targetName, targetArgs)
 	if err != nil {
 		logrus.Fatal(err)
+	}
+	if !isPublic(root.GetName()) {
+		return nil, tcontext.Context{}, fmt.Errorf("calling non-public target: %s\npublic targets must start with uppercase letter", targetName)
 	}
 	globals, err := evaluateGlobals(globalDefs)
 	if err != nil {

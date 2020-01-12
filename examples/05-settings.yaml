@@ -1,10 +1,10 @@
 
 settings:
   # shell: scripts defined in target.run.[].sh will execute in defined shell (default: sh)
-  shell: bash      
+  shell: bash
 
   # init: execute before each script. it will execute in the same shell process (default: empty)
-  init: "set -ex"  
+  init: "set -ex"
 
   # shieldEnv: do not expose environment variables to targets
   # eg. `$ HELLO=world tame foo;` -> variable HELLO will not be set in target foo (or any target) if shieldEnv is true
@@ -21,10 +21,9 @@ targets:
   GetShell:
     run:
     - sh: echo $0
-  
+
   EnvVars:
     run:
     - sh: env
 
 
-  

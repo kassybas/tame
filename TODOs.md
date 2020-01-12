@@ -12,6 +12,7 @@
 - create extensive documentation
 - make append to list possible
 - load file or string to variables
+- add print step
 - docker
 - cli
 - logging

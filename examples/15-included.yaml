@@ -4,12 +4,12 @@ settings:
 
 targets:
 
-  caller:
+  Caller:
     run:
     - sh: echo "i will call a different target"
     - call called: {}
 
-  log:
+  Log:
     args: {$msg: "message"}
     run:
     - sh: echo Shell is $0
@@ -18,7 +18,7 @@ targets:
       opts: silent
     - sh: printf "[%s] %s\n" "${timestamp}" "${msg}"
 
-  called:
+  Called:
     run:
     - sh: echo "i was Called"
       $: $result
