@@ -1,3 +1,5 @@
+settings:
+  shell: /bin/bash
 
 include:
   # path is always relative to the current file
@@ -10,6 +12,7 @@ include:
 targets:
   callFromOtherFile:
     run:
+    - sh: echo "Shell is $0"
     - sh: echo "starting"
     - call helloWorld.Hello: {}
     - call foo.caller: {}

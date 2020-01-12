@@ -7,6 +7,7 @@ type Tamefile struct {
 	Sets        SettingsShema           `yaml:"settings,omitempty"`
 	Globals     map[string]interface{}  `yaml:"globals,omitempty"`
 	Targets     map[string]TargetSchema `yaml:"targets,omitempty"`
+	Commands    map[string]string       `yaml:"cmds,omitempty"`
 
 	WorkDir        string            `yaml:"workDir,omitempty"`
 	DefaultEnvVars map[string]string `yaml:"defaults,omitempty"`

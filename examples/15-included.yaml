@@ -1,5 +1,6 @@
 settings:
   shieldEnv: true
+  shell: /bin/sh
 
 targets:
 
@@ -11,6 +12,7 @@ targets:
   log:
     args: {$msg: "message"}
     run:
+    - sh: echo Shell is $0
     - sh: date "+%T"
       $: $timestamp
       opts: silent
