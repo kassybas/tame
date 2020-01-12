@@ -69,6 +69,9 @@ func processStatuses(statusChan, resultChan chan step.StepStatus, syncStepDone c
 func (t *Target) startIterations(statusChan, resultChan chan step.StepStatus, syncStepDone chan bool, ctx tcontext.Context, vt *vartable.VarTable) {
 	var wg sync.WaitGroup
 	for _, s := range t.Steps {
+		if s.Kind() == steptype.Wait {
+			wg.Wait()
+		}
 		iterator, iterable, err := getIters(vt, s)
 		if err != nil {
 			resultChan <- step.StepStatus{Err: err, IsBreaking: true}

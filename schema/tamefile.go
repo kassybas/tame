@@ -46,6 +46,7 @@ type MergedStepSchema struct {
 	ResultContainers *[]string      `mapstructure:"$"`      // string is allowed due to weak decode
 	Script           *[]string      `mapstructure:"sh"`     // string is allowed due to weak decode
 	Expr             *string        `mapstructure:"expr"`
+	Wait             *interface{}   `mapstructure:"wait"`
 
 	// Name is a dynamic key can be either (but only one of):
 	CalledTargetName    *string                `mapstructure:"-"` // loaded dynamically since the key is the called target

@@ -46,3 +46,14 @@ targets:
         opts: async
       - sh: echo "I will run"
       - sh: echo "I too will run"
+      # at the end of the target, tame waits for the async steps to finish
+      # add a return step to skip waiting for the async steps to finish
+
+  parallelReturn:
+    run:
+      - sh: for i in {1..4}; do echo "first job...$i"; sleep 1; done
+        opts: async
+        $: $result
+      - sh: echo "I will run"
+      - wait: {}          # wait waits for all async steps in the target to finish
+      - return: $result   # return does not wait for async steps to finish, so $result would be unset
