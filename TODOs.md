@@ -17,7 +17,6 @@
 - cli
 - logging
 - make all field separators configurable
-- oneliner target
 - add can-fail option to expressions
 - add possiblity to wait for async step
 
