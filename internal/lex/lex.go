@@ -62,12 +62,10 @@ func Analyse(tf schema.Tamefile, targetName string, cliVarArgs []string) (step.S
 	if err != nil {
 		return nil, nil, err
 	}
-
 	if targetName == "" {
 		helpscreen.PrintTeafileDescription(parsedTargets)
 		os.Exit(0)
 	}
-
 	// build the dependency graph with the called target
 	var root step.Step
 	root, err = createDependencyGraph(parsedTargets, targetName, cliVarArgs, tf.Includes)

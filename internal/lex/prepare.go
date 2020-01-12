@@ -3,7 +3,10 @@ package lex
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
+
+	"github.com/kassybas/tame/schema"
 
 	"github.com/kassybas/tame/internal/keywords"
 	"github.com/kassybas/tame/internal/loader"
@@ -41,11 +44,20 @@ func evaluateGlobals(globalDefs map[string]interface{}) ([]tvar.TVariable, error
 	return vars, nil
 }
 
+func convertIncludesToRelativePath(path string, includes []schema.IncludeSchema) []schema.IncludeSchema {
+	for i := range includes {
+		includes[i].Path = fmt.Sprintf("%s%s%s", filepath.Dir(path), string(filepath.Separator), includes[i].Path)
+	}
+	return includes
+}
+
 func PrepareStep(path, targetName string, targetArgs []string) (step.Step, tcontext.Context, error) {
 	tf, err := loader.Load(path)
 	if err != nil {
 		return nil, tcontext.Context{}, fmt.Errorf("error loading tamefile: %s\n%s", path, err.Error())
 	}
+	tf.Includes = convertIncludesToRelativePath(path, tf.Includes)
+
 	root, globalDefs, err := Analyse(tf, targetName, targetArgs)
 	if err != nil {
 		logrus.Fatal(err)

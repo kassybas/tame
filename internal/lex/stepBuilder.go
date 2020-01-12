@@ -18,6 +18,9 @@ func loadCalledTargetInclude(name, caller string, includes []schema.IncludeSchem
 	for _, incl := range includes {
 		if namespace == incl.Alias {
 			s, _, err := PrepareStep(incl.Path, calledTargetName, []string{})
+			if err != nil {
+				return target.Target{}, err
+			}
 			return s.(*callstep.CallStep).GetCalledTarget(), err
 		}
 	}

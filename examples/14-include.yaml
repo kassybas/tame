@@ -1,9 +1,9 @@
 
 include:
   # path is always relative to the current file
-  - path: "examples/01-hello-world.yaml"
+  - path: "01-hello-world.yaml"
     as: helloWorld
-  - path: "examples/15-included.yaml"
+  - path: "15-included.yaml"
     as: foo
 
 
