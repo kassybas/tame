@@ -14,7 +14,7 @@ targets:
   # tame -f examples/01-hello-world.yaml HelloLocal
   HelloLocal:
     run:
-    - var $name: "john doe"
+    - $name: "john doe"
     - sh: echo "hello $name"
 
   # tame -f examples/01-hello-world.yaml HelloArg

@@ -34,7 +34,7 @@ targets:
     run:
     - call IsItOk: {$status: "ok"} ## -> prints
     - call IsItOk: {$status: "foo"} ## -> finishes empty
-    - var $userName: "John"
+    - $userName: "John"
     - call IsUser: {$userName: $userName} ## -> finishes returns false
       $: $isUser
     - expr: $isUser ? "member":"non-member"
@@ -43,8 +43,8 @@ targets:
 
   ExampleExpr:
     run:
-    - var $userMap: {}
-    - var $testUsers: ["Kate", "Pierre", "Arthur"]
+    - $userMap: {}
+    - $testUsers: ["Kate", "Pierre", "Arthur"]
     - for: {$: $user, in: $testUsers}
       expr: $user in $users
       $: $userMap.$user

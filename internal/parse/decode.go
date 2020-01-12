@@ -24,12 +24,12 @@ func loadCallStepSchema(raw map[string]interface{}, dynamicKey string, result *s
 }
 
 func loadVarStepSchema(raw map[string]interface{}, dynamicKey string, result *schema.MergedStepSchema) error {
-	vn, err := parseVariableName(dynamicKey)
+	err := validateVariableName(dynamicKey)
 	if err != nil {
 		return fmt.Errorf("error while parsing step '%s'\n\t%s", dynamicKey, err.Error())
 	}
-	result.VarName = &vn
-	result.ResultContainers = &[]string{vn}
+	result.VarName = &dynamicKey
+	result.ResultContainers = &[]string{dynamicKey}
 	result.VarValue = raw[dynamicKey]
 	return err
 }
@@ -40,7 +40,7 @@ func loadDynamicKey(raw map[string]interface{}, dynamicKey string, result *schem
 		if err != nil {
 			return err
 		}
-	} else if strings.HasPrefix(dynamicKey, keywords.StepVar) {
+	} else if strings.HasPrefix(dynamicKey, keywords.PrefixReference) && len(dynamicKey) > 1 {
 		err := loadVarStepSchema(raw, dynamicKey, result)
 		if err != nil {
 			return err

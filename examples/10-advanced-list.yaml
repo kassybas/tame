@@ -4,10 +4,10 @@ settings:
 targets:
   IndexAList:
     run:
-    - var $myList:
+    - $myList:
       - darkness
       - my old
       - friend
-    - var $i: 2
-    - var $line: $myList[$i]
+    - $i: 2
+    - $line: $myList[$i]
     - sh: echo "line is '${line}'"

@@ -15,7 +15,7 @@ targets:
 
   ReturnMap:
     run:
-    - var $mymap:
+    - $mymap:
         date:
           month: september
           day: 22

@@ -25,11 +25,11 @@ targets:
       opts: silent
       $: $MSG
     - sh: echo MSG:"${MSG}"
-      
-  
+
+
   BuildAll:
     run:
-    - var $platforms:
+    - $platforms:
         darwin:
           bin_path: "bin/bin_darwin"
           flags: "-cdsw"
@@ -38,7 +38,7 @@ targets:
           flags: "-cdsw"
     - call Build: {$config: $platforms.darwin}   # maps fields are separated by `.` in tame context
     - call Build: {$config: $platforms.linux}
-    
+
   Build:
     args: { $config }
     run:
