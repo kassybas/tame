@@ -5,7 +5,6 @@
 - add cleanup step
 - make ctx target dependent
 - tooling to syntaxcheck all tamefiles
-- separate var declaration and assignment
 - resolve expressions everywhere
 - optimizations
     - vartable creates env_vars even if nothing has changes (should reuse previous one)
