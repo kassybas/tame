@@ -1,8 +1,8 @@
 
 # TODOs
 
-- include
-- parallel wait on return
+- add public/private targets and includes
+- add cleanup step
 - make ctx target dependent
 - tooling to syntaxcheck all tamefiles
 - separate var declaration and assignment
@@ -19,4 +19,5 @@
 - make all field separators configurable
 - oneliner target
 - add can-fail option to expressions
+- add possiblity to wait for async step
 

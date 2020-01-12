@@ -15,6 +15,7 @@ import (
 	"github.com/kassybas/tame/internal/step/returnstep"
 	"github.com/kassybas/tame/internal/step/shellstep"
 	"github.com/kassybas/tame/internal/step/varstep"
+	"github.com/kassybas/tame/internal/step/waitstep"
 	"github.com/kassybas/tame/internal/target"
 	"github.com/kassybas/tame/schema"
 )
@@ -56,6 +57,10 @@ func buildStep(rawStep map[string]interface{}) (step.Step, error) {
 	case steptype.Expr:
 		{
 			return exprstep.NewExprStep(stepDef)
+		}
+	case steptype.Wait:
+		{
+			return waitstep.NewWaitStep(stepDef)
 		}
 	default:
 		{
