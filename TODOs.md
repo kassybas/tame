@@ -1,10 +1,9 @@
 
 # TODOs
 
-- make ctx target dependent
 - if/else, for with multiple steps
-- fix referenceing variable fields in maps in expressions
-- add can-fail option to expressions
+- fix referencing variable fields in maps in expressions
+- add can-fail option to expressions and calls
 - resolve expressions everywhere
 - create extensive documentation
 - make append to list possible
@@ -13,6 +12,7 @@
 - cli
 - logging
 - make all field separators configurable
+- make globals r/w?
 
 - docker
 - optimizations
