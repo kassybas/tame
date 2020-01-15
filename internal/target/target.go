@@ -127,12 +127,15 @@ func getIters(vt *vartable.VarTable, s step.Step) (string, []interface{}, error)
 	return s.GetIteratorName(), iterableVal, nil
 }
 
-func (t Target) Make(vt *vartable.VarTable) step.StepStatus {
+func (t Target) Make(vt *vartable.VarTable, opts opts.ExecutionOpts) step.StepStatus {
 	vt.AddVariables(t.Ctx.Globals)
 	err := resolveParams(vt, t.Params)
 	if err != nil {
 		return step.StepStatus{Err: fmt.Errorf("could not resolve parameters in target: %s\n\t%s", t.Name, err)}
 	}
+	// inherit silent
+	t.Opts.Silent = opts.Silent
+
 	status := t.runAllSteps(*t.Ctx, vt)
 	return status
 }
