@@ -35,20 +35,12 @@ func loadVarStepSchema(raw map[string]interface{}, dynamicKey string, result *sc
 }
 
 func loadDynamicKey(raw map[string]interface{}, dynamicKey string, result *schema.MergedStepSchema) error {
-	if strings.HasPrefix(dynamicKey, keywords.StepCall) {
-		err := loadCallStepSchema(raw, dynamicKey, result)
-		if err != nil {
-			return err
-		}
-	} else if strings.HasPrefix(dynamicKey, keywords.PrefixReference) && len(dynamicKey) > 1 {
-		err := loadVarStepSchema(raw, dynamicKey, result)
-		if err != nil {
-			return err
-		}
-	} else {
-		return fmt.Errorf("unknown key in step: %s", dynamicKey)
+	// starting with $ -> it's a var
+	if strings.HasPrefix(dynamicKey, keywords.PrefixReference) && len(dynamicKey) > 1 {
+		return loadVarStepSchema(raw, dynamicKey, result)
 	}
-	return nil
+	// not starting with $ -> it's a call
+	return loadCallStepSchema(raw, dynamicKey, result)
 }
 
 func loadMergedStepSchema(raw map[string]interface{}) (schema.MergedStepSchema, error) {

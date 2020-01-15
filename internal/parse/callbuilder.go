@@ -7,13 +7,13 @@ import (
 
 func parseCalledTargetName(k string) (string, error) {
 	fields := strings.Fields(k)
-	if len(fields) > 2 {
-		return "", fmt.Errorf("'%s': called target name contains whitespaces", k)
-	}
-	if len(fields) == 1 {
+	if len(fields) == 0 {
 		return "", fmt.Errorf("'%s': no called target name found", k)
 	}
-	return fields[1], nil
+	if len(fields) > 1 {
+		return "", fmt.Errorf("'%s': called target name contains whitespaces", k)
+	}
+	return fields[0], nil
 }
 
 func parseCallStepArgs(argDefs interface{}) (map[string]interface{}, error) {

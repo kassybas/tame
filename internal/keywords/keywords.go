@@ -25,8 +25,6 @@ var (
 	GlobalDefaultVarSuffix = "?"
 
 	StepShell  = "sh"
-	StepVar    = "var"
-	StepCall   = "call"
 	StepReturn = "return"
 
 	StepFor         = "for"

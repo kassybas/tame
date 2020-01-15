@@ -30,23 +30,6 @@ func ParseTeafile(tf schema.Tamefile, ctx *tcontext.Context) (map[string]target.
 		}
 		targets[targetKey] = trg
 	}
-	for commandKey, commandValue := range tf.Commands {
-		if _, exists := targets[commandKey]; exists {
-			return nil, fmt.Errorf("command name conflicts with target name: %s", commandKey)
-		}
-		wrappedCmd := schema.TargetSchema{
-			StepDefinition: []map[string]interface{}{
-				map[string]interface{}{
-					keywords.StepShell: []string{commandValue},
-				},
-			},
-		}
-		trg, err := buildTarget(commandKey, wrappedCmd, ctx)
-		if err != nil {
-			return targets, err
-		}
-		targets[commandKey] = trg
-	}
 	return targets, nil
 }
 

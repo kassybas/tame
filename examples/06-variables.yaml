@@ -36,8 +36,8 @@ targets:
         linux:
           bin_path: "bin/bin_linux"
           flags: "-cdsw"
-    - call Build: {$config: $platforms.darwin}   # maps fields are separated by `.` in tame context
-    - call Build: {$config: $platforms.linux}
+    - Build: {$config: $platforms.darwin}   # maps fields are separated by `.` in tame context
+    - Build: {$config: $platforms.linux}
 
   Build:
     args: { $config }

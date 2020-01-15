@@ -32,10 +32,10 @@ targets:
 
   ExampleIf:
     run:
-    - call IsItOk: {$status: "ok"} ## -> prints
-    - call IsItOk: {$status: "foo"} ## -> finishes empty
+    - IsItOk: {$status: "ok"} ## -> prints
+    - IsItOk: {$status: "foo"} ## -> finishes empty
     - $userName: "John"
-    - call IsUser: {$userName: $userName} ## -> finishes returns false
+    - IsUser: {$userName: $userName} ## -> finishes returns false
       $: $isUser
     - expr: $isUser ? "member":"non-member"
       $: $res

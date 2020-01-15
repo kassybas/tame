@@ -9,7 +9,7 @@ targets:
   TestVar:
     run:
     - sh: echo "config is ${config_build}" 
-    - call ReturnMap: {}
+    - ReturnMap: {}
       $: date
     - sh: echo "${date_day}"
 

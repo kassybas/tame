@@ -16,13 +16,13 @@ targets:
   CallFromOtherFile:
     run:
     - sh: echo "starting"
-    - call helloWorld.Hello: {}
-    - call foo.Caller: {}
+    - helloWorld.Hello: {}
+    - foo.Caller: {}
       $: $result
-    - call foo.Log: {$msg: "Log this for me"}
+    - foo.Log: {$msg: "Log this for me"}
     - sh: echo "received $result"
 
   TestContext:
     run:
     - sh: echo "Shell is $0"
-    - call foo.CheckGlobal: {}
+    - foo.CheckGlobal: {}

@@ -18,10 +18,10 @@ targets:
   WelcomeToday:
     run:
     - $: $day_of_week
-      call Today: {$format: "+%a"}   # overwriting default $format argument
+      Today: {$format: "+%a"}   # overwriting default $format argument
       opts: silent    # silencing all steps in today target
 
     - $: $user
-      call User: {}   # call is followed by empty map, because no arguments needed
+      User: {}   # call is followed by empty map, because no arguments needed
       opts: silent
     - sh: echo "Welcome ${user}! Today is ${day_of_week}"

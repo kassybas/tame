@@ -10,7 +10,7 @@ targets:
   Caller:
     run:
     - sh: echo "i will call a different target"
-    - call called: {}
+    - called: {}
 
   Log:
     args: {$msg: "message"}

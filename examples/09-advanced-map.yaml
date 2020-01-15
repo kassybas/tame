@@ -20,19 +20,19 @@ targets:
 
   Build:
     run:
-    - call CreateMap: {}
+    - CreateMap: {}
       $: $result
     - sh: env
 
   GetPlatformConfig:
     args: {$platform}
     run:
-    - call CreateMap: {}
+    - CreateMap: {}
       $: $config
     - return: $config.$platform   # you can access the fields dynamically
 
   PrintVars:
     run:
-    - call GetPlatformConfig: {$platform: "mac"}
+    - GetPlatformConfig: {$platform: "mac"}
       $: $macConfig
     - sh: env

@@ -1,16 +1,19 @@
 globals:
   $foo: "my global value"
 
-# Commands are simple scripts without any steps or options
-cmds:
-  # tame -f examples/01-hello-world.yaml Hello
-  Hello: echo "hello world"
-
-  # tame -f examples/01-hello-world.yaml HelloGlobal
-  HelloGlobal: echo "hello $foo"
 
 # Targets allow multiple steps, arguments, variables and returns
 targets:
+  # tame -f examples/01-hello-world.yaml Hello
+  Hello:
+    run:
+    - sh: echo "hello world"
+
+  # tame -f examples/01-hello-world.yaml HelloGlobal
+  HelloGlobal:
+    run:
+    - sh: echo "hello $foo"
+
   # tame -f examples/01-hello-world.yaml HelloLocal
   HelloLocal:
     run:
@@ -26,5 +29,5 @@ targets:
   # tame -f examples/01-hello-world.yaml HelloCall
   HelloCall:
     run:
-    - call Hello: {}
-    - call HelloArg: {$name: "passing an argument"}
+    - Hello: {}
+    - HelloArg: {$name: "passing an argument"}
