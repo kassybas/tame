@@ -2,6 +2,9 @@ settings:
   shieldEnv: true
   shell: /bin/sh
 
+globals:
+  $foo: "value of foo"
+
 targets:
 
   Caller:
@@ -12,14 +15,18 @@ targets:
   Log:
     args: {$msg: "message"}
     run:
-    - sh: echo Shell is $0
     - sh: date "+%T"
       $: $timestamp
       opts: silent
     - sh: printf "[%s] %s\n" "${timestamp}" "${msg}"
 
-  Called:
+  called:
     run:
     - sh: echo "i was Called"
       $: $result
     - return: $result
+
+  CheckGlobal:
+    run:
+    - sh: echo Shell is $0
+    - sh: echo GLOBAL is $foo

@@ -29,9 +29,8 @@ func evaluateGlobals(globalDefs map[string]interface{}) ([]tvar.TVariable, error
 		if strings.HasSuffix(k, keywords.GlobalDefaultVarSuffix) {
 			name := strings.TrimSuffix(k, keywords.GlobalDefaultVarSuffix)
 			name = strings.TrimSpace(name)
-			sysEnvValue, sysEnvExists := os.LookupEnv(name)
 			var value interface{}
-			if sysEnvExists {
+			if sysEnvValue, sysEnvExists := os.LookupEnv(name); sysEnvExists {
 				value = sysEnvValue
 			} else {
 				value = v
@@ -66,15 +65,10 @@ func PrepareStep(path, targetName string, targetArgs []string) (step.Step, tcont
 		return nil, tcontext.Context{}, fmt.Errorf("error loading tamefile: %s\n%s", path, err.Error())
 	}
 	tf.Includes = convertIncludesToRelativePath(path, tf.Includes)
-
-	root, globalDefs, err := Analyse(tf, targetName, targetArgs)
-	if err != nil {
-		logrus.Fatal(err)
-	}
-	if !isPublic(root.GetName()) {
+	if !isPublic(targetName) {
 		return nil, tcontext.Context{}, fmt.Errorf("calling non-public target: %s\npublic targets must start with uppercase letter", targetName)
 	}
-	globals, err := evaluateGlobals(globalDefs)
+	globals, err := evaluateGlobals(tf.Globals)
 	if err != nil {
 		return nil, tcontext.Context{}, fmt.Errorf("failed to evaluate global variables:\n\t%s", err.Error())
 	}
@@ -85,6 +79,10 @@ func PrepareStep(path, targetName string, targetArgs []string) (step.Step, tcont
 	ctx, err := createContext(globals, stgs)
 	if err != nil {
 		return nil, tcontext.Context{}, fmt.Errorf("error while creating context:\n\t%s", err.Error())
+	}
+	root, err := Analyse(tf, targetName, targetArgs, &ctx)
+	if err != nil {
+		logrus.Fatal(err)
 	}
 	return root, ctx, nil
 }

@@ -11,6 +11,7 @@ import (
 	"github.com/kassybas/tame/internal/step"
 	"github.com/kassybas/tame/internal/step/callstep"
 	"github.com/kassybas/tame/internal/target"
+	"github.com/kassybas/tame/internal/tcontext"
 )
 
 func parseCLITargetArgs(targetArgs []string) (map[string]interface{}, error) {
@@ -56,11 +57,11 @@ func createDependencyGraph(targets map[string]target.Target, targetName string, 
 }
 
 // Analyse creates the internal representation
-func Analyse(tf schema.Tamefile, targetName string, cliVarArgs []string) (step.Step, map[string]interface{}, error) {
+func Analyse(tf schema.Tamefile, targetName string, cliVarArgs []string, ctx *tcontext.Context) (step.Step, error) {
 
-	parsedTargets, err := parse.ParseTeafile(tf)
+	parsedTargets, err := parse.ParseTeafile(tf, ctx)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 	if targetName == "" {
 		helpscreen.PrintTeafileDescription(parsedTargets)
@@ -70,8 +71,8 @@ func Analyse(tf schema.Tamefile, targetName string, cliVarArgs []string) (step.S
 	var root step.Step
 	root, err = createDependencyGraph(parsedTargets, targetName, cliVarArgs, tf.Includes)
 	if err != nil {
-		return root, nil, err
+		return root, err
 	}
 
-	return root, tf.Globals, nil
+	return root, nil
 }

@@ -1,6 +1,9 @@
 settings:
   shell: /bin/bash
 
+globals:
+  $bar: "value of bar"
+
 include:
   # path is always relative to the current file
   - path: "01-hello-world.yaml"
@@ -12,10 +15,14 @@ include:
 targets:
   CallFromOtherFile:
     run:
-    - sh: echo "Shell is $0"
     - sh: echo "starting"
     - call helloWorld.Hello: {}
-    - call foo.caller: {}
+    - call foo.Caller: {}
       $: $result
-    - call foo.log: {$msg: "Log this for me"}
+    - call foo.Log: {$msg: "Log this for me"}
     - sh: echo "received $result"
+
+  TestContext:
+    run:
+    - sh: echo "Shell is $0"
+    - call foo.CheckGlobal: {}

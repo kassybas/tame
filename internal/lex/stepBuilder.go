@@ -19,7 +19,7 @@ func loadCalledTargetInclude(name, caller string, includes []schema.IncludeSchem
 		if namespace == incl.Alias {
 			s, _, err := PrepareStep(incl.Path, calledTargetName, []string{})
 			if err != nil {
-				return target.Target{}, err
+				return target.Target{}, fmt.Errorf("error while loading include: %s\n\t%s", name, err.Error())
 			}
 			return s.(*callstep.CallStep).GetCalledTarget(), err
 		}

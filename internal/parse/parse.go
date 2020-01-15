@@ -17,13 +17,14 @@ import (
 	"github.com/kassybas/tame/internal/step/varstep"
 	"github.com/kassybas/tame/internal/step/waitstep"
 	"github.com/kassybas/tame/internal/target"
+	"github.com/kassybas/tame/internal/tcontext"
 	"github.com/kassybas/tame/schema"
 )
 
-func ParseTeafile(tf schema.Tamefile) (map[string]target.Target, error) {
+func ParseTeafile(tf schema.Tamefile, ctx *tcontext.Context) (map[string]target.Target, error) {
 	targets := make(map[string]target.Target)
 	for targetKey, targetValue := range tf.Targets {
-		trg, err := buildTarget(targetKey, targetValue)
+		trg, err := buildTarget(targetKey, targetValue, ctx)
 		if err != nil {
 			return targets, err
 		}
@@ -40,7 +41,7 @@ func ParseTeafile(tf schema.Tamefile) (map[string]target.Target, error) {
 				},
 			},
 		}
-		trg, err := buildTarget(commandKey, wrappedCmd)
+		trg, err := buildTarget(commandKey, wrappedCmd, ctx)
 		if err != nil {
 			return targets, err
 		}
@@ -99,10 +100,11 @@ func buildSteps(stepDefs []map[string]interface{}) ([]step.Step, error) {
 	return steps, nil
 }
 
-func buildTarget(targetKey string, targetDef schema.TargetSchema) (target.Target, error) {
+func buildTarget(targetKey string, targetDef schema.TargetSchema, ctx *tcontext.Context) (target.Target, error) {
 	var err error
 	newTarget := target.Target{
 		Name: targetKey,
+		Ctx:  ctx,
 	}
 
 	newTarget.Opts, err = helpers.BuildOpts(targetDef.OptsDefinition)

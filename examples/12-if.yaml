@@ -38,7 +38,7 @@ targets:
     - call IsUser: {$userName: $userName} ## -> finishes returns false
       $: $isUser
     - expr: $isUser ? "member":"non-member"
-      $: res
+      $: $res
     - sh: echo $res
 
   ExampleExpr:

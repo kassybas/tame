@@ -29,15 +29,3 @@ type StepStatus struct {
 	IsSync             bool
 	Err                error
 }
-
-// TODO: cleanup
-// type Result struct {
-// 	StdoutVar      string
-// 	StdoutValue    string
-// 	StderrVar      string
-// 	StderrValue    string
-// 	StdStatusVar   string
-// 	StdStatusValue int
-// 	ResultNames    []string
-// 	ResultValues   []interface{}
-// }

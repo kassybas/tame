@@ -15,7 +15,6 @@ import (
 	"github.com/kassybas/tame/internal/tcontext"
 	"github.com/kassybas/tame/internal/tvar"
 	"github.com/kassybas/tame/types/opts"
-	"github.com/kassybas/tame/types/settings"
 )
 
 type Param struct {
@@ -25,14 +24,14 @@ type Param struct {
 }
 
 type Target struct {
-	GlobalSettings *settings.Settings
-	Name           string
-	Steps          []step.Step
-	Params         []Param
-	Opts           opts.ExecutionOpts
-	Variables      []tvar.TVariable
-	Summary        string
-	Status         int
+	Ctx       *tcontext.Context
+	Name      string
+	Steps     []step.Step
+	Params    []Param
+	Opts      opts.ExecutionOpts
+	Variables []tvar.TVariable
+	Summary   string
+	Status    int
 }
 
 func mergeOpts(globalOpts, targetOpts, stepOpts opts.ExecutionOpts) opts.ExecutionOpts {
@@ -128,13 +127,13 @@ func getIters(vt *vartable.VarTable, s step.Step) (string, []interface{}, error)
 	return s.GetIteratorName(), iterableVal, nil
 }
 
-func (t Target) Make(ctx tcontext.Context, vt *vartable.VarTable) step.StepStatus {
-	vt.AddVariables(ctx.Globals)
+func (t Target) Make(vt *vartable.VarTable) step.StepStatus {
+	vt.AddVariables(t.Ctx.Globals)
 	err := resolveParams(vt, t.Params)
 	if err != nil {
 		return step.StepStatus{Err: fmt.Errorf("could not resolve parameters in target: %s\n\t%s", t.Name, err)}
 	}
-	status := t.runAllSteps(ctx, vt)
+	status := t.runAllSteps(*t.Ctx, vt)
 	return status
 }
 
