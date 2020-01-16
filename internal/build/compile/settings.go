@@ -1,4 +1,4 @@
-package lex
+package compile
 
 import (
 	"github.com/kassybas/tame/internal/helpers"

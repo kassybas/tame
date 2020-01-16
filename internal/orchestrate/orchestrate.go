@@ -3,7 +3,7 @@ package orchestrate
 import (
 	"os"
 
-	"github.com/kassybas/tame/internal/lex"
+	"github.com/kassybas/tame/internal/build/compile"
 
 	"github.com/kassybas/tame/internal/vartable"
 
@@ -12,7 +12,7 @@ import (
 
 func Make(path, targetName string, targetArgs []string) {
 
-	root, ctx, err := lex.PrepareStep(path, targetName, targetArgs)
+	root, ctx, err := compile.PrepareStep(path, targetName, targetArgs)
 	if err != nil {
 		logrus.Fatal(err)
 	}

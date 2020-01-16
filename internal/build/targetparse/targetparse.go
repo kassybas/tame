@@ -1,14 +1,14 @@
-package parse
+package targetparse
 
 import (
 	"fmt"
 	"strings"
 
-	"github.com/kassybas/tame/internal/decode"
+	"github.com/kassybas/tame/internal/build/stepbuilder"
+	"github.com/kassybas/tame/internal/build/stepparse"
 	"github.com/kassybas/tame/internal/helpers"
 	"github.com/kassybas/tame/internal/keywords"
 	"github.com/kassybas/tame/internal/step"
-	"github.com/kassybas/tame/internal/stepbuilder"
 	"github.com/kassybas/tame/internal/target"
 	"github.com/kassybas/tame/internal/tcontext"
 	"github.com/kassybas/tame/schema"
@@ -27,7 +27,7 @@ func ParseTeafile(tf schema.Tamefile, ctx *tcontext.Context) (map[string]target.
 }
 
 func buildStep(rawStep map[string]interface{}) (step.Step, error) {
-	stepDef, err := decode.ParseStepSchema(rawStep)
+	stepDef, err := stepparse.ParseStepSchema(rawStep)
 	if err != nil {
 		return nil, err
 	}

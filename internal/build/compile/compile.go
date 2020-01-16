@@ -1,13 +1,13 @@
-package lex
+package compile
 
 import (
 	"os"
 
 	"github.com/kassybas/tame/schema"
 
+	"github.com/kassybas/tame/internal/build/targetparse"
 	"github.com/kassybas/tame/internal/helpers"
 	"github.com/kassybas/tame/internal/helpscreen"
-	"github.com/kassybas/tame/internal/build/parse"
 	"github.com/kassybas/tame/internal/step"
 	"github.com/kassybas/tame/internal/step/callstep"
 	"github.com/kassybas/tame/internal/target"
@@ -56,10 +56,10 @@ func createDependencyGraph(targets map[string]target.Target, targetName string, 
 	return rootStep, err
 }
 
-// Analyse creates the internal representation
-func Analyse(tf schema.Tamefile, targetName string, cliVarArgs []string, ctx *tcontext.Context) (step.Step, error) {
+// Compile creates the internal representation
+func Compile(tf schema.Tamefile, targetName string, cliVarArgs []string, ctx *tcontext.Context) (step.Step, error) {
 
-	parsedTargets, err := parse.ParseTeafile(tf, ctx)
+	parsedTargets, err := targetparse.ParseTeafile(tf, ctx)
 	if err != nil {
 		return nil, err
 	}

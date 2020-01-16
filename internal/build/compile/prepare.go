@@ -1,4 +1,4 @@
-package lex
+package compile
 
 import (
 	"fmt"
@@ -9,7 +9,7 @@ import (
 	"github.com/kassybas/tame/schema"
 
 	"github.com/kassybas/tame/internal/keywords"
-	"github.com/kassybas/tame/internal/loader"
+	"github.com/kassybas/tame/internal/build/loader"
 	"github.com/kassybas/tame/internal/step"
 	"github.com/kassybas/tame/internal/tcontext"
 	"github.com/kassybas/tame/internal/tvar"
@@ -80,7 +80,7 @@ func PrepareStep(path, targetName string, targetArgs []string) (step.Step, tcont
 	if err != nil {
 		return nil, tcontext.Context{}, fmt.Errorf("error while creating context:\n\t%s", err.Error())
 	}
-	root, err := Analyse(tf, targetName, targetArgs, &ctx)
+	root, err := Compile(tf, targetName, targetArgs, &ctx)
 	if err != nil {
 		logrus.Fatal(err)
 	}
