@@ -41,7 +41,3 @@ func (s *BaseStep) GetIterable() interface{} {
 func (s *BaseStep) GetName() string {
 	return s.name
 }
-
-func (s *BaseStep) GetCondition() string {
-	return s.ifCondition
-}

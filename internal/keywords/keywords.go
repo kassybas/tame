@@ -1,16 +1,12 @@
 package keywords
 
 var (
-	Opts = "opts"
+	PrefixReference = "$"
 
-	PrefixReference   = "$"
-	PrefixTameKeyword = "."
-
-	OptsSeparator = " "
-	OptSilent     = "silent"
-	OptCanFail    = "allowed-fail"
-	OptAsync      = "async"
-	OptsNotSet    = "not-set"
+	OptSilent  = "silent"
+	OptCanFail = "allowed-fail"
+	OptAsync   = "async"
+	OptsNotSet = "not-set"
 
 	PossibleOpts = []string{
 		OptCanFail, OptSilent, OptAsync,
@@ -24,13 +20,5 @@ var (
 	CliArgSeparator        = "="
 	GlobalDefaultVarSuffix = "?"
 
-	StepShell  = "sh"
-	StepReturn = "return"
-
-	StepFor         = "for"
-	StepForIterable = "in"
-	StepForIterator = "$"
-
-	StepCallResult = "$"
-	ShellOutResult = "$"
+	StepIf = "if"
 )

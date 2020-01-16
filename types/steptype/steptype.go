@@ -10,7 +10,7 @@ const (
 	Return
 	Expr
 	Wait
-	Dump
+	If
 )
 
 func (t Steptype) ToStr() string {
@@ -29,8 +29,8 @@ func (t Steptype) ToStr() string {
 		return "expr"
 	case Wait:
 		return "wait"
-	case Dump:
-		return "Dump"
+	case If:
+		return "if"
 	default:
 		panic("internal error: non-steptype steptype")
 	}

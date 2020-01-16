@@ -17,7 +17,6 @@ type Step interface {
 	RunStep(tcontext.Context, *vartable.VarTable) StepStatus
 	GetIteratorName() string
 	GetIterable() interface{}
-	GetCondition() string
 }
 
 type StepStatus struct {
