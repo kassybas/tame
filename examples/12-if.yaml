@@ -20,32 +20,43 @@ targets:
   IsUser:
     args: {$userName}
     run:
-      - if: $userName in $users
-        return: true
+      - if $userName in $users:
+        - return: true
       - return: false
 
   IsItOk:
-    args: {$status}
+    args: {$status: "ok"}
     run:
+    - sh: echo $status
+    - sh: echo $ok
     - if $status == $ok:
-      sh: echo "all is well"
+        - sh: echo "all is well"
 
   ExampleIf:
     run:
-    - IsItOk: {$status: "ok"} ## -> prints
-    - IsItOk: {$status: "foo"} ## -> finishes empty
+    # - IsItOk: {$status: "ok"} ## -> prints
+    # - IsItOk: {$status: "foo"} ## -> finishes empty
     - $userName: "John"
-    - if expression:
-        - sh: echo hey
+    - sh: echo user is $userName
+    - if $userName == "John":
+        - sh: echo True $userName
+          $: $result
+        - sh: echo Result is "$result"
+        - $HELLO: "tourist"
+        - $userName: "touristJohn"
       else:
-        - sh: alright
+        - sh: echo False $userName
+    - sh: echo RESULT WAS "$result"
+    - sh: echo HELLO $HELLO
+    - sh: echo HELLO $userName
 
 
-    - IsUser: {$userName: $userName} ## -> finishes returns false
-      $: $isUser
-    - expr: $isUser ? "member":"non-member"
-      $: $res
-    - sh: echo $res
+
+    # - IsUser: {$userName: $userName} ## -> finishes returns false
+    #   $: $isUser
+    # - expr: $isUser ? "member":"non-member"
+    #   $: $res
+    # - sh: echo $res
 
 
   ExampleExpr:

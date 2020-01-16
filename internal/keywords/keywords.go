@@ -20,5 +20,6 @@ var (
 	CliArgSeparator        = "="
 	GlobalDefaultVarSuffix = "?"
 
-	StepIf = "if"
+	IfStepPrefix = "if "
+	IfStepElse   = "else"
 )

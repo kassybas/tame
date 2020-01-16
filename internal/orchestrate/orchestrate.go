@@ -1,7 +1,6 @@
 package orchestrate
 
 import (
-	"fmt"
 	"os"
 
 	"github.com/kassybas/tame/internal/lex"
@@ -21,11 +20,11 @@ func Make(path, targetName string, targetArgs []string) {
 	// TODO: put cli args in here
 	status := root.RunStep(ctx, vartable.NewVarTable())
 	if status.Err != nil {
-		logrus.Fatal("error:\n\t", status.Err.Error())
+		logrus.Errorf(status.Err.Error())
 	}
 	// pass through the status code
 	if status.Stdstatus != 0 {
-		fmt.Fprintf(os.Stdout, "tame: *** [%s] Error %d\n", targetName, status.Stdstatus)
+		logrus.Errorf("tame: *** [%s] Error %d\n", targetName, status.Stdstatus)
 	}
 
 	os.Exit(status.Stdstatus)

@@ -1,5 +1,7 @@
 package schema
 
+import "github.com/kassybas/tame/types/steptype"
+
 type Tamefile struct {
 	TameVersion string                  `yaml:"tameVersion,omitempty"`
 	Includes    []IncludeSchema         `yaml:"include,omitempty"`
@@ -41,7 +43,6 @@ type ForLoopSchema struct {
 // MergedStepSchema is the base format of step
 type MergedStepSchema struct {
 	ForLoop          ForLoopSchema  `mapstructure:"for"`
-	Condition        *string        `mapstructure:"if"`
 	Return           *[]interface{} `mapstructure:"return"` // string is allowed due to weak decode
 	Opts             *[]string      `mapstructure:"opts"`   // string is allowed due to weak decode
 	ResultContainers *[]string      `mapstructure:"$"`      // string is allowed due to weak decode
@@ -49,9 +50,13 @@ type MergedStepSchema struct {
 	Expr             *string        `mapstructure:"expr"`
 	Wait             *interface{}   `mapstructure:"wait"`
 
-	// Name is a dynamic key can be either (but only one of):
-	CalledTargetName    *string                `mapstructure:"-"` // loaded dynamically since the key is the called target
-	CallArgumentsPassed map[string]interface{} `mapstructure:"-"` // loaded dynamically since the key is the called target so arguments are unkown
-	VarName             *string                `mapstructure:"-"` // loaded dynamically since the key is the variable name
-	VarValue            interface{}            `mapstructure:"-"` // loaded dynamically since the key is the variable name so value is unknown
+	// loaded dynamically since the yaml key defines the step type or step data
+	IfCondition         *string                `mapstructure:"-"` // if IfCondition
+	IfSteps             []MergedStepSchema     `mapstructure:"-"` // if IfCondition: IfSteps
+	ElseSteps           []MergedStepSchema     `mapstructure:"-"` // else: ElseSteps
+	CalledTargetName    *string                `mapstructure:"-"` // CalledTargetName: {}
+	CallArgumentsPassed map[string]interface{} `mapstructure:"-"` // CalledTargetName: CallArgumentsPassed
+	VarName             *string                `mapstructure:"-"` // $VarName
+	VarValue            interface{}            `mapstructure:"-"` // $VarName: VarValue
+	StepType            steptype.Steptype      `mapstructure:"-"` // type of step
 }

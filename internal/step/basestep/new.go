@@ -28,10 +28,6 @@ func NewBaseStep(stepDef schema.MergedStepSchema, stepType steptype.Steptype, na
 	if stepDef.ForLoop.Iterable != "" {
 		newStep.iterable = stepDef.ForLoop.Iterable
 	}
-	// If condition
-	if stepDef.Condition != nil {
-		newStep.ifCondition = *stepDef.Condition
-	}
 	newStep.name = name
 	return newStep, err
 }

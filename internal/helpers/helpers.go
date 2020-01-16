@@ -18,6 +18,23 @@ func GetKeyValueFromEnvString(envStr string) (string, string, error) {
 	return k, v, nil
 }
 
+func ConvertInterToMapStrInter(inter interface{}) (map[string]interface{}, error) {
+	res := make(map[string]interface{})
+	mInter, ok := inter.(map[interface{}]interface{})
+	if !ok {
+		return nil, fmt.Errorf("converting non-map to map[string]: %v", inter)
+	}
+	for key, value := range mInter {
+		switch key := key.(type) {
+		case string:
+			res[key] = value
+		default:
+			return nil, fmt.Errorf("non-string key found in map: %v", key)
+		}
+	}
+	return res, nil
+}
+
 func BuildOpts(optsDef []string) (opts.ExecutionOpts, error) {
 	opts := opts.ExecutionOpts{}
 	for _, opt := range optsDef {
