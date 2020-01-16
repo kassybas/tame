@@ -44,6 +44,8 @@ targets:
         - sh: echo Result is "$result"
         - $HELLO: "tourist"
         - $userName: "touristJohn"
+        - if $userName == "touristJohn":
+          - sh: echo Embedded if
       else:
         - sh: echo False $userName
     - sh: echo RESULT WAS "$result"

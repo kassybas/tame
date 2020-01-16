@@ -7,7 +7,7 @@ import (
 
 	"github.com/kassybas/tame/internal/helpers"
 	"github.com/kassybas/tame/internal/helpscreen"
-	"github.com/kassybas/tame/internal/parse"
+	"github.com/kassybas/tame/internal/build/parse"
 	"github.com/kassybas/tame/internal/step"
 	"github.com/kassybas/tame/internal/step/callstep"
 	"github.com/kassybas/tame/internal/target"
