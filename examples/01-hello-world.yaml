@@ -10,7 +10,9 @@ $foo: "my global value"
 Hello: echo "hello world"
 
 # tame -f examples/01-hello-world.yaml HelloGlobal
-HelloGlobal: echo "hello $foo"
+# global variables are added to the environment variable of the script
+# this differs from Makefiles since there the expansion of values happens before script execution
+HelloGlobal: echo "hello ${foo}"
 
 # tame -f examples/01-hello-world.yaml HelloLocal
 # more comples targets contain multople steps under the run keyword
@@ -22,6 +24,8 @@ HelloLocal:
 # tame -f examples/01-hello-world.yaml HelloArg
 # arguments can be added with default value
 # all arguments are named arguments
+# default value can be set to null, requiring it to be passed during the call
+# in single line yaml syntax, null can be omitted, eg: args: {$name}
 HelloArg:
   args: {$name: "my default name"}
   run:
