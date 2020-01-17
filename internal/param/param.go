@@ -13,18 +13,20 @@ type Param struct {
 }
 
 func ResolveParams(vt *vartable.VarTable, params []Param) error {
-	newVt := vartable.NewVarTable()
 	for _, p := range params {
 		if vt.Exists(p.Name) {
 			val, err := vt.GetVar(p.Name)
 			if err != nil {
 				return err
 			}
-			newVt.Add(p.Name, val.Value())
+			vt.Add(p.Name, val.Value())
 			continue
 		}
 		if p.HasDefault {
-			newVt.Add(p.Name, p.DefaultValue)
+			err := vt.Add(p.Name, p.DefaultValue)
+			if err != nil {
+				return fmt.Errorf("error adding default parameter: %s\n\t", p.Name, err.Error())
+			}
 			continue
 		}
 		return fmt.Errorf("parameter without value or default value: %s", p.Name)

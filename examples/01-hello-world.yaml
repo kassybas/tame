@@ -29,11 +29,12 @@ HelloLocal:
 HelloArg:
   args: {$name: "my default name"}
   run:
-  - sh: echo "hello $name"
+  - sh: echo "hello argument $name"
 
 # tame -f examples/01-hello-world.yaml HelloCall
 # calling other targets in steps is possible
 HelloCall:
   run:
   - Hello: {} # no arguments
-  - HelloArg: {$name: "passing an argument"}  # one named argument
+  # - HelloArg: {$name: "passing an argument"}  # one named argument
+  - HelloArg: {}  # one named argument
