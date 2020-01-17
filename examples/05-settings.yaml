@@ -1,4 +1,5 @@
 
+# settings is a reserved word to define settings and change tame behaviour
 settings:
   # shell: scripts defined in target.run.[].sh will execute in defined shell (default: sh)
   shell: bash
@@ -6,8 +7,8 @@ settings:
   # init: execute before each script. it will execute in the same shell process (default: empty)
   init: "set -ex"
 
-  # shieldEnv: do not expose environment variables to targets
-  # eg. `$ HELLO=world tame foo;` -> variable HELLO will not be set in target foo (or any target) if shieldEnv is true
+  # shieldEnv: do not expose tame cli's environment's variables to targets
+  # eg. `$ HELLO=world tame foo` -> variable HELLO will not be set in target foo (or any target) if shieldEnv is true
   shieldEnv: false
 
   # when maps are flattened and injected to a shell step as environment variable, the fields of the map are separated by the configured string
@@ -16,14 +17,12 @@ settings:
   shellFieldSeparator: "-"
 
 
-targets:
+GetShell:
+  run:
+  - sh: echo $0
 
-  GetShell:
-    run:
-    - sh: echo $0
-
-  EnvVars:
-    run:
-    - sh: env
+EnvVars:
+  run:
+  - sh: env
 
 

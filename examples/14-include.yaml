@@ -4,6 +4,8 @@ settings:
 globals:
   $bar: "value of bar"
 
+# include is a reserved word
+# including a file allows to call targets in other tamefiles
 include:
   # path is always relative to the current file
   - path: "01-hello-world.yaml"
@@ -12,17 +14,16 @@ include:
     as: foo
 
 
-targets:
-  CallOtherFile:
-    run:
-    - sh: echo "starting"
-    - helloWorld.Hello: {}
-    - foo.Caller: {}
-      =: $result
-    - foo.Log: {$msg: "Log this for me"}
-    - sh: echo "received $result"
+CallOtherFile:
+  run:
+  - sh: echo "starting"
+  - helloWorld.Hello: {}
+  - foo.Caller: {}
+    =: $result
+  - foo.Log: {$msg: "Log this for me"}
+  - sh: echo "received $result"
 
-  TestContext:
-    run:
-    - sh: echo "Shell is $0"
-    - foo.CheckGlobal: {}
+TestContext:
+  run:
+  - sh: echo "Shell is $0"
+  - foo.CheckGlobal: {}

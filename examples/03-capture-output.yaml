@@ -1,25 +1,24 @@
 
-targets:
 # tame -f examples/03-capture-output.yaml ShellOut
-  ShellOut:
-    run:
-    - sh: echo "hello world"
-      =: $welcome  # save stdout to $welcome variable
-    - sh: echo "welcome ${welcome}"
+ShellOut:
+  run:
+  - sh: echo "hello world"
+    =: $welcome  # save stdout to $welcome variable
+  - sh: echo "welcome ${welcome}"
 
 # tame -f examples/03-capture-output.yaml ShellErr
-  ShellErr:
-    run:
-    - =: [null, $welcome]  # save stderr to $welcome variable, stdout is ignored using null yaml value
-      sh: echo "hello std error" >&2  # redirect output to stderr
-    - sh: echo "welcome ${welcome}"
+ShellErr:
+  run:
+  - sh: echo "hello std error" >&2  # redirect output to stderr
+    =: [null, $welcome]  # save stderr to $welcome variable, stdout is ignored using null yaml value
+  - sh: echo "welcome ${welcome}"
 
 # tame -f examples/03-capture-output.yaml ShellStatus
-  ShellStatus:
-    run:
-    - =: [null, null, $exit_code]  # save return code to $exit_code (stdout and stderr is ignored using null yaml value)
-      sh: exit 42
-      opts: allowed-fail   # allowing failure because exit status 42 would halt execution by default
-    - sh: echo "the previous process exited with ${exit_code}"
+ShellStatus:
+  run:
+  - sh: exit 42
+    =: [null, null, $exit_code]  # save return code to $exit_code (stdout and stderr is ignored using null yaml value)
+    opts: allowed-fail   # allowing failure because exit status 42 would halt execution by default
+  - sh: echo "the previous process exited with ${exit_code}"
 
 

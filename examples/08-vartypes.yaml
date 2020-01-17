@@ -1,22 +1,20 @@
 settings:
   shieldEnv: true
 
-globals:
-  $config:
-    build: "foo"
+$config:
+  build: "foo"
 
-targets:
-  TestVar:
-    run:
-    - sh: echo "config is ${config_build}" 
-    - ReturnMap: {}
-      =: date
-    - sh: echo "${date_day}"
+TestVar:
+  run:
+  - sh: echo "config is ${config_build}"
+  - ReturnMap: {}
+    =: date
+  - sh: echo "${date_day}"
 
-  ReturnMap:
-    run:
-    - $mymap:
-        date:
-          month: september
-          day: 22
-    - return: $mymap.date
+ReturnMap:
+  run:
+  - $mymap:
+      date:
+        month: september
+        day: 22
+  - return: $mymap.date

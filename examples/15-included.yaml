@@ -2,31 +2,28 @@ settings:
   shieldEnv: true
   shell: /bin/sh
 
-globals:
-  $foo: "value of foo"
+$foo: "value of foo"
 
-targets:
+Caller:
+  run:
+  - sh: echo "i will call a different target"
+  - called: {}
 
-  Caller:
-    run:
-    - sh: echo "i will call a different target"
-    - called: {}
+Log:
+  args: {$msg: "message"}
+  run:
+  - sh: date "+%T"
+    =: $timestamp
+    opts: silent
+  - sh: printf "[%s] %s\n" "${timestamp}" "${msg}"
 
-  Log:
-    args: {$msg: "message"}
-    run:
-    - sh: date "+%T"
-      =: $timestamp
-      opts: silent
-    - sh: printf "[%s] %s\n" "${timestamp}" "${msg}"
+called:
+  run:
+  - sh: echo "i was Called"
+    =: $result
+  - return: $result
 
-  called:
-    run:
-    - sh: echo "i was Called"
-      =: $result
-    - return: $result
-
-  CheckGlobal:
-    run:
-    - sh: echo Shell is $0
-    - sh: echo GLOBAL is $foo
+CheckGlobal:
+  run:
+  - sh: echo Shell is $0
+  - sh: echo GLOBAL is $foo

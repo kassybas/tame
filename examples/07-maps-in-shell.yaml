@@ -1,12 +1,10 @@
 settings:
   shellFieldSeparator: "__"  # overwrite default "_" field separator with double: "__"
 
-globals:
-  $config:
-    linux: "enabled"  # these nested variable values can be accessed via "." in Tame context
-    mac: "disabled"   #   and the cofnigured shellFieldSeparator in a shell context
+$config:
+  linux: "enabled"  # these nested variable values can be accessed via "." in Tame context
+  mac: "disabled"   #   and the cofnigured shellFieldSeparator in a shell context
 
-targets:
-  FieldSepExample:
-    run:
-    - sh: echo "config is ${config__linux}" # use "__" as separator in the flattened map variable name
+FieldSepExample:
+  run:
+  - sh: echo "config is ${config__linux}" # use "__" as separator in the flattened map variable name

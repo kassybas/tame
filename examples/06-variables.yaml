@@ -2,45 +2,43 @@
 settings:
   shell: /bin/bash
 
-globals:
-  $HOME?: "/tmp" # question mark (?:) enables overwriting of globals with environment variables
-  $my_string: "hello world"
-  $my_int: 42
-  $user:
-    name: John
-    age: 22
-    address:
-      city: London
-      street: Main street
-
-targets:
-
-  PrintUser:
-    run:
-    - sh: |
-        echo "${user_name} is ${user_age} years old. Lives in ${user_address_city}"  # maps fields are separated by `_` in shell context which should configurable sooner or later
-
-  TestSilence:
-    run:
-    - sh: echo "YOYOYOYOYO"
-      opts: silent
-      =: $MSG
-    - sh: echo MSG:"${MSG}"
+$HOME?: "/tmp" # question mark (?:) enables overwriting of globals with environment variables
+$my_string: "hello world"
+$my_int: 42
+$user:
+  name: John
+  age: 22
+  address:
+    city: London
+    street: Main street
 
 
-  BuildAll:
-    run:
-    - $platforms:
-        darwin:
-          bin_path: "bin/bin_darwin"
-          flags: "-cdsw"
-        linux:
-          bin_path: "bin/bin_linux"
-          flags: "-cdsw"
-    - Build: {$config: $platforms.darwin}   # maps fields are separated by `.` in tame context
-    - Build: {$config: $platforms.linux}
+PrintUser:
+  run:
+  - sh: |
+      echo "${user_name} is ${user_age} years old. Lives in ${user_address_city}"  # maps fields are separated by `_` in shell context which should configurable sooner or later
 
-  Build:
-    args: { $config }
-    run:
-    - sh: echo "I build to $config_bin_path with flags $config_flags"
+TestSilence:
+  run:
+  - sh: echo "YOYOYOYOYO"
+    opts: silent
+    =: $MSG
+  - sh: echo MSG:"${MSG}"
+
+
+BuildAll:
+  run:
+  - $platforms:
+      darwin:
+        bin_path: "bin/bin_darwin"
+        flags: "-cdsw"
+      linux:
+        bin_path: "bin/bin_linux"
+        flags: "-cdsw"
+  - Build: {$config: $platforms.darwin}   # maps fields are separated by `.` in tame context
+  - Build: {$config: $platforms.linux}
+
+Build:
+  args: { $config }
+  run:
+  - sh: echo "I build to $config_bin_path with flags $config_flags"

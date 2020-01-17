@@ -1,38 +1,36 @@
 settings:
   shieldEnv: true
 
-targets:
+CreateMap:
+  run:
+  - $config:
+      linux:
+        arch: amd64
+        os: linux
+      mac:
+        arch: amd64
+        os: darwin
+      listy:
+      - one
+      - two
+      - three
+  - return: $config
 
-  CreateMap:
-    run:
-    - $config:
-        linux:
-          arch: amd64
-          os: linux
-        mac:
-          arch: amd64
-          os: darwin
-        listy:
-        - one
-        - two
-        - three
-    - return: $config
+Build:
+  run:
+  - CreateMap: {}
+    =: $result
+  - sh: env
 
-  Build:
-    run:
-    - CreateMap: {}
-      =: $result
-    - sh: env
+GetPlatformConfig:
+  args: {$platform}
+  run:
+  - CreateMap: {}
+    =: $config
+  - return: $config.$platform   # you can access the fields dynamically
 
-  GetPlatformConfig:
-    args: {$platform}
-    run:
-    - CreateMap: {}
-      =: $config
-    - return: $config.$platform   # you can access the fields dynamically
-
-  PrintVars:
-    run:
-    - GetPlatformConfig: {$platform: "mac"}
-      =: $macConfig
-    - sh: env
+PrintVars:
+  run:
+  - GetPlatformConfig: {$platform: "mac"}
+    =: $macConfig
+  - sh: env

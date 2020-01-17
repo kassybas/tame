@@ -18,6 +18,19 @@ func GetKeyValueFromEnvString(envStr string) (string, string, error) {
 	return k, v, nil
 }
 
+func IsPublic(targetName string) bool {
+	if len(targetName) == 0 {
+		// helpscreen call -> TODO: fix this
+		return true
+	}
+	firstChar := string(targetName[0])
+	// check if first character is lowercase
+	if strings.ToLower(firstChar) == firstChar {
+		return false
+	}
+	return true
+}
+
 func ConvertInterToMapStrInter(inter interface{}) (map[string]interface{}, error) {
 	res := make(map[string]interface{})
 	mInter, ok := inter.(map[interface{}]interface{})

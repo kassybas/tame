@@ -1,13 +1,12 @@
 settings:
   shieldEnv: true
 
-targets:
-  IndexAList:
-    run:
-    - $myList:
-      - darkness
-      - my old
-      - friend
-    - $i: 2
-    - $line: $myList[$i]
-    - sh: echo "line is '${line}'"
+IndexAList:
+  run:
+  - $myList:
+    - darkness
+    - my old
+    - friend
+  - $i: 2
+  - $line: $myList[$i]
+  - sh: echo "line is '${line}'"

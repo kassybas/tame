@@ -3,13 +3,13 @@ package compile
 import (
 	"fmt"
 	"path/filepath"
-	"strings"
 
 	"github.com/kassybas/tame/schema"
 
 	"github.com/kassybas/tame/internal/build/loader"
 	"github.com/kassybas/tame/internal/build/targetparse"
 	"github.com/kassybas/tame/internal/build/varparse"
+	"github.com/kassybas/tame/internal/helpers"
 	"github.com/kassybas/tame/internal/step"
 	"github.com/kassybas/tame/internal/tcontext"
 	"github.com/kassybas/tame/internal/tvar"
@@ -31,15 +31,6 @@ func convertIncludesToRelativePath(path string, includes []schema.IncludeSchema)
 	return includes
 }
 
-func isPublic(targetName string) bool {
-	firstChar := string(targetName[0])
-	// check if first character is lowercase
-	if strings.ToLower(firstChar) == firstChar {
-		return false
-	}
-	return true
-}
-
 func PrepareStep(path, targetName string, targetArgs []string) (step.Step, tcontext.Context, error) {
 	// load static keys
 	tf, dynamicKeys, err := loader.Load(path)
@@ -57,9 +48,8 @@ func PrepareStep(path, targetName string, targetArgs []string) (step.Step, tcont
 	if len(dynamicKeys) != 0 {
 		return nil, tcontext.Context{}, fmt.Errorf("unknown keys in file: %s\n\t%s", path, err.Error())
 	}
-
 	tf.Includes = convertIncludesToRelativePath(path, tf.Includes)
-	if !isPublic(targetName) {
+	if !helpers.IsPublic(targetName) {
 		return nil, tcontext.Context{}, fmt.Errorf("calling non-public target: %s\npublic targets must start with uppercase letter", targetName)
 	}
 	globals, err := varparse.EvaluateGlobals(tf.Globals)

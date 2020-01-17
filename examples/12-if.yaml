@@ -3,9 +3,8 @@
 settings:
   shieldEnv: true
 
-globals:
-  $ok: "ok"
-  $users:
+$ok: "ok"
+$users:
   - Arthur
   - Dent
   - Doctor
@@ -16,62 +15,61 @@ globals:
 # Expressions in if statements use antonmedv/expr library
 # See Docs: https://github.com/antonmedv/expr/blob/master/docs/Language-Definition.md
 
-targets:
-  IsUser:
-    args: {$userName}
-    run:
-      - if $userName in $users:
-        - return: true
-      - return: false
+IsUser:
+  args: {$userName}
+  run:
+    - if $userName in $users:
+      - return: true
+    - return: false
 
-  IsItOk:
-    args: {$status: "ok"}
-    run:
-    - sh: echo status $status
-    - sh: echo ok $ok
-    - if $status == $ok:
-        - sh: echo "all is well"
+IsItOk:
+  args: {$status: "ok"}
+  run:
+  - sh: echo status $status
+  - sh: echo ok $ok
+  - if $status == $ok:
+      - sh: echo "all is well"
 
-  ExampleIf:
-    run:
-    - if true:
-      - IsItOk: {$status: "ok"} ## -> prints
+ExampleIf:
+  run:
+  - if true:
+    - IsItOk: {$status: "ok"} ## -> prints
 
-    # - IsItOk: {$status: "foo"} ## -> finishes empty
-    # - $userName: "John"
-    # - sh: echo user is $userName
-    # - if $userName == "John":
-    #     - sh: echo True $userName
-    #       =: $result
-    #     - sh: echo Result is "$result"
-    #     - $HELLO: "tourist"
-    #     - $userName: "touristJohn"
-    #     - if $userName == "touristJohn":
-    #       - sh: echo Embedded if
-    #   else:
-    #     - sh: echo False $userName
-    # - sh: echo RESULT WAS "$result"
-    # - sh: echo HELLO $HELLO
-    # - sh: echo HELLO $userName
-
+  - IsItOk: {$status: "foo"} ## -> finishes empty
+  - $userName: "John"
+  - sh: echo user is $userName
+  - if $userName == "John":
+      - sh: echo True $userName
+        =: $result
+      - sh: echo Result is "$result"
+      - $HELLO: "tourist"
+      - $userName: "touristJohn"
+      - if $userName == "touristJohn":
+        - sh: echo Embedded if
+    else:
+      - sh: echo False $userName
+  - sh: echo RESULT WAS "$result"
+  - sh: echo HELLO $HELLO
+  - sh: echo HELLO $userName
 
 
-    # - IsUser: {$userName: $userName} ## -> finishes returns false
-    #   =: $isUser
-    # - expr: $isUser ? "member":"non-member"
-    #   =: $res
-    # - sh: echo $res
+
+  - IsUser: {$userName: $userName} ## -> finishes returns false
+    =: $isUser
+  - expr: $isUser ? "member":"non-member"
+    =: $res
+  - sh: echo $res
 
 
-  # ExampleExpr:
-  #   run:
-  #   - $userMap: {}
-  #   - $testUsers: ["Kate", "Pierre", "Arthur"]
-  #   - for: {$user: $testUsers}
-  #     do:
-  #     - expr: $user in $users
-  #       =: $userMap.$user
-  #   - sh: env
+ExampleExpr:
+  run:
+  - $userMap: {}
+  - $testUsers: ["Kate", "Pierre", "Arthur"]
+  - for: {$user: $testUsers}
+    do:
+    - expr: $user in $users
+      =: $userMap.$user
+  - sh: env
 
 
 
