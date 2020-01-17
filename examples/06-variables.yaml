@@ -23,7 +23,7 @@ targets:
     run:
     - sh: echo "YOYOYOYOYO"
       opts: silent
-      $: $MSG
+      =: $MSG
     - sh: echo MSG:"${MSG}"
 
 

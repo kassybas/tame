@@ -42,7 +42,7 @@ targets:
     # - sh: echo user is $userName
     # - if $userName == "John":
     #     - sh: echo True $userName
-    #       $: $result
+    #       =: $result
     #     - sh: echo Result is "$result"
     #     - $HELLO: "tourist"
     #     - $userName: "touristJohn"
@@ -57,9 +57,9 @@ targets:
 
 
     # - IsUser: {$userName: $userName} ## -> finishes returns false
-    #   $: $isUser
+    #   =: $isUser
     # - expr: $isUser ? "member":"non-member"
-    #   $: $res
+    #   =: $res
     # - sh: echo $res
 
 
@@ -70,7 +70,7 @@ targets:
   #   - for: {$user: $testUsers}
   #     do:
   #     - expr: $user in $users
-  #       $: $userMap.$user
+  #       =: $userMap.$user
   #   - sh: env
 
 

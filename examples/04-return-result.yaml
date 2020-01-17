@@ -5,23 +5,23 @@ targets:
     args: { $format: "+%m-%d-%Y"} # setting a default argument
     run:
     - sh: date "${format}"
-      $: $today  # save stdout to $welcome variable
+      =: $today  # save stdout to $welcome variable
     - sh: echo "done"
     - return: $today  # return the value of variable
 
   User:
     run:
     - sh: whoami
-      $: $user
+      =: $user
     - return: $user
 
   WelcomeToday:
     run:
-    - $: $day_of_week
+    - =: $day_of_week
       Today: {$format: "+%a"}   # overwriting default $format argument
       opts: silent    # silencing all steps in today target
 
-    - $: $user
+    - =: $user
       User: {}   # call is followed by empty map, because no arguments needed
       opts: silent
     - sh: echo "Welcome ${user}! Today is ${day_of_week}"

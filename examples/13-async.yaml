@@ -62,7 +62,7 @@ targets:
         do:
         - sh: echo "Hi ${name}!" && sleep 1
           opts: async
-          $: $result
+          =: $result
         - sh: echo "WE WAIT"
         - wait: {}  # wait for all async jobs to finish, otherwise $result variables would be empty
         - sh: echo result was $result
@@ -83,7 +83,7 @@ targets:
     run:
       - sh: for i in {1..4}; do echo "first job...$i"; sleep 1; done
         opts: async
-        $: $result
+        =: $result
       - sh: echo "I will run"
       - wait: {} # wait waits for all async steps in the target to finish
       - return: $result # return does not wait for async steps to finish, so $result would be unset

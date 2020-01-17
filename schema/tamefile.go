@@ -41,7 +41,7 @@ type MergedStepSchema struct {
 	ForRawSteps      []interface{}           `mapstructure:"do"`
 	Return           *[]interface{}          `mapstructure:"return"` // single interface is allowed due to weak decode
 	Opts             *[]string               `mapstructure:"opts"`   // string is allowed due to weak decode
-	ResultContainers *[]string               `mapstructure:"$"`      // string is allowed due to weak decode
+	ResultContainers *[]string               `mapstructure:"="`      // string is allowed due to weak decode
 	Script           *[]string               `mapstructure:"sh"`     // string is allowed due to weak decode
 	Expr             *string                 `mapstructure:"expr"`
 	Wait             *interface{}            `mapstructure:"wait"`

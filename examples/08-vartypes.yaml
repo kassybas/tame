@@ -10,7 +10,7 @@ targets:
     run:
     - sh: echo "config is ${config_build}" 
     - ReturnMap: {}
-      $: date
+      =: date
     - sh: echo "${date_day}"
 
   ReturnMap:

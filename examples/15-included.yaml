@@ -16,14 +16,14 @@ targets:
     args: {$msg: "message"}
     run:
     - sh: date "+%T"
-      $: $timestamp
+      =: $timestamp
       opts: silent
     - sh: printf "[%s] %s\n" "${timestamp}" "${msg}"
 
   called:
     run:
     - sh: echo "i was Called"
-      $: $result
+      =: $result
     - return: $result
 
   CheckGlobal:
