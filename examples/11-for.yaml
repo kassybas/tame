@@ -28,12 +28,13 @@ targets:
 
   Builder:
     run:
-    # - for: {$platform: $config}
-    #   do:
-    #   - BuildBin: {$os: $config.$platform.os, $arch: $config.$platform.arch}
-    - for: {$tag: $tags}
+    - for: {$platform: $config}
       do:
-      - DockerTag: {$tag: $tag}
+      - BuildBin: {$os: $config.$platform.os, $arch: $config.$platform.arch}
+
+    # - for: {$tag: $tags}
+    #   do:
+    #   - DockerTag: {$tag: $tag}
 
   DockerTag:
     args: {$tag: "YOLO"}

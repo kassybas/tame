@@ -44,12 +44,12 @@ func (s *CallStep) IsCalledTargetSet() bool {
 }
 
 func (s *CallStep) RunStep(ctx tcontext.Context, vt *vartable.VarTable) step.StepStatus {
-	err := validateArgs(s.arguments, s.calledTarget)
+	newVt, err := createArgsVartable(s.arguments, s.calledTarget, vt)
 	if err != nil {
 		return step.StepStatus{Err: fmt.Errorf("invalid arguments in target call:\n\t%s", err.Error())}
 	}
 
-	newVt, err := param.ResolveParams(vt, s.calledTarget.Params)
+	err = param.ResolveParams(newVt, s.calledTarget.Params)
 	if err != nil {
 		return step.StepStatus{Err: fmt.Errorf("could not resolve parameters in target call: %s\n\t%s", s.calledTargetName, err)}
 	}
@@ -60,16 +60,22 @@ func (s *CallStep) RunStep(ctx tcontext.Context, vt *vartable.VarTable) step.Ste
 	return status
 }
 
-func validateArgs(argDefs []tvar.TVariable, calledTarget target.Target) error {
+func createArgsVartable(argDefs []tvar.TVariable, calledTarget target.Target, vt *vartable.VarTable) (*vartable.VarTable, error) {
+	newVt := vartable.NewVarTable()
 	for _, arg := range argDefs {
-		if !calledTarget.IsParameter(arg.Name()) {
-			return fmt.Errorf("unknown parameter for target %s: '%s'", calledTarget.Name, arg.Name())
-		}
 		if arg.Value() == nil {
-			return fmt.Errorf("passing empty(null) argument for target %s: '%s: %v'", calledTarget.Name, arg.Name(), arg.Value())
+			return nil, fmt.Errorf("passing empty(null) argument for target is not allowed %s: '%s: %v'", calledTarget.Name, arg.Name(), arg.Value())
 		}
+		if !calledTarget.IsParameter(arg.Name()) {
+			return nil, fmt.Errorf("unknown parameter for target %s: '%s'", calledTarget.Name, arg.Name())
+		}
+		resolvedValue, err := vt.ResolveValue(arg.Value())
+		if err != nil {
+			return nil, fmt.Errorf("passed parameter value cannot be resolved: %s", arg.Value())
+		}
+		newVt.Add(arg.Name(), resolvedValue)
 	}
-	return nil
+	return newVt, nil
 }
 
 func (s *CallStep) SetCalledTarget(t interface{}) {
