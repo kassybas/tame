@@ -1,33 +1,35 @@
-globals:
-  $foo: "my global value"
-
+# variables start with $ sign
+$foo: "my global value"
 
 # Targets allow multiple steps, arguments, variables and returns
-targets:
-  # tame -f examples/01-hello-world.yaml Hello
-  Hello:
-    run:
-    - sh: echo "hello world"
+# targets can be set internal by starting them with lowercase letter
+# internal targets cannot be included from other file or called from cli
 
-  # tame -f examples/01-hello-world.yaml HelloGlobal
-  HelloGlobal:
-    run:
-    - sh: echo "hello $foo"
+# simple targets contain one script, it can be called with the following command
+# tame -f examples/01-hello-world.yaml Hello
+Hello: echo "hello world"
 
-  # tame -f examples/01-hello-world.yaml HelloLocal
-  HelloLocal:
-    run:
-    - $name: "john doe"
-    - sh: echo "hello $name"
+# tame -f examples/01-hello-world.yaml HelloGlobal
+HelloGlobal: echo "hello $foo"
 
-  # tame -f examples/01-hello-world.yaml HelloArg
-  HelloArg:
-    args: {$name: "my default name"}
-    run:
-    - sh: echo "hello $name"
+# tame -f examples/01-hello-world.yaml HelloLocal
+# more comples targets contain multople steps under the run keyword
+HelloLocal:
+  run:
+  - $name: "john doe"
+  - sh: echo "hello $name"
 
-  # tame -f examples/01-hello-world.yaml HelloCall
-  HelloCall:
-    run:
-    - Hello: {}
-    - HelloArg: {$name: "passing an argument"}
+# tame -f examples/01-hello-world.yaml HelloArg
+# arguments can be added with default value
+# all arguments are named arguments
+HelloArg:
+  args: {$name: "my default name"}
+  run:
+  - sh: echo "hello $name"
+
+# tame -f examples/01-hello-world.yaml HelloCall
+# calling other targets in steps is possible
+HelloCall:
+  run:
+  - Hello: {} # no arguments
+  - HelloArg: {$name: "passing an argument"}  # one named argument

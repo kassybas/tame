@@ -3,36 +3,35 @@ package schema
 import "github.com/kassybas/tame/types/steptype"
 
 type Tamefile struct {
-	TameVersion string                  `yaml:"tameVersion,omitempty"`
-	Includes    []IncludeSchema         `yaml:"include,omitempty"`
-	Loads       []string                `yaml:"load,omitempty"`
-	Sets        SettingsShema           `yaml:"settings,omitempty"`
-	Globals     map[string]interface{}  `yaml:"globals,omitempty"`
-	Targets     map[string]TargetSchema `yaml:"targets,omitempty"`
-	Commands    map[string]string       `yaml:"cmds,omitempty"`
+	TameVersion string                  `mapstructure:"tameVersion,omitempty"`
+	Includes    []IncludeSchema         `mapstructure:"include,omitempty"`
+	Loads       []string                `mapstructure:"load,omitempty"`
+	Sets        SettingsShema           `mapstructure:"settings,omitempty"`
+	Globals     map[string]interface{}  `mapstructure:"-,omitempty"`
+	Targets     map[string]TargetSchema `mapstructure:"-,omitempty"`
 
-	WorkDir        string            `yaml:"workDir,omitempty"`
-	DefaultEnvVars map[string]string `yaml:"defaults,omitempty"`
+	WorkDir        string            `mapstructure:"workDir,omitempty"`
+	DefaultEnvVars map[string]string `mapstructure:"defaults,omitempty"`
 }
 
 type IncludeSchema struct {
-	Path  string `yaml:"path,omitempty"`
-	Alias string `yaml:"as,omitempty"`
+	Path  string `mapstructure:"path,omitempty"`
+	Alias string `mapstructure:"as,omitempty"`
 }
 
 type TargetSchema struct {
-	ArgDefinition  map[string]interface{}   `yaml:"args,omitempty"`
-	StepDefinition []map[string]interface{} `yaml:"run,omitempty"`
-	OptsDefinition []string                 `yaml:"opts,omitempty"`
-	Summary        string                   `yaml:"summary,omitempty"`
+	ArgDefinition  map[string]interface{}   `mapstructure:"args,omitempty"`
+	StepDefinition []map[string]interface{} `mapstructure:"run,omitempty"`
+	OptsDefinition []string                 `mapstructure:"opts,omitempty"`
+	Summary        string                   `mapstructure:"summary,omitempty"`
 }
 
 type SettingsShema struct {
-	Shell               string   `yaml:"shell,omitempty"`
-	Init                string   `yaml:"init,omitempty"`
-	GlobalOpts          []string `yaml:"opts,omitempty"`
-	ShieldEnv           bool     `yaml:"shieldEnv,omitempty"`
-	ShellFieldSeparator string   `yaml:"shellFieldSeparator,omitempty"`
+	Shell               string   `mapstructure:"shell,omitempty"`
+	Init                string   `mapstructure:"init,omitempty"`
+	GlobalOpts          []string `mapstructure:"opts,omitempty"`
+	ShieldEnv           bool     `mapstructure:"shieldEnv,omitempty"`
+	ShellFieldSeparator string   `mapstructure:"shellFieldSeparator,omitempty"`
 }
 
 // MergedStepSchema is the base format of step

@@ -4,99 +4,43 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/kassybas/tame/internal/build/stepbuilder"
-	"github.com/kassybas/tame/internal/build/stepparse"
-	"github.com/kassybas/tame/internal/helpers"
 	"github.com/kassybas/tame/internal/keywords"
-	"github.com/kassybas/tame/internal/param"
-	"github.com/kassybas/tame/internal/step"
-	"github.com/kassybas/tame/internal/stepblock"
-	"github.com/kassybas/tame/internal/target"
-	"github.com/kassybas/tame/internal/tcontext"
 	"github.com/kassybas/tame/schema"
+	"github.com/mitchellh/mapstructure"
 )
 
-func ParseTeafile(tf schema.Tamefile, ctx *tcontext.Context) (map[string]target.Target, error) {
-	targets := make(map[string]target.Target)
-	for targetKey, targetValue := range tf.Targets {
-		trg, err := buildTarget(targetKey, targetValue, ctx)
-		if err != nil {
-			return targets, err
+func ParseTargets(dynamicKeys map[string]interface{}) (map[string]schema.TargetSchema, error) {
+	targets := map[string]schema.TargetSchema{}
+	for k, v := range dynamicKeys {
+		if strings.HasPrefix(k, keywords.PrefixReference) {
+			continue
 		}
-		targets[targetKey] = trg
-	}
-	return targets, nil
-}
-
-func buildStep(rawStep map[string]interface{}) (step.Step, error) {
-	stepDef, err := stepparse.ParseStepSchema(rawStep)
-	if err != nil {
-		return nil, err
-	}
-	return stepbuilder.NewStep(stepDef)
-
-}
-
-func buildSteps(stepDefs []map[string]interface{}) (stepblock.StepBlock, error) {
-	steps := make([]step.Step, len(stepDefs))
-	for i, stepDef := range stepDefs {
-		newStep, err := buildStep(stepDef)
-		if err != nil {
-			return stepblock.StepBlock{}, err
-		}
-		steps[i] = newStep
-	}
-	return stepblock.NewStepBlock(steps), nil
-}
-
-func buildTarget(targetKey string, targetDef schema.TargetSchema, ctx *tcontext.Context) (target.Target, error) {
-	var err error
-	newTarget := target.Target{
-		Name: targetKey,
-		Ctx:  ctx,
-	}
-
-	newTarget.Opts, err = helpers.BuildOpts(targetDef.OptsDefinition)
-	if err != nil {
-		return newTarget, fmt.Errorf("failed to parse opts for '%s'\n\t%s", targetKey, err)
-	}
-
-	// Parameters
-	newTarget.Params, err = buildParameters(targetDef.ArgDefinition)
-	if err != nil {
-		return newTarget, fmt.Errorf("failed to parse parameters for '%s'\n\t%s", targetKey, err)
-	}
-	// Steps
-	newTarget.Steps, err = buildSteps(targetDef.StepDefinition)
-	if err != nil {
-		return newTarget, fmt.Errorf("failed to parse steps for target '%s'\n\t%s", targetKey, err)
-	}
-
-	newTarget.Summary = targetDef.Summary
-
-	return newTarget, err
-}
-
-func buildParameters(paramDefs map[string]interface{}) ([]param.Param, error) {
-	params := []param.Param{}
-
-	for paramKey, paramValue := range paramDefs {
-		if !strings.HasPrefix(paramKey, keywords.PrefixReference) {
-			return params, fmt.Errorf("arguments must start with '$' symbol: %s (correct: %s%s)", paramKey, keywords.PrefixReference, paramKey)
-		}
-		newParam := param.Param{
-			Name: paramKey,
-		}
-		switch paramValue.(type) {
-		case nil:
-			newParam.HasDefault = false
+		var newTargetSch schema.TargetSchema
+		switch v := v.(type) {
+		// simple targets with single commands result in a single shell stepped target
+		case string:
+			{
+				newTargetSch.StepDefinition = []map[string]interface{}{
+					map[string]interface{}{
+						keywords.ShellStep: v,
+					},
+				}
+			}
+		// complex targets
 		default:
 			{
-				newParam.HasDefault = true
-				newParam.DefaultValue = paramValue
+				var md mapstructure.Metadata
+				err := mapstructure.DecodeMetadata(v, &newTargetSch, &md)
+				if err != nil {
+					return nil, fmt.Errorf("failed to parse target: %s\n\t%s", k, err.Error())
+				}
+				if len(md.Unused) != 0 {
+					return nil, fmt.Errorf("unknown keys in target: %s\n\t%s", k, md.Unused)
+				}
 			}
 		}
-		params = append(params, newParam)
+		targets[k] = newTargetSch
+		delete(dynamicKeys, k)
 	}
-	return params, nil
+	return targets, nil
 }

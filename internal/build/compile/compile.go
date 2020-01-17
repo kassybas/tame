@@ -5,7 +5,7 @@ import (
 
 	"github.com/kassybas/tame/schema"
 
-	"github.com/kassybas/tame/internal/build/targetparse"
+	"github.com/kassybas/tame/internal/build/targetbuild"
 	"github.com/kassybas/tame/internal/helpers"
 	"github.com/kassybas/tame/internal/helpscreen"
 	"github.com/kassybas/tame/internal/step"
@@ -56,10 +56,10 @@ func createDependencyGraph(targets map[string]target.Target, targetName string, 
 	return rootStep, err
 }
 
-// Compile creates the internal representation
-func Compile(tf schema.Tamefile, targetName string, cliVarArgs []string, ctx *tcontext.Context) (step.Step, error) {
+// CompileTarget creates the internal representation
+func CompileTarget(tf schema.Tamefile, targetName string, cliVarArgs []string, ctx *tcontext.Context) (step.Step, error) {
 
-	parsedTargets, err := targetparse.ParseTeafile(tf, ctx)
+	parsedTargets, err := targetbuild.BuildTargets(tf, ctx)
 	if err != nil {
 		return nil, err
 	}

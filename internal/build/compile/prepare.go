@@ -2,14 +2,14 @@ package compile
 
 import (
 	"fmt"
-	"os"
 	"path/filepath"
 	"strings"
 
 	"github.com/kassybas/tame/schema"
 
-	"github.com/kassybas/tame/internal/keywords"
 	"github.com/kassybas/tame/internal/build/loader"
+	"github.com/kassybas/tame/internal/build/targetparse"
+	"github.com/kassybas/tame/internal/build/varparse"
 	"github.com/kassybas/tame/internal/step"
 	"github.com/kassybas/tame/internal/tcontext"
 	"github.com/kassybas/tame/internal/tvar"
@@ -22,25 +22,6 @@ func createContext(globals []tvar.TVariable, sts settings.Settings) (tcontext.Co
 		Globals:  globals,
 		Settings: sts,
 	}, nil
-}
-func evaluateGlobals(globalDefs map[string]interface{}) ([]tvar.TVariable, error) {
-	var vars []tvar.TVariable
-	for k, v := range globalDefs {
-		if strings.HasSuffix(k, keywords.GlobalDefaultVarSuffix) {
-			name := strings.TrimSuffix(k, keywords.GlobalDefaultVarSuffix)
-			name = strings.TrimSpace(name)
-			var value interface{}
-			if sysEnvValue, sysEnvExists := os.LookupEnv(name); sysEnvExists {
-				value = sysEnvValue
-			} else {
-				value = v
-			}
-			vars = append(vars, tvar.NewVariable(name, value))
-			continue
-		}
-		vars = append(vars, tvar.NewVariable(k, v))
-	}
-	return vars, nil
 }
 
 func convertIncludesToRelativePath(path string, includes []schema.IncludeSchema) []schema.IncludeSchema {
@@ -60,15 +41,28 @@ func isPublic(targetName string) bool {
 }
 
 func PrepareStep(path, targetName string, targetArgs []string) (step.Step, tcontext.Context, error) {
-	tf, err := loader.Load(path)
+	// load static keys
+	tf, dynamicKeys, err := loader.Load(path)
 	if err != nil {
-		return nil, tcontext.Context{}, fmt.Errorf("error loading tamefile: %s\n%s", path, err.Error())
+		return nil, tcontext.Context{}, fmt.Errorf("error loading tamefile: %s\n\t%s", path, err.Error())
 	}
+	// load dynamic keys: targets
+	if tf.Targets, err = targetparse.ParseTargets(dynamicKeys); err != nil {
+		return nil, tcontext.Context{}, fmt.Errorf("error while parsing targets in file %s\n\t%s", path, err.Error())
+	}
+	// load dynamic keys: global variables
+	if tf.Globals, err = varparse.ParseGlobals(dynamicKeys); err != nil {
+		return nil, tcontext.Context{}, fmt.Errorf("error while parsing global variables in file: %s\n\t%s", path, err.Error())
+	}
+	if len(dynamicKeys) != 0 {
+		return nil, tcontext.Context{}, fmt.Errorf("unknown keys in file: %s\n\t%s", path, err.Error())
+	}
+
 	tf.Includes = convertIncludesToRelativePath(path, tf.Includes)
 	if !isPublic(targetName) {
 		return nil, tcontext.Context{}, fmt.Errorf("calling non-public target: %s\npublic targets must start with uppercase letter", targetName)
 	}
-	globals, err := evaluateGlobals(tf.Globals)
+	globals, err := varparse.EvaluateGlobals(tf.Globals)
 	if err != nil {
 		return nil, tcontext.Context{}, fmt.Errorf("failed to evaluate global variables:\n\t%s", err.Error())
 	}
@@ -80,7 +74,7 @@ func PrepareStep(path, targetName string, targetArgs []string) (step.Step, tcont
 	if err != nil {
 		return nil, tcontext.Context{}, fmt.Errorf("error while creating context:\n\t%s", err.Error())
 	}
-	root, err := Compile(tf, targetName, targetArgs, &ctx)
+	root, err := CompileTarget(tf, targetName, targetArgs, &ctx)
 	if err != nil {
 		logrus.Fatal(err)
 	}

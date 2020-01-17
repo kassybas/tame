@@ -3,6 +3,7 @@ settings:
   shell: /bin/bash
 
 globals:
+  $HOME?: "/tmp" # question mark (?:) enables overwriting of globals with environment variables
   $my_string: "hello world"
   $my_int: 42
   $user:

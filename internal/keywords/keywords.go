@@ -26,4 +26,5 @@ var (
 
 	IfStepPrefix = "if "
 	IfStepElse   = "else"
+	ShellStep    = "sh"
 )

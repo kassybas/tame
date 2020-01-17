@@ -4,6 +4,7 @@ import (
 	"io/ioutil"
 
 	"github.com/kassybas/tame/schema"
+	"github.com/mitchellh/mapstructure"
 	"gopkg.in/yaml.v2"
 )
 
@@ -15,14 +16,24 @@ func readFile(filePath string) ([]byte, error) {
 	return b, nil
 }
 
-func Load(filePath string) (schema.Tamefile, error) {
+func Load(filePath string) (schema.Tamefile, map[string]interface{}, error) {
 	fc, err := readFile(filePath)
 	if err != nil {
-		return schema.Tamefile{}, err
+		return schema.Tamefile{}, nil, err
 	}
 
-	t := schema.Tamefile{}
-
-	err = yaml.UnmarshalStrict(fc, &t)
-	return t, err
+	var raw map[string]interface{}
+	err = yaml.UnmarshalStrict(fc, &raw)
+	if err != nil {
+		return schema.Tamefile{}, nil, err
+	}
+	var md mapstructure.Metadata
+	var result schema.Tamefile
+	err = mapstructure.DecodeMetadata(raw, &result, &md)
+	dynamic := make(map[string]interface{})
+	// collect dynamic key-values
+	for _, k := range md.Unused {
+		dynamic[k] = raw[k]
+	}
+	return result, dynamic, err
 }
