@@ -47,7 +47,7 @@ func CompileTarget(tf schema.Tamefile, targetName string, cliVarArgs map[string]
 		return nil, err
 	}
 	if targetName == "" {
-		helpscreen.PrintTeafileDescription(parsedTargets)
+		helpscreen.PrintTeafileDescription(parsedTargets, tf)
 		os.Exit(0)
 	}
 	// build the dependency graph with the called target

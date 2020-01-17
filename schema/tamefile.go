@@ -7,6 +7,7 @@ type Tamefile struct {
 	Includes    []IncludeSchema         `mapstructure:"include,omitempty"`
 	Loads       []string                `mapstructure:"load,omitempty"`
 	Sets        SettingsShema           `mapstructure:"settings,omitempty"`
+	Summary     string                  `mapstructure:"summary,omitempty"`
 	Globals     map[string]interface{}  `mapstructure:"-,omitempty"`
 	Targets     map[string]TargetSchema `mapstructure:"-,omitempty"`
 
