@@ -13,16 +13,16 @@ func PrintTeafileDescription(targets map[string]target.Target) {
 		if !helpers.IsPublic(k) {
 			continue
 		}
-		fmt.Printf("- %s", k)
+		fmt.Printf("\t- %s", k)
 		if len(v.Summary) != 0 {
-			fmt.Printf(": %s", v.Summary)
+			fmt.Printf("-- %s", v.Summary)
 		}
 		if len(v.Params) != 0 {
-			fmt.Printf("\n\t-args: ")
+			fmt.Printf("\n\t\t\\\\-args: ")
 			for _, p := range v.Params {
 				fmt.Printf("%s", p.Name)
 				if p.HasDefault {
-					fmt.Printf("(default: '%s') ", p.DefaultValue)
+					fmt.Printf(" (default: '%s') ", p.DefaultValue)
 				}
 			}
 		}

@@ -7,7 +7,7 @@
 - make append to list possible
 - load and parse file or string to variables
 - add print variable step
-- cli
+- overwrite in cli and include
 - logging
 - make all field separators configurable
 - make globals r/w?

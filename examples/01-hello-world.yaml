@@ -35,7 +35,10 @@ HelloArg:
 # tame -f examples/01-hello-world.yaml HelloCall
 # calling other targets in steps is possible
 HelloCall:
+  # summary provides documentation
+  # it is also displayed on the help screen, when tame is called without a target, eg: tame -f tame/file.yaml
+  summary: Calls two other targets
   run:
-  - Hello: {} # no arguments
-  # - HelloArg: {$name: "passing an argument"}  # one named argument
-  - HelloArg: {}  # one named argument
+  - Hello: {} # no arguments in target
+  - HelloArg: {$name: "passing an argument"}  # one named argument
+  - HelloArg: {}  # no argument passed -> HelloArg default argument will be used
