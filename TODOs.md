@@ -1,18 +1,17 @@
 
 # TODOs
-
-- add summary
-- resolve expressions everywhere
-- create extensive documentation
-- make append to list possible
-- load and parse file or string to variables
-- add print variable step
-- overwrite in cli and include
 - logging
+- create extensive documentation
+
+- resolve expressions everywhere
+- make append to list possible
+- load yaml/dump yaml
+- overwrites in cli and in include
 - make all field separators configurable
 - make globals r/w?
 - fix referencing variable fields in maps in expressions
 - escape $ and .
+- while loop
 
 - docker
 - optimizations

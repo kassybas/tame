@@ -27,7 +27,7 @@ func PrintTeafileDescription(targets map[string]target.Target, tf schema.Tamefil
 			for _, p := range v.Params {
 				fmt.Printf("%s", p.Name)
 				if p.HasDefault {
-					fmt.Printf(" (default: '%s') ", p.DefaultValue)
+					fmt.Printf(" (default: '%v') ", p.DefaultValue)
 				}
 			}
 		}

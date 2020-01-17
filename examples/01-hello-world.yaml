@@ -1,12 +1,14 @@
 # variables start with $ sign
+# global variables are immutable
 $foo: "my global value"
 
-# Targets allow multiple steps, arguments, variables and returns
-# targets can be set internal by starting them with lowercase letter
-# internal targets cannot be included from other file or called from cli
+# Targets allow multiple steps, arguments, variables and returns.
+# Targets are internal when starting with lowercase letter.
+# Internal targets cannot be included from other files or called from the CLI.
 
-# simple targets contain one script, it can be called with the following command
-# tame -f examples/01-hello-world.yaml Hello
+# Targets can be called with the following command: tame TARGET_NAME
+# eg. tame -f examples/01-hello-world.yaml Hello
+# In simple target format is the following:
 Hello: echo "hello world"
 
 # tame -f examples/01-hello-world.yaml HelloGlobal
@@ -14,19 +16,18 @@ Hello: echo "hello world"
 # this differs from Makefiles since there the expansion of values happens before script execution
 HelloGlobal: echo "hello ${foo}"
 
+# more complex targets contain multiple steps under the run keyword
 # tame -f examples/01-hello-world.yaml HelloLocal
-# more comples targets contain multople steps under the run keyword
 HelloLocal:
   run:
-  - $name: "john doe"
+  - $name: "john doe"  # declare variable
   - sh: echo "hello $name"
 
+# Arguments can be added with default value.
+# All arguments are named, no positional args.
+# If the default value is set to null, it is required to be passed during the call.
+# Arguments can also be passed from CLI eg. `tame HelloArg --name="foo"`
 # tame -f examples/01-hello-world.yaml HelloArg
-# arguments can be added with default value
-# all arguments are named arguments
-# default value can be set to null, requiring it to be passed during the call
-# in single line yaml syntax, null can be omitted, eg: args: {$name}
-# arguments can also be passed from CLI eg. `tame HelloArg --name="foo"`
 HelloArg:
   args: {$name: "my default name"}
   run:
@@ -35,8 +36,8 @@ HelloArg:
 # tame -f examples/01-hello-world.yaml HelloCall
 # calling other targets in steps is possible
 HelloCall:
-  # summary provides documentation
-  # it is also displayed on the help screen, when tame is called without a target, eg: tame -f tame/file.yaml
+  # Summary provides documentation in helpscreen.
+  # Helpscreen is displayed when tame is called without a target, eg: tame -f tame/file.yaml
   summary: Calls two other targets
   run:
   - Hello: {} # no arguments in target

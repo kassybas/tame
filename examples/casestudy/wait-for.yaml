@@ -1,5 +1,0 @@
-
-summary: WaitForIt script designed to synchronize services like docker containers
-
-WaitForIt:
-  args: { $host: localhost }

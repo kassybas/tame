@@ -2,7 +2,7 @@
 settings:
   shell: /bin/bash
 
-$HOME?: "/tmp" # question mark (?:) enables overwriting of globals with environment variables
+$HOME?: "/tmp" # question mark (?:) enables overwriting of globals with environment variables as in Make '?='
 $my_string: "hello world"
 $my_int: 42
 $user:
@@ -16,7 +16,8 @@ $user:
 PrintUser:
   run:
   - sh: |
-      echo "${user_name} is ${user_age} years old. Lives in ${user_address_city}"  # maps fields are separated by `_` in shell context which should configurable sooner or later
+      # maps fields are separated by `_` in shell context which should configurable sooner or later
+      echo "${user_name} is ${user_age} years old. Lives in ${user_address_city}"
 
 TestSilence:
   run:
