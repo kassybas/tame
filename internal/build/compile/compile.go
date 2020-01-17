@@ -29,7 +29,7 @@ func parseCLITargetArgs(targetArgs []string) (map[string]interface{}, error) {
 func getRootStepSchema(targetName string, cliVarArgs []string) (schema.MergedStepSchema, error) {
 	var root schema.MergedStepSchema
 	var err error
-	root.CalledTargetName = &targetName
+	root.CalledTargetName = targetName
 	root.CallArgumentsPassed, err = parseCLITargetArgs(cliVarArgs)
 	if err != nil {
 		return root, err
@@ -46,11 +46,11 @@ func createDependencyGraph(targets map[string]target.Target, targetName string, 
 	if err != nil {
 		return &callstep.CallStep{}, err
 	}
-	calledTarget, err := findCalledTarget(targetName, "[tame cli]", targets, includes)
+	calledTarget, err := findCalledTarget(targetName, targets, includes)
 	if err != nil {
 		return &callstep.CallStep{}, err
 	}
-	err = populateSteps(&calledTarget, targets, includes)
+	err = linkCalledTargets(&calledTarget.Steps, "[tame]", targets, includes)
 	rootStep.SetCalledTarget(calledTarget)
 
 	return rootStep, err

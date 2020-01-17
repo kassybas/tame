@@ -1,18 +1,19 @@
 package basestep
 
 import (
+	"github.com/kassybas/tame/internal/tvar"
+	"github.com/kassybas/tame/internal/vartable"
 	"github.com/kassybas/tame/types/opts"
 	"github.com/kassybas/tame/types/steptype"
 )
 
 type BaseStep struct {
-	name         string
-	kind         steptype.Steptype
-	resultNames  []string
-	opts         opts.ExecutionOpts
-	iteratorName string
-	iterable     interface{}
-	ifCondition  string
+	name        string
+	kind        steptype.Steptype
+	resultNames []string
+	opts        opts.ExecutionOpts
+	ifCondition string
+	iteratorVar tvar.TVariable
 }
 
 func (s *BaseStep) Kind() steptype.Steptype {
@@ -30,12 +31,8 @@ func (s *BaseStep) GetOpts() opts.ExecutionOpts {
 	return s.opts
 }
 
-func (s *BaseStep) GetIteratorName() string {
-	return s.iteratorName
-}
+func (s *BaseStep) SetIterator(vt *vartable.VarTable) {
 
-func (s *BaseStep) GetIterable() interface{} {
-	return s.iterable
 }
 
 func (s *BaseStep) GetName() string {

@@ -27,30 +27,32 @@ targets:
   IsItOk:
     args: {$status: "ok"}
     run:
-    - sh: echo $status
-    - sh: echo $ok
+    - sh: echo status $status
+    - sh: echo ok $ok
     - if $status == $ok:
         - sh: echo "all is well"
 
   ExampleIf:
     run:
-    # - IsItOk: {$status: "ok"} ## -> prints
+    - if true:
+      - IsItOk: {$status: "ok"} ## -> prints
+
     # - IsItOk: {$status: "foo"} ## -> finishes empty
-    - $userName: "John"
-    - sh: echo user is $userName
-    - if $userName == "John":
-        - sh: echo True $userName
-          $: $result
-        - sh: echo Result is "$result"
-        - $HELLO: "tourist"
-        - $userName: "touristJohn"
-        - if $userName == "touristJohn":
-          - sh: echo Embedded if
-      else:
-        - sh: echo False $userName
-    - sh: echo RESULT WAS "$result"
-    - sh: echo HELLO $HELLO
-    - sh: echo HELLO $userName
+    # - $userName: "John"
+    # - sh: echo user is $userName
+    # - if $userName == "John":
+    #     - sh: echo True $userName
+    #       $: $result
+    #     - sh: echo Result is "$result"
+    #     - $HELLO: "tourist"
+    #     - $userName: "touristJohn"
+    #     - if $userName == "touristJohn":
+    #       - sh: echo Embedded if
+    #   else:
+    #     - sh: echo False $userName
+    # - sh: echo RESULT WAS "$result"
+    # - sh: echo HELLO $HELLO
+    # - sh: echo HELLO $userName
 
 
 
@@ -61,14 +63,15 @@ targets:
     # - sh: echo $res
 
 
-  ExampleExpr:
-    run:
-    - $userMap: {}
-    - $testUsers: ["Kate", "Pierre", "Arthur"]
-    - for: {$: $user, in: $testUsers}
-      expr: $user in $users
-      $: $userMap.$user
-    - sh: env
+  # ExampleExpr:
+  #   run:
+  #   - $userMap: {}
+  #   - $testUsers: ["Kate", "Pierre", "Arthur"]
+  #   - for: {$user: $testUsers}
+  #     do:
+  #     - expr: $user in $users
+  #       $: $userMap.$user
+  #   - sh: env
 
 
 

@@ -2,7 +2,6 @@ package returnstep
 
 import (
 	"fmt"
-	"log"
 
 	"github.com/kassybas/tame/internal/step"
 	"github.com/kassybas/tame/internal/step/basestep"
@@ -43,8 +42,4 @@ func (s *ReturnStep) RunStep(ctx tcontext.Context, vt *vartable.VarTable) step.S
 
 func (s *ReturnStep) GetCalledTargetName() string {
 	return "return"
-}
-
-func (s *ReturnStep) SetCalledTarget(t interface{}) {
-	log.Fatal("internal error: calling target in return")
 }

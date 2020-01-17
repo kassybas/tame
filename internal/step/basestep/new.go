@@ -21,13 +21,6 @@ func NewBaseStep(stepDef schema.MergedStepSchema, stepType steptype.Steptype, na
 	if stepDef.ResultContainers != nil {
 		newStep.resultNames = *stepDef.ResultContainers
 	}
-	// For Loop
-	if stepDef.ForLoop.Iterator != "" {
-		newStep.iteratorName = stepDef.ForLoop.Iterator
-	}
-	if stepDef.ForLoop.Iterable != "" {
-		newStep.iterable = stepDef.ForLoop.Iterable
-	}
 	newStep.name = name
 	return newStep, err
 }

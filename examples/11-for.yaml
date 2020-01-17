@@ -22,18 +22,21 @@ targets:
 
   Foo:
     run:
-    - for: {$: $name, in: ["john", "kate", "arthur"]}
-      sh: echo Hello $name
+    - for: {$name: ["john", "kate", "arthur"]}
+      do:
+      - sh: echo Hello $name
 
   Builder:
     run:
-    - for: {$: $platform, in: $config}
-      BuildBin: {$os: $config.$platform.os, $arch: $config.$platform.arch}
-    - for: {$: $tag, in: $tags}
-      DockerTag: {$tag: $tag}
+    # - for: {$platform: $config}
+    #   do:
+    #   - BuildBin: {$os: $config.$platform.os, $arch: $config.$platform.arch}
+    - for: {$tag: $tags}
+      do:
+      - DockerTag: {$tag: $tag}
 
   DockerTag:
-    args: {$tag}
+    args: {$tag: "YOLO"}
     run:
     - sh: echo "docker tag myimage myimage:${tag}"
 

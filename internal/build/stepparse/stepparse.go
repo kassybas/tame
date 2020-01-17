@@ -52,10 +52,10 @@ func loadCallStepSchema(raw map[string]interface{}, dynamicKey string, result *s
 	if err != nil {
 		return err
 	}
-	result.CalledTargetName = &ct
+	result.CalledTargetName = ct
 	result.CallArgumentsPassed, err = parseCallStepArgs(raw[dynamicKey])
 	if err != nil {
-		return fmt.Errorf("error while parsing arguments of call step [%s]\n\t%s", result.CallArgumentsPassed, err.Error())
+		return fmt.Errorf("error while parsing arguments of step '%s' args: '%v'\n\t%s", result.CalledTargetName, result.CallArgumentsPassed, err.Error())
 	}
 	return err
 }
@@ -65,7 +65,7 @@ func loadVarStepSchema(raw map[string]interface{}, dynamicKey string, result *sc
 	if err != nil {
 		return fmt.Errorf("error while parsing step '%s'\n\t%s", dynamicKey, err.Error())
 	}
-	result.VarName = &dynamicKey
+	result.VarName = dynamicKey
 	result.ResultContainers = &[]string{dynamicKey}
 	result.VarValue = raw[dynamicKey]
 	return err
@@ -95,7 +95,7 @@ func loadIfStepSchema(raw map[string]interface{}, result *schema.MergedStepSchem
 	for k, v := range raw {
 		if strings.HasPrefix(k, keywords.IfStepPrefix) {
 			condition := strings.TrimPrefix(k, keywords.IfStepPrefix)
-			result.IfCondition = &condition
+			result.IfCondition = condition
 			if result.IfSteps, err = loadSubSteps(v); err != nil {
 				return err
 			}
@@ -133,7 +133,7 @@ func loadMergedStepSchema(raw interface{}) (schema.MergedStepSchema, error) {
 	}
 	// 2: if and else
 	if len(md.Unused) > 2 {
-		return result, fmt.Errorf("multiple dyanmic keys found in step, only one allowed (var ... or call ...), got: %v", md.Unused)
+		return result, fmt.Errorf("multiple unknown keys found in step, expect: $varname, targetname, if, else; got: %v", md.Unused)
 	}
 	if len(md.Unused) > 0 {
 		err = loadDynamicKey(rawMap, md.Unused[0], &result)
@@ -158,7 +158,16 @@ func ParseStepSchema(raw interface{}) (schema.MergedStepSchema, error) {
 		return mergedSchema, err
 	}
 	// Determine step type
-	if mergedSchema.IfCondition != nil {
+	if mergedSchema.ForLoop != nil {
+		if mergedSchema.ForSteps, err = loadSubSteps(mergedSchema.ForRawSteps); err != nil {
+			return mergedSchema, fmt.Errorf("failed to parse for-do block steps: %s", err.Error())
+		}
+		mergedSchema.StepType, err = setStepType(mergedSchema.StepType, steptype.For)
+		if err != nil {
+			return mergedSchema, err
+		}
+	}
+	if mergedSchema.IfCondition != "" {
 		mergedSchema.StepType, err = setStepType(mergedSchema.StepType, steptype.If)
 		if err != nil {
 			return mergedSchema, err
@@ -182,13 +191,13 @@ func ParseStepSchema(raw interface{}) (schema.MergedStepSchema, error) {
 			return mergedSchema, err
 		}
 	}
-	if mergedSchema.VarName != nil {
+	if mergedSchema.VarName != "" {
 		mergedSchema.StepType, err = setStepType(mergedSchema.StepType, steptype.Var)
 		if err != nil {
 			return mergedSchema, err
 		}
 	}
-	if mergedSchema.CalledTargetName != nil {
+	if mergedSchema.CalledTargetName != "" {
 		mergedSchema.StepType, err = setStepType(mergedSchema.StepType, steptype.Call)
 		if err != nil {
 			return mergedSchema, err

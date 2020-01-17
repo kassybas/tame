@@ -20,7 +20,7 @@ func NewVarStep(stepDef schema.MergedStepSchema) (*VarStep, error) {
 	var err error
 	var newStep VarStep
 	newStep.definition = stepDef.VarValue
-	newStep.BaseStep, err = basestep.NewBaseStep(stepDef, steptype.Var, *stepDef.VarName)
+	newStep.BaseStep, err = basestep.NewBaseStep(stepDef, steptype.Var, stepDef.VarName)
 	return &newStep, err
 }
 

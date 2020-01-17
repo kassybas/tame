@@ -8,7 +8,9 @@ import (
 	"github.com/kassybas/tame/internal/build/stepparse"
 	"github.com/kassybas/tame/internal/helpers"
 	"github.com/kassybas/tame/internal/keywords"
+	"github.com/kassybas/tame/internal/param"
 	"github.com/kassybas/tame/internal/step"
+	"github.com/kassybas/tame/internal/stepblock"
 	"github.com/kassybas/tame/internal/target"
 	"github.com/kassybas/tame/internal/tcontext"
 	"github.com/kassybas/tame/schema"
@@ -35,16 +37,16 @@ func buildStep(rawStep map[string]interface{}) (step.Step, error) {
 
 }
 
-func buildSteps(stepDefs []map[string]interface{}) ([]step.Step, error) {
+func buildSteps(stepDefs []map[string]interface{}) (stepblock.StepBlock, error) {
 	steps := make([]step.Step, len(stepDefs))
 	for i, stepDef := range stepDefs {
 		newStep, err := buildStep(stepDef)
 		if err != nil {
-			return steps, err
+			return stepblock.StepBlock{}, err
 		}
 		steps[i] = newStep
 	}
-	return steps, nil
+	return stepblock.NewStepBlock(steps), nil
 }
 
 func buildTarget(targetKey string, targetDef schema.TargetSchema, ctx *tcontext.Context) (target.Target, error) {
@@ -75,14 +77,14 @@ func buildTarget(targetKey string, targetDef schema.TargetSchema, ctx *tcontext.
 	return newTarget, err
 }
 
-func buildParameters(paramDefs map[string]interface{}) ([]target.Param, error) {
-	params := []target.Param{}
+func buildParameters(paramDefs map[string]interface{}) ([]param.Param, error) {
+	params := []param.Param{}
 
 	for paramKey, paramValue := range paramDefs {
 		if !strings.HasPrefix(paramKey, keywords.PrefixReference) {
 			return params, fmt.Errorf("arguments must start with '$' symbol: %s (correct: %s%s)", paramKey, keywords.PrefixReference, paramKey)
 		}
-		newParam := target.Param{
+		newParam := param.Param{
 			Name: paramKey,
 		}
 		switch paramValue.(type) {

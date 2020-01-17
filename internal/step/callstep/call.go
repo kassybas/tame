@@ -3,6 +3,7 @@ package callstep
 import (
 	"fmt"
 
+	"github.com/kassybas/tame/internal/param"
 	"github.com/kassybas/tame/internal/step"
 	"github.com/kassybas/tame/internal/step/basestep"
 	"github.com/kassybas/tame/internal/target"
@@ -18,16 +19,17 @@ type CallStep struct {
 	calledTargetName string
 	arguments        []tvar.TVariable
 	calledTarget     target.Target
+	calledTargetSet  bool
 }
 
 func NewCallStep(stepDef schema.MergedStepSchema) (*CallStep, error) {
 	var err error
 	var newStep CallStep
 	// Called target
-	if stepDef.CalledTargetName == nil {
+	if stepDef.CalledTargetName == "" {
 		return &newStep, fmt.Errorf("missing called target name in call step")
 	}
-	newStep.calledTargetName = *stepDef.CalledTargetName
+	newStep.calledTargetName = stepDef.CalledTargetName
 	// Args
 	newStep.arguments = []tvar.TVariable{}
 	for k, v := range stepDef.CallArgumentsPassed {
@@ -37,12 +39,19 @@ func NewCallStep(stepDef schema.MergedStepSchema) (*CallStep, error) {
 	return &newStep, err
 }
 
+func (s *CallStep) IsCalledTargetSet() bool {
+	return s.calledTargetSet
+}
+
 func (s *CallStep) RunStep(ctx tcontext.Context, vt *vartable.VarTable) step.StepStatus {
-	// TODOb: resolve global variables too
-	newVt := vartable.NewVarTable()
-	err := createArgsVartable(s.arguments, s.calledTarget, newVt)
+	err := validateArgs(s.arguments, s.calledTarget)
 	if err != nil {
-		return step.StepStatus{Err: fmt.Errorf("step: %s\n\t%s", s.GetName(), err.Error())}
+		return step.StepStatus{Err: fmt.Errorf("invalid arguments in target call:\n\t%s", err.Error())}
+	}
+
+	newVt, err := param.ResolveParams(vt, s.calledTarget.Params)
+	if err != nil {
+		return step.StepStatus{Err: fmt.Errorf("could not resolve parameters in target call: %s\n\t%s", s.calledTargetName, err)}
 	}
 	status := s.calledTarget.Make(newVt, s.GetOpts())
 	if status.Err != nil {
@@ -51,7 +60,7 @@ func (s *CallStep) RunStep(ctx tcontext.Context, vt *vartable.VarTable) step.Ste
 	return status
 }
 
-func createArgsVartable(argDefs []tvar.TVariable, calledTarget target.Target, vt *vartable.VarTable) error {
+func validateArgs(argDefs []tvar.TVariable, calledTarget target.Target) error {
 	for _, arg := range argDefs {
 		if !calledTarget.IsParameter(arg.Name()) {
 			return fmt.Errorf("unknown parameter for target %s: '%s'", calledTarget.Name, arg.Name())
@@ -59,18 +68,13 @@ func createArgsVartable(argDefs []tvar.TVariable, calledTarget target.Target, vt
 		if arg.Value() == nil {
 			return fmt.Errorf("passing empty(null) argument for target %s: '%s: %v'", calledTarget.Name, arg.Name(), arg.Value())
 		}
-		val, err := vt.ResolveValue(arg.Value())
-		if err != nil {
-			return err
-		}
-		vt.Add(arg.Name(), val)
 	}
-
 	return nil
 }
 
 func (s *CallStep) SetCalledTarget(t interface{}) {
 	s.calledTarget = t.(target.Target)
+	s.calledTargetSet = true
 }
 
 func (s *CallStep) GetCalledTarget() target.Target {

@@ -11,6 +11,7 @@ const (
 	Expr
 	Wait
 	If
+	For
 )
 
 func (t Steptype) ToStr() string {
@@ -31,6 +32,8 @@ func (t Steptype) ToStr() string {
 		return "wait"
 	case If:
 		return "if"
+	case For:
+		return "for"
 	default:
 		panic("internal error: non-steptype steptype")
 	}

@@ -35,28 +35,25 @@ type SettingsShema struct {
 	ShellFieldSeparator string   `yaml:"shellFieldSeparator,omitempty"`
 }
 
-type ForLoopSchema struct {
-	Iterator string      `mapstructure:"$"`
-	Iterable interface{} `mapstructure:"in"`
-}
-
 // MergedStepSchema is the base format of step
 type MergedStepSchema struct {
-	ForLoop          ForLoopSchema  `mapstructure:"for"`
-	Return           *[]interface{} `mapstructure:"return"` // string is allowed due to weak decode
-	Opts             *[]string      `mapstructure:"opts"`   // string is allowed due to weak decode
-	ResultContainers *[]string      `mapstructure:"$"`      // string is allowed due to weak decode
-	Script           *[]string      `mapstructure:"sh"`     // string is allowed due to weak decode
-	Expr             *string        `mapstructure:"expr"`
-	Wait             *interface{}   `mapstructure:"wait"`
+	ForLoop          *map[string]interface{} `mapstructure:"for"`
+	ForRawSteps      []interface{}           `mapstructure:"do"`
+	Return           *[]interface{}          `mapstructure:"return"` // single interface is allowed due to weak decode
+	Opts             *[]string               `mapstructure:"opts"`   // string is allowed due to weak decode
+	ResultContainers *[]string               `mapstructure:"$"`      // string is allowed due to weak decode
+	Script           *[]string               `mapstructure:"sh"`     // string is allowed due to weak decode
+	Expr             *string                 `mapstructure:"expr"`
+	Wait             *interface{}            `mapstructure:"wait"`
 
 	// loaded dynamically since the yaml key defines the step type or step data
-	IfCondition         *string                `mapstructure:"-"` // if IfCondition
+	ForSteps            []MergedStepSchema     `mapstructure:"-"` // do: [ForSteps]
+	IfCondition         string                 `mapstructure:"-"` // if IfCondition
 	IfSteps             []MergedStepSchema     `mapstructure:"-"` // if IfCondition: IfSteps
 	ElseSteps           []MergedStepSchema     `mapstructure:"-"` // else: ElseSteps
-	CalledTargetName    *string                `mapstructure:"-"` // CalledTargetName: {}
-	CallArgumentsPassed map[string]interface{} `mapstructure:"-"` // CalledTargetName: CallArgumentsPassed
-	VarName             *string                `mapstructure:"-"` // $VarName
+	CalledTargetName    string                 `mapstructure:"-"` // CalledTargetName: {}
+	CallArgumentsPassed map[string]interface{} `mapstructure:"-"` // CalledTargetName: {CallArgumentsPassed}
+	VarName             string                 `mapstructure:"-"` // $VarName
 	VarValue            interface{}            `mapstructure:"-"` // $VarName: VarValue
 	StepType            steptype.Steptype      `mapstructure:"-"` // type of step
 }

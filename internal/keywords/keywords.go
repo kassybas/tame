@@ -11,6 +11,10 @@ var (
 	PossibleOpts = []string{
 		OptCanFail, OptSilent, OptAsync,
 	}
+	// illegal target names
+	ReservedKeywords = []string{
+		"settings", "return", "wait", "if", "else", "opts", "sh", "$", "include",
+	}
 
 	ShellFieldSeparator = "_"
 	TameFieldSeparator  = "."

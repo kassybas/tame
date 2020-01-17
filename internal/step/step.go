@@ -15,8 +15,6 @@ type Step interface {
 	GetOpts() opts.ExecutionOpts
 	SetOpts(opts.ExecutionOpts)
 	RunStep(tcontext.Context, *vartable.VarTable) StepStatus
-	GetIteratorName() string
-	GetIterable() interface{}
 }
 
 type StepStatus struct {
