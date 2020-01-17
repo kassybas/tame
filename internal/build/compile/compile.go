@@ -6,7 +6,6 @@ import (
 	"github.com/kassybas/tame/schema"
 
 	"github.com/kassybas/tame/internal/build/targetbuild"
-	"github.com/kassybas/tame/internal/helpers"
 	"github.com/kassybas/tame/internal/helpscreen"
 	"github.com/kassybas/tame/internal/step"
 	"github.com/kassybas/tame/internal/step/callstep"
@@ -14,30 +13,14 @@ import (
 	"github.com/kassybas/tame/internal/tcontext"
 )
 
-func parseCLITargetArgs(targetArgs []string) (map[string]interface{}, error) {
-	args := make(map[string]interface{}, len(targetArgs))
-	for _, argStr := range targetArgs {
-		k, v, err := helpers.GetKeyValueFromEnvString(argStr)
-		if err != nil {
-			return nil, err
-		}
-		args[k] = v
-	}
-	return args, nil
-}
-
-func getRootStepSchema(targetName string, cliVarArgs []string) (schema.MergedStepSchema, error) {
+func getRootStepSchema(targetName string, cliVarArgs map[string]interface{}) (schema.MergedStepSchema, error) {
 	var root schema.MergedStepSchema
-	var err error
 	root.CalledTargetName = targetName
-	root.CallArgumentsPassed, err = parseCLITargetArgs(cliVarArgs)
-	if err != nil {
-		return root, err
-	}
-	return root, err
+	root.CallArgumentsPassed = cliVarArgs
+	return root, nil
 }
 
-func createDependencyGraph(targets map[string]target.Target, targetName string, cliVarArgs []string, includes []schema.IncludeSchema) (step.Step, error) {
+func createDependencyGraph(targets map[string]target.Target, targetName string, cliVarArgs map[string]interface{}, includes []schema.IncludeSchema) (step.Step, error) {
 	rootSchema, err := getRootStepSchema(targetName, cliVarArgs)
 	if err != nil {
 		return &callstep.CallStep{}, err
@@ -57,7 +40,7 @@ func createDependencyGraph(targets map[string]target.Target, targetName string, 
 }
 
 // CompileTarget creates the internal representation
-func CompileTarget(tf schema.Tamefile, targetName string, cliVarArgs []string, ctx *tcontext.Context) (step.Step, error) {
+func CompileTarget(tf schema.Tamefile, targetName string, cliVarArgs map[string]interface{}, ctx *tcontext.Context) (step.Step, error) {
 
 	parsedTargets, err := targetbuild.BuildTargets(tf, ctx)
 	if err != nil {

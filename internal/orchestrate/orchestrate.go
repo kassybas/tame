@@ -10,7 +10,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func Make(path, targetName string, targetArgs []string) {
+func Make(path, targetName string, targetArgs map[string]interface{}) {
 
 	root, ctx, err := compile.PrepareStep(path, targetName, targetArgs)
 	if err != nil {

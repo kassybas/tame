@@ -8,14 +8,36 @@ import (
 	"github.com/kassybas/tame/types/opts"
 )
 
-func GetKeyValueFromEnvString(envStr string) (string, string, error) {
-	if !strings.Contains(envStr, "=") {
-		return "", "", fmt.Errorf(`unknown argument format provided: expected: "arg_name=arg_value", got: %s`, envStr)
+func GetKeyValueFromEnvString(envStr string) (string, interface{}, error) {
+	// TODO: fix this with some proper regex
+	if !strings.HasPrefix(envStr, "--") {
+		return "", "", fmt.Errorf(`unknown argument format provided: expected: "--arg_name=arg_value", got: %s`, envStr)
 	}
+	// remove dashes
+	envStr = strings.TrimPrefix(envStr, "--")
+	// prepend $
+	envStr = fmt.Sprintf("%s%s", keywords.PrefixReference, envStr)
+	if !strings.Contains(envStr, keywords.CliArgSeparator) {
+		return envStr, true, nil
+	}
+
 	sps := strings.SplitN(envStr, keywords.CliArgSeparator, 2)
-	k := sps[0]
-	v := sps[1]
-	return k, v, nil
+	return sps[0], sps[1], nil
+}
+
+func ParseCLITargetArgs(flags []string) (map[string]interface{}, error) {
+	args := make(map[string]interface{}, len(flags))
+	for i, argStr := range flags {
+		if i == 0 {
+			continue
+		}
+		k, v, err := GetKeyValueFromEnvString(argStr)
+		if err != nil {
+			return nil, err
+		}
+		args[k] = v
+	}
+	return args, nil
 }
 
 func IsPublic(targetName string) bool {

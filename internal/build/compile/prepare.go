@@ -31,7 +31,7 @@ func convertIncludesToRelativePath(path string, includes []schema.IncludeSchema)
 	return includes
 }
 
-func PrepareStep(path, targetName string, targetArgs []string) (step.Step, tcontext.Context, error) {
+func PrepareStep(path, targetName string, targetArgs map[string]interface{}) (step.Step, tcontext.Context, error) {
 	// load static keys
 	tf, dynamicKeys, err := loader.Load(path)
 	if err != nil {

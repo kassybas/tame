@@ -5,6 +5,6 @@ import (
 )
 
 // MakeCommand runs the given target of the file
-func MakeCommand(file, targetName string, targetArgs []string) {
+func MakeCommand(file, targetName string, targetArgs map[string]interface{}) {
 	orchestrate.Make(file, targetName, targetArgs)
 }

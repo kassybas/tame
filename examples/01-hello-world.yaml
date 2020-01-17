@@ -26,6 +26,7 @@ HelloLocal:
 # all arguments are named arguments
 # default value can be set to null, requiring it to be passed during the call
 # in single line yaml syntax, null can be omitted, eg: args: {$name}
+# arguments can also be passed from CLI eg. `tame HelloArg --name="foo"`
 HelloArg:
   args: {$name: "my default name"}
   run:

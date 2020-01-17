@@ -20,7 +20,7 @@ func loadCalledTargetInclude(name string, includes []schema.IncludeSchema, targe
 	calledTargetName := strings.TrimLeft(name, namespace+keywords.TameFieldSeparator)
 	for _, incl := range includes {
 		if namespace == incl.Alias {
-			s, _, err := PrepareStep(incl.Path, calledTargetName, []string{})
+			s, _, err := PrepareStep(incl.Path, calledTargetName, map[string]interface{}{})
 			if err != nil {
 				return target.Target{}, fmt.Errorf("error while loading include: %s\n\t%s", name, err.Error())
 			}

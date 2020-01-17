@@ -4,6 +4,8 @@ import (
 	"os"
 
 	"github.com/kassybas/tame/cmd"
+	"github.com/kassybas/tame/internal/helpers"
+	"github.com/sirupsen/logrus"
 	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli"
 )
@@ -24,17 +26,17 @@ func main() {
 			Usage:       "Path of tame source yaml",
 			Destination: &tameFile,
 		},
-		cli.StringSliceFlag{
-			Name:  "args, a",
-			Usage: "Set arguments for target [arg-name=arg-value]",
-		},
 	}
 
 	app.Action = func(c *cli.Context) {
 		if c.NArg() > 0 {
 			targetName = c.Args()[0]
 		}
-		targetArgs := c.GlobalStringSlice("args")
+		targetArgs, err := helpers.ParseCLITargetArgs(c.Args())
+		if err != nil {
+			logrus.Fatalf("failed to parse target flags:\n\t%s", err)
+
+		}
 		cmd.MakeCommand(tameFile, targetName, targetArgs)
 	}
 
