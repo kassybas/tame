@@ -88,7 +88,12 @@ func startIterations(steps stepblock.StepBlock, statusChan, resultChan chan step
 		}
 		wg.Add(1)
 		if s.GetOpts().Async {
-			go orchestrateIteration(s, ctx, vartable.CopyVarTable(vt), &wg, statusChan, parentOpts)
+			// copy vartable in case of async execution to have unique iterator
+			newVt := vartable.CopyVarTable(vt)
+			if s.GetIteratorVar() != nil {
+				newVt.AddVar(s.GetIteratorVar())
+			}
+			go orchestrateIteration(s, ctx, newVt, &wg, statusChan, parentOpts)
 		} else {
 			orchestrateIteration(s, ctx, vt, &wg, statusChan, parentOpts)
 			// wait for sync step to finish processing results

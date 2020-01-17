@@ -1,6 +1,9 @@
 package step
 
 import (
+	"reflect"
+
+	"github.com/kassybas/tame/internal/tvar"
 	"github.com/kassybas/tame/internal/vartable"
 
 	"github.com/kassybas/tame/internal/tcontext"
@@ -15,6 +18,17 @@ type Step interface {
 	GetOpts() opts.ExecutionOpts
 	SetOpts(opts.ExecutionOpts)
 	RunStep(tcontext.Context, *vartable.VarTable) StepStatus
+	SetIteratorVar(tvar.TVariable)
+	GetIteratorVar() tvar.TVariable
+}
+
+func Clone(s Step) Step {
+	indirect := reflect.Indirect(reflect.ValueOf(s))
+	newIndirect := reflect.New(indirect.Type())
+	newIndirect.Elem().Set(reflect.ValueOf(indirect.Interface()))
+	newNamed := newIndirect.Interface()
+	casted := newNamed.(Step)
+	return casted
 }
 
 type StepStatus struct {

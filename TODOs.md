@@ -1,8 +1,6 @@
 
 # TODOs
 
-- if/else, for with multiple steps
-- fix referencing variable fields in maps in expressions
 - add can-fail option to expressions and calls
 - resolve expressions everywhere
 - create extensive documentation
@@ -13,6 +11,7 @@
 - logging
 - make all field separators configurable
 - make globals r/w?
+- fix referencing variable fields in maps in expressions
 
 - docker
 - optimizations

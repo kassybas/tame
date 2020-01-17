@@ -10,6 +10,7 @@ import (
 	"github.com/kassybas/tame/internal/stepblock"
 	"github.com/kassybas/tame/internal/steprunner"
 	"github.com/kassybas/tame/internal/tcontext"
+	"github.com/kassybas/tame/internal/tvar"
 	"github.com/kassybas/tame/internal/vartable"
 	"github.com/kassybas/tame/schema"
 	"github.com/kassybas/tame/types/steptype"
@@ -112,13 +113,21 @@ func (s *ForStep) RunStep(ctx tcontext.Context, vt *vartable.VarTable) step.Step
 		}
 	}
 	var status step.StepStatus
+
+	// generate flattened list of steps
+	genForSteps := []step.Step{}
 	for _, itVal := range iterable {
-		vt.Add(iterator, itVal)
-		// TODo handle async copy
-		status = steprunner.RunAllSteps(s.forSteps, ctx, vt, s.GetOpts())
-		if status.Err != nil {
-			return status
+		for _, fStep := range s.forSteps.GetAll() {
+			newStep := step.Clone(fStep)
+			if newStep.GetOpts().Async {
+				newStep.SetIteratorVar(tvar.NewVariable(iterator, itVal))
+			}
+			genForSteps = append(genForSteps, newStep)
 		}
+	}
+	status = steprunner.RunAllSteps(stepblock.NewStepBlock(genForSteps), ctx, vt, s.GetOpts())
+	if status.Err != nil {
+		return status
 	}
 	return status
 }

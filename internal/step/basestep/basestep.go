@@ -2,7 +2,6 @@ package basestep
 
 import (
 	"github.com/kassybas/tame/internal/tvar"
-	"github.com/kassybas/tame/internal/vartable"
 	"github.com/kassybas/tame/types/opts"
 	"github.com/kassybas/tame/types/steptype"
 )
@@ -31,8 +30,11 @@ func (s *BaseStep) GetOpts() opts.ExecutionOpts {
 	return s.opts
 }
 
-func (s *BaseStep) SetIterator(vt *vartable.VarTable) {
-
+func (s *BaseStep) SetIteratorVar(v tvar.TVariable) {
+	s.iteratorVar = v
+}
+func (s *BaseStep) GetIteratorVar() tvar.TVariable {
+	return s.iteratorVar
 }
 
 func (s *BaseStep) GetName() string {
