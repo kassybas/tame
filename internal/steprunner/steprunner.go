@@ -95,6 +95,7 @@ func startIterations(steps stepblock.StepBlock, statusChan, resultChan chan step
 			}
 			go orchestrateIteration(s, ctx, newVt, &wg, statusChan, parentOpts)
 		} else {
+			vt.AddVar(s.GetIteratorVar())
 			orchestrateIteration(s, ctx, vt, &wg, statusChan, parentOpts)
 			// wait for sync step to finish processing results
 			<-syncStepDone

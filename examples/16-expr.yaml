@@ -1,0 +1,28 @@
+settings:
+  shieldEnv: true
+
+$hello: tourist
+$dubist: inbudapest
+
+# Expressions use the antonmed/expr library
+# Expression language definition: https://github.com/antonmedv/expr/blob/master/docs/Language-Definition.md
+
+
+TestExprRange:
+  run:
+  - expr: "1..5"  # results in a list 1 to 10
+    =: $seq
+  - for: {$i: $seq}
+    do:
+    - sh: echo Number:${i}
+
+TestExprMember:
+  run:
+  - $foo: ['a', 'b', 'c','d']
+  - expr: " 'a' in $foo "
+    =: $isItMember
+  - sh: echo "Is it member? ${isItMember}"
+
+  - expr: len($foo)
+    =: $len
+  - sh: echo "lenght of array is ${len}"

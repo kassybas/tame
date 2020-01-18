@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/kassybas/tame/internal/dotref"
+	"github.com/sirupsen/logrus"
 
 	"github.com/kassybas/tame/internal/keywords"
 	"github.com/kassybas/tame/types/vartype"
@@ -15,13 +16,36 @@ type TList struct {
 	values []TVariable
 }
 
-func NewList(name string, values []interface{}) TList {
+func NewList(name string, values interface{}) TList {
 	tl := TList{
 		name:   name,
-		values: make([]TVariable, len(values)),
+		values: []TVariable{},
 	}
-	for i := range values {
-		tl.values[i] = NewVariable(ConvertKeyToString(i), values[i])
+	// this is repetitive because []interface{} is not a generic type enymore
+	// it cannot be casted to []int like interface{}
+	switch values := values.(type) {
+	case []interface{}: //, []int, []string, []bool, []float64:
+		for i := range values {
+			tl.values = append(tl.values, NewVariable(ConvertKeyToString(i), values[i]))
+		}
+	case []int:
+		for i := range values {
+			tl.values = append(tl.values, NewVariable(ConvertKeyToString(i), values[i]))
+		}
+	case []string:
+		for i := range values {
+			tl.values = append(tl.values, NewVariable(ConvertKeyToString(i), values[i]))
+		}
+	case []float64:
+		for i := range values {
+			tl.values = append(tl.values, NewVariable(ConvertKeyToString(i), values[i]))
+		}
+	case []bool:
+		for i := range values {
+			tl.values = append(tl.values, NewVariable(ConvertKeyToString(i), values[i]))
+		}
+	default:
+		logrus.Fatalf("internal error: creating list from non-iterable type: %s -- type: %T", name, values)
 	}
 	return tl
 }

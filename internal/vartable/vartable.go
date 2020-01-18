@@ -60,6 +60,9 @@ func (vt *VarTable) Exists(name string) bool {
 }
 
 func (vt *VarTable) AddVar(v tvar.TVariable) error {
+	if v == nil {
+		return nil
+	}
 	vt.Lock()
 	vt.vars[v.Name()] = v
 	vt.Unlock()

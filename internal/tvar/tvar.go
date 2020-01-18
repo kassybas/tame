@@ -20,7 +20,7 @@ type TVariable interface {
 func NewVariable(name string, value interface{}) TVariable {
 	var newVar TVariable
 	switch value := value.(type) {
-	case []interface{}:
+	case []interface{}, []int, []string, []float64:
 		{
 			newVar = NewList(name, value)
 		}

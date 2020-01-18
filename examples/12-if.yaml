@@ -14,6 +14,7 @@ $users:
 
 # Expressions in if statements use antonmedv/expr library
 # See Docs: https://github.com/antonmedv/expr/blob/master/docs/Language-Definition.md
+# Expressions in if must resolve to a boolean value
 
 IsUser:
   args: {$userName}

@@ -119,9 +119,7 @@ func (s *ForStep) RunStep(ctx tcontext.Context, vt *vartable.VarTable) step.Step
 	for _, itVal := range iterable {
 		for _, fStep := range s.forSteps.GetAll() {
 			newStep := step.Clone(fStep)
-			if newStep.GetOpts().Async {
-				newStep.SetIteratorVar(tvar.NewVariable(iterator, itVal))
-			}
+			newStep.SetIteratorVar(tvar.NewVariable(iterator, itVal))
 			genForSteps = append(genForSteps, newStep)
 		}
 	}
