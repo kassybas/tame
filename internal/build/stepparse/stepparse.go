@@ -157,6 +157,12 @@ func ParseStepSchema(raw interface{}) (schema.MergedStepSchema, error) {
 	if err != nil {
 		return mergedSchema, err
 	}
+	if mergedSchema.Dump != nil {
+		mergedSchema.StepType, err = setStepType(mergedSchema.StepType, steptype.Dump)
+		if err != nil {
+			return mergedSchema, err
+		}
+	}
 	// Determine step type
 	if mergedSchema.ForLoop != nil {
 		if mergedSchema.ForSteps, err = loadSubSteps(mergedSchema.ForRawSteps); err != nil {

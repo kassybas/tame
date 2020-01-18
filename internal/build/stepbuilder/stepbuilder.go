@@ -5,6 +5,7 @@ import (
 
 	"github.com/kassybas/tame/internal/step"
 	"github.com/kassybas/tame/internal/step/callstep"
+	"github.com/kassybas/tame/internal/step/dumpstep"
 	"github.com/kassybas/tame/internal/step/exprstep"
 	"github.com/kassybas/tame/internal/step/forstep"
 	"github.com/kassybas/tame/internal/step/ifstep"
@@ -76,6 +77,10 @@ func NewStep(stepDef schema.MergedStepSchema) (step.Step, error) {
 				return nil, fmt.Errorf("error parsing step in for-do block:\n\t%s", err.Error())
 			}
 			return forstep.NewForStep(stepDef, forSteps)
+		}
+	case steptype.Dump:
+		{
+			return dumpstep.NewDumpStep(stepDef)
 		}
 	default:
 		{

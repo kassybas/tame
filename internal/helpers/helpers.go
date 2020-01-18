@@ -53,6 +53,42 @@ func IsPublic(targetName string) bool {
 	return true
 }
 
+func DeepConvertInterToMapStrInter(inter interface{}) (interface{}, error) {
+	var err error
+	res := make(map[string]interface{})
+	mInter, isMap := inter.(map[interface{}]interface{})
+	if isMap {
+		for key, value := range mInter {
+			switch key := key.(type) {
+			case string:
+				_, needToGoDeeper := value.(map[interface{}]interface{})
+				if needToGoDeeper {
+					value, err = DeepConvertInterToMapStrInter(value)
+					if err != nil {
+						return nil, err
+					}
+				}
+				res[key] = value
+			default:
+				return nil, fmt.Errorf("non-string key in map: %v", key)
+			}
+		}
+		return res, nil
+	}
+	// convert list elements, because list elements can be map[interface{}]interface{}
+	lInter, isList := inter.([]interface{})
+	if isList {
+		for i := range lInter {
+			lInter[i], err = DeepConvertInterToMapStrInter(lInter[i])
+			if err != nil {
+				return nil, err
+			}
+		}
+		return lInter, nil
+	}
+	return inter, nil
+}
+
 func ConvertInterToMapStrInter(inter interface{}) (map[string]interface{}, error) {
 	res := make(map[string]interface{})
 	mInter, ok := inter.(map[interface{}]interface{})

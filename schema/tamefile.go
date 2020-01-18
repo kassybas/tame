@@ -35,6 +35,12 @@ type SettingsShema struct {
 	ShellFieldSeparator string   `mapstructure:"shellFieldSeparator,omitempty"`
 }
 
+type DumpSchema struct {
+	SourceVarName string `mapstructure:"var,omitempty"`
+	Path          string `mapstructure:"path,omitempty"`
+	Format        string `mapstructure:"format,omitempty"`
+}
+
 // MergedStepSchema is the base format of step
 type MergedStepSchema struct {
 	ForLoop          *map[string]interface{} `mapstructure:"for"`
@@ -45,6 +51,7 @@ type MergedStepSchema struct {
 	Script           *[]string               `mapstructure:"sh"`     // string is allowed due to weak decode
 	Expr             *string                 `mapstructure:"expr"`
 	Wait             *interface{}            `mapstructure:"wait"`
+	Dump             *DumpSchema             `mapstructure:"dump"`
 
 	// loaded dynamically since the yaml key defines the step type or step data
 	ForSteps            []MergedStepSchema     `mapstructure:"-"` // do: [ForSteps]

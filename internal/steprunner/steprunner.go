@@ -64,21 +64,21 @@ func updateVarsWithResultVariables(vt *vartable.VarTable, resultVarNames []strin
 }
 
 func processStatuses(statusChan, resultChan chan step.StepStatus, syncStepDone chan bool, vt *vartable.VarTable) {
-	var lastStatus step.StepStatus
+	var curStatus step.StepStatus
 	for status := range statusChan {
-		lastStatus = status
-		if lastStatus.Err != nil {
-			resultChan <- lastStatus
+		curStatus = status
+		if curStatus.Err != nil {
+			resultChan <- curStatus
 		}
-		lastStatus.Err = updateVarsWithResultVariables(vt, status.ResultNames, status.Results, status.AllowedLessResults)
-		if lastStatus.IsBreaking {
-			resultChan <- lastStatus
+		curStatus.Err = updateVarsWithResultVariables(vt, status.ResultNames, status.Results, status.AllowedLessResults)
+		if curStatus.IsBreaking {
+			resultChan <- curStatus
 		}
 		if status.IsSync {
 			syncStepDone <- true
 		}
 	}
-	resultChan <- lastStatus
+	resultChan <- curStatus
 }
 func startIterations(steps stepblock.StepBlock, statusChan, resultChan chan step.StepStatus, syncStepDone chan bool, ctx tcontext.Context, vt *vartable.VarTable, parentOpts opts.ExecutionOpts) {
 	var wg sync.WaitGroup

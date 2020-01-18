@@ -21,6 +21,6 @@ func NewWaitStep(stepDef schema.MergedStepSchema) (*WaitStep, error) {
 }
 
 func (s *WaitStep) RunStep(ctx tcontext.Context, vt *vartable.VarTable) step.StepStatus {
-	// waiting is handled in target runner
+	// waiting is handled in steprunner
 	return step.StepStatus{}
 }

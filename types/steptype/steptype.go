@@ -12,6 +12,7 @@ const (
 	Wait
 	If
 	For
+	Dump
 )
 
 func (t Steptype) ToStr() string {
@@ -34,6 +35,8 @@ func (t Steptype) ToStr() string {
 		return "if"
 	case For:
 		return "for"
+	case Dump:
+		return "dump"
 	default:
 		panic("internal error: non-steptype steptype")
 	}

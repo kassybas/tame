@@ -32,7 +32,7 @@ func ParseTargets(dynamicKeys map[string]interface{}) (map[string]schema.TargetS
 				var md mapstructure.Metadata
 				err := mapstructure.DecodeMetadata(v, &newTargetSch, &md)
 				if err != nil {
-					return nil, fmt.Errorf("failed to parse target: %s\n\t%s", k, err.Error())
+					return nil, fmt.Errorf("failed to parse target, incorrect yaml format: %s\n\t%s", k, err.Error())
 				}
 				if len(md.Unused) != 0 {
 					return nil, fmt.Errorf("unknown keys in target: %s\n\t%s", k, md.Unused)
