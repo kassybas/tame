@@ -14,7 +14,10 @@ DumpExample:
         os: darwin
   - dump:
       var: $config
-      path: "./hello.yaml"
-      format: json
-    =: $result   # dumps value as yaml formatted string to $result variable
+      # path to save the contents of variable to
+      # if path omitted: variable is not saved (only results are in := as astring)
+      path: "./hello.json"
+      format: json  # variable format, possible options: json|yaml
+    # dumps value as json formatted string to $result variable
+    =: $result
   - sh: echo "Dumped value is:${result}"
