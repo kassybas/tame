@@ -1,5 +1,6 @@
 
 # TODOs
+- tests
 - logging
 - create extensive documentation
 
@@ -12,6 +13,7 @@
 - fix referencing variable fields in maps in expressions
 - escape $ and .
 - while loop
+- target-specific shell
 
 - docker
 - optimizations

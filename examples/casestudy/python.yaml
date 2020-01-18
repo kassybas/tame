@@ -1,0 +1,10 @@
+settings:
+  shell: python
+
+
+ExecuteMe: |
+  print("hey Busra")
+  dict = {
+    "hello": 12
+  }
+  print(dict["hello"])

@@ -1,0 +1,10 @@
+
+include:
+- path: "./wait-for-it.yaml"
+  as: waitforit
+
+statupDocker:
+  run:
+  - sh: echo startup
+
+  - waitforit.WaitForIt: {}
