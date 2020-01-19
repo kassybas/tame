@@ -59,19 +59,15 @@ func DeepConvertInterToMapStrInter(inter interface{}) (interface{}, error) {
 	mInter, isMap := inter.(map[interface{}]interface{})
 	if isMap {
 		for key, value := range mInter {
-			switch key := key.(type) {
-			case string:
-				_, needToGoDeeper := value.(map[interface{}]interface{})
-				if needToGoDeeper {
-					value, err = DeepConvertInterToMapStrInter(value)
-					if err != nil {
-						return nil, err
-					}
+			_, needToGoDeeper := value.(map[interface{}]interface{})
+			if needToGoDeeper {
+				value, err = DeepConvertInterToMapStrInter(value)
+				if err != nil {
+					return nil, err
 				}
-				res[key] = value
-			default:
-				return nil, fmt.Errorf("non-string key in map: %v", key)
 			}
+			res[fmt.Sprintf("%v", key)] = value
+			// return nil, fmt.Errorf("non-string key in map: %v", key)
 		}
 		return res, nil
 	}

@@ -7,11 +7,13 @@ settings:
 DumpExample:
   run:
   - $config:
-    - linux:
+      linux:
         os: linux
         arch: amd64
-    - mac:
+      mac:
         os: darwin
+      9:              # when dumping the variable in json format, non-string keys are converted to string
+        os: planet9
   - dump:
       var: $config
       # path to save the contents of variable to
