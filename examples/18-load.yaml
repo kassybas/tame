@@ -1,0 +1,38 @@
+settings:
+  shieldEnv: true
+
+
+LoadExampleFil:
+  run:
+  - load:
+      path: "examples/files/hello.toml"
+      format: toml
+    =: $loaded
+  - sh: env
+
+
+LoadExampleVariable:
+  run:
+  - $sourceVar: |
+      {
+        "foo": "bar",
+        "baz": 42
+      }
+  - load:
+      var: $sourceVar   # only one can be defined for source: path or var
+      format: json
+    =: $loaded
+  - sh: echo json field is ${loaded_foo}
+
+LoadExampleCurl:
+  run:
+  - sh: curl "http://worldtimeapi.org/api/timezone/Europe/London"
+    =: $apiResponse
+    opts: silent
+  - load:
+      var: $apiResponse
+      format: json
+    =: $parsedApiResp  # loads json string into tame variables
+  - $currentTime: $parsedApiResp.datetime
+  - sh: echo "Current time is ${currentTime}"
+

@@ -9,6 +9,7 @@ import (
 	"github.com/kassybas/tame/internal/step/exprstep"
 	"github.com/kassybas/tame/internal/step/forstep"
 	"github.com/kassybas/tame/internal/step/ifstep"
+	"github.com/kassybas/tame/internal/step/loadstep"
 	"github.com/kassybas/tame/internal/step/returnstep"
 	"github.com/kassybas/tame/internal/step/shellstep"
 	"github.com/kassybas/tame/internal/step/varstep"
@@ -81,6 +82,10 @@ func NewStep(stepDef schema.MergedStepSchema) (step.Step, error) {
 	case steptype.Dump:
 		{
 			return dumpstep.NewDumpStep(stepDef)
+		}
+	case steptype.Load:
+		{
+			return loadstep.NewLoadStep(stepDef)
 		}
 	default:
 		{

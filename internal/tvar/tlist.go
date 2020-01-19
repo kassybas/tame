@@ -55,7 +55,6 @@ func (v TList) Name() string {
 }
 
 func (v TList) ToStr() string {
-	// TODO: yaml dump?
 	return fmt.Sprintf("%v", v.values)
 }
 

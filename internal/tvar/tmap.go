@@ -2,12 +2,12 @@ package tvar
 
 import (
 	"fmt"
-	"log"
 	"strings"
 
 	"github.com/kassybas/tame/internal/dotref"
 	"github.com/kassybas/tame/internal/keywords"
 	"github.com/kassybas/tame/types/vartype"
+	"github.com/sirupsen/logrus"
 )
 
 type TMap struct {
@@ -31,9 +31,15 @@ func NewMap(name string, value interface{}) TMap {
 		{
 			// create map
 			for k, v := range value {
-				// original type of key is converted to string in the name
+				// original type of key is converted to string in the name of the variable not in the map
 				stringKey := ConvertKeyToString(k)
 				tm.values[k] = NewVariable(stringKey, v)
+			}
+		}
+	case map[string]interface{}:
+		{
+			for k, v := range value {
+				tm.values[k] = NewVariable(k, v)
 			}
 		}
 	case map[interface{}]TVariable:
@@ -49,7 +55,7 @@ func NewMap(name string, value interface{}) TMap {
 		}
 	default:
 		{
-			log.Fatalf("unknown type to create map from %s: %T", name, value)
+			logrus.Fatalf("unknown type to create map from %s: %T", name, value)
 		}
 	}
 	return tm
@@ -60,7 +66,6 @@ func (v TMap) Name() string {
 }
 
 func (v TMap) ToStr() string {
-	// TODO: yaml dump?
 	return fmt.Sprintf("%v", v.values)
 }
 

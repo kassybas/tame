@@ -1,10 +1,9 @@
 package tvar
 
 import (
-	"log"
-
 	"github.com/kassybas/tame/internal/dotref"
 	"github.com/kassybas/tame/types/vartype"
+	"github.com/sirupsen/logrus"
 )
 
 type TVariable interface {
@@ -28,14 +27,14 @@ func NewVariable(name string, value interface{}) TVariable {
 		{
 			newVar = NewScalar(name, value)
 		}
-	case map[interface{}]interface{}, map[interface{}]TVariable, TVariable, []TVariable:
+	case map[interface{}]interface{}, map[string]interface{}, map[interface{}]TVariable, TVariable, []TVariable:
 		{
 			// encapsulate value to field
 			newVar = NewMap(name, value)
 		}
 	default:
 		{
-			log.Fatalf("unknown variable type %s: %T", name, value)
+			logrus.Fatalf("unknown variable type %s: %T", name, value)
 		}
 
 	}

@@ -9,7 +9,7 @@ const (
 	TMapType
 )
 
-func GetTypeNameString(t TVarType) string {
+func (t TVarType) Name() string {
 	switch t {
 	case TScalarType:
 		{

@@ -8,7 +8,7 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-func readFile(filePath string) ([]byte, error) {
+func ReadFile(filePath string) ([]byte, error) {
 	b, err := ioutil.ReadFile(filePath)
 	if err != nil {
 		return nil, err
@@ -17,7 +17,7 @@ func readFile(filePath string) ([]byte, error) {
 }
 
 func Load(filePath string) (schema.Tamefile, map[string]interface{}, error) {
-	fc, err := readFile(filePath)
+	fc, err := ReadFile(filePath)
 	if err != nil {
 		return schema.Tamefile{}, nil, err
 	}

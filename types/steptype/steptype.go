@@ -13,6 +13,7 @@ const (
 	If
 	For
 	Dump
+	Load
 )
 
 func (t Steptype) ToStr() string {
@@ -37,6 +38,8 @@ func (t Steptype) ToStr() string {
 		return "for"
 	case Dump:
 		return "dump"
+	case Load:
+		return "load"
 	default:
 		panic("internal error: non-steptype steptype")
 	}
