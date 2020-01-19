@@ -6,6 +6,8 @@ LoadExampleFil:
   run:
   - load:
       path: "examples/files/hello.toml"
+      # load format can be json|yaml|toml|string (default: string)
+      # in string format no parsing is done on the source content, it is passed to the result variable as is
       format: toml
     =: $loaded
   - sh: env
@@ -19,7 +21,7 @@ LoadExampleVariable:
         "baz": 42
       }
   - load:
-      var: $sourceVar   # only one can be defined for source: path or var
+      var: $sourceVar  # only one can be defined for source: path or var
       format: json
     =: $loaded
   - sh: echo json field is ${loaded_foo}

@@ -19,7 +19,7 @@ DumpExample:
       # if path omitted: variable is not saved (only results are in := as astring)
       path: "./hello.json"
       # Note: when dumping the variable in json or toml format, non-string keys are converted to string
-      format: toml  # variable format, possible options: json|yaml|toml
+      format: toml  # resulting format, possible options: json|yaml|toml
     # dumps value as json formatted string to $result variable
     =: $result
   - sh: echo "Dumped value is:${result}"

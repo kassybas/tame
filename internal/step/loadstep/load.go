@@ -43,7 +43,11 @@ func NewLoadStep(stepDef schema.MergedStepSchema) (*LoadStep, error) {
 func parseContents(contents string, format string) (interface{}, error) {
 	var result interface{}
 	switch format {
-	case "yaml", "":
+	case "string", "":
+		{
+			return contents, nil
+		}
+	case "yaml":
 		{
 			err := yaml.Unmarshal([]byte(contents), &result)
 			if err != nil {
@@ -76,12 +80,14 @@ func parseContents(contents string, format string) (interface{}, error) {
 func (s *LoadStep) RunStep(ctx tcontext.Context, vt *vartable.VarTable) step.StepStatus {
 	var contents string
 	if s.path != "" {
+		// load from file
 		cbytes, err := loader.ReadFile(s.path)
 		if err != nil {
 			return step.StepStatus{Err: fmt.Errorf("failed to load file in step: %s\n\t", s.GetName(), err.Error())}
 		}
 		contents = string(cbytes)
 	} else {
+		// load from variable
 		v, err := vt.GetVar(s.sourceVarName)
 		if err != nil {
 			return step.StepStatus{Err: fmt.Errorf("failed to resolve variable load step: %s\n\t", s.GetName(), err.Error())}
