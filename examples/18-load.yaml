@@ -2,16 +2,23 @@ settings:
   shieldEnv: true
 
 
-LoadExampleFil:
+LoadExampleFile:
   run:
   - load:
       path: "examples/files/hello.toml"
       # load format can be json|yaml|toml|string (default: string)
       # in string format no parsing is done on the source content, it is passed to the result variable as is
-      format: toml
-    =: $loaded
+      format: toml #  --> file contents will be parsed to tame variable $foo as map
+    =: $foo
   - sh: env
 
+LoadExampleFileString:
+  run:
+  - load:
+      path: "examples/files/hello.toml"
+      format: string  #  --> file contents will be passed to tame variable $loaded as string
+    =: $loaded
+  - sh: env
 
 LoadExampleVariable:
   run:
