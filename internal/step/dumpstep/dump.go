@@ -1,11 +1,13 @@
 package dumpstep
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io"
 	"os"
 
+	"github.com/BurntSushi/toml"
 	"github.com/kassybas/tame/internal/helpers"
 	"github.com/kassybas/tame/internal/step"
 	"github.com/kassybas/tame/internal/step/basestep"
@@ -35,33 +37,48 @@ func NewDumpStep(stepDef schema.MergedStepSchema) (*DumpStep, error) {
 }
 
 func getFormattedValue(v interface{}, format string) (string, error) {
-	var dumpedValue []byte
-	var err error
+	var dumpedValue string
 	switch format {
 	case "yaml", "":
 		{
-			dumpedValue, err = yaml.Marshal(&v)
+			dumpedValueBytes, err := yaml.Marshal(&v)
 			if err != nil {
 				return "", fmt.Errorf("could not encode source variable to yaml in dump step: %s", err.Error())
 			}
+			dumpedValue = string(dumpedValueBytes)
 		}
 	case "json":
 		{
-			// json unmarshal does not support map[interface{}] interface
+			// json does not support map[interface{}]interface{}
 			// so we need to convert it to map[string]interface{}
 			strMapValue, err := helpers.DeepConvertInterToMapStrInter(v)
 			if err != nil {
 				return "", fmt.Errorf("could not encode source variable to json in dump step: %s", err.Error())
 			}
-			dumpedValue, err = json.Marshal(&strMapValue)
+			dumpedValueBytes, err := json.Marshal(&strMapValue)
 			if err != nil {
 				return "", fmt.Errorf("could not encode source variable to json in dump step: %s", err.Error())
 			}
+			dumpedValue = string(dumpedValueBytes)
+		}
+	case "toml":
+		{
+			// toml does not support map[interface{}] interface{}
+			// so we need to convert it to map[string]interface{}
+			strMapValue, err := helpers.DeepConvertInterToMapStrInter(v)
+			if err != nil {
+				return "", fmt.Errorf("could not encode source variable to toml in dump step: %s", err.Error())
+			}
+			buf := new(bytes.Buffer)
+			if err := toml.NewEncoder(buf).Encode(strMapValue); err != nil {
+				return "", fmt.Errorf("could not encode source variable to toml in dump step: %s", err.Error())
+			}
+			dumpedValue = buf.String()
 		}
 	default:
-		return "", fmt.Errorf("unknown encoding in dump step, possible: yaml|json, got: %s", format)
+		return "", fmt.Errorf("unknown encoding in dump step, possible: yaml|json|toml, got: %s", format)
 	}
-	return string(dumpedValue), nil
+	return dumpedValue, nil
 
 }
 func writeToFile(path string, data string) error {
