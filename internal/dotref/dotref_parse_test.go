@@ -174,20 +174,20 @@ func TestParseDotRef(t *testing.T) {
 			},
 			false,
 		},
-		// {
-		// 	"test10",
-		// 	args{fullName: `hello["tourist.dubist"]`},
-		// 	[]RefField{
-		// 		RefField{FieldName: "hello", Type: reftype.Literal},
-		// 		RefField{
-		// 			Type: reftype.InnerRef,
-		// 			InnerRefs: []RefField{
-		// 				RefField{FieldName: "tourist.dubist", Type: reftype.Literal},
-		// 			},
-		// 		},
-		// 	},
-		// 	false,
-		// },
+		{
+			"test10",
+			args{fullName: `hello["tourist.dubist"]`},
+			[]RefField{
+				RefField{FieldName: "hello", Type: reftype.Literal},
+				RefField{
+					Type: reftype.InnerRef,
+					InnerRefs: []RefField{
+						RefField{FieldName: "tourist.dubist", Type: reftype.Literal},
+					},
+				},
+			},
+			false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

@@ -31,7 +31,23 @@ func NewRefTree(parent *RefTree) *RefTree {
 	return &newTree
 }
 
+func trimLiteralQuotes(field string) (string, error) {
+	if strings.HasPrefix(field, `"`) {
+		if !strings.HasSuffix(field, `"`) {
+			return "", fmt.Errorf("missing closing bracket: %s", field)
+		}
+		field = strings.Trim(field, `"`)
+	} else if strings.HasPrefix(field, `'`) {
+		if !strings.HasSuffix(field, `"`) {
+			return "", fmt.Errorf("missing closing bracket: %s", field)
+		}
+		field = strings.Trim(field, `'`)
+	}
+	return field, nil
+}
+
 func (r *RefTree) AddField(field string) error {
+	var err error
 	rt := reftype.Unset
 	if strings.HasPrefix(field, "$") {
 		if r.cur.count > 0 {
@@ -39,6 +55,10 @@ func (r *RefTree) AddField(field string) error {
 		}
 		rt = reftype.VarName
 	} else {
+		field, err = trimLiteralQuotes(field)
+		if err != nil {
+			return err
+		}
 		rt = reftype.Literal
 	}
 	r.AddNode(RefField{FieldName: field, Type: rt})

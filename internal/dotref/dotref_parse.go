@@ -11,29 +11,26 @@ func ParseDotRef(fullName string) ([]RefField, error) {
 	for _, ch := range fullName {
 		pos++
 		switch ch {
-		// case '"':
-		// 	if singleQuotesStarted {
-		// 		continue
-		// 	}
-		// 	if pos == prevPos+1 {
-		// 		return nil, fmt.Errorf("quoting in the middle of variable reference: %s", fullName)
-		// 	}
-		// 	doubleQuotesStarted = !doubleQuotesStarted
-		// case '\'':
-		// 	if doubleQuotesStarted {
-		// 		continue
-		// 	}
-		// 	if pos == prevPos+1 {
-		// 		return nil, fmt.Errorf("quoting in the middle of variable reference: %s", fullName)
-		// 	}
-		// 	singleQuotesStarted = !singleQuotesStarted
+		case '"':
+			if singleQuotesStarted {
+				continue
+			}
+			doubleQuotesStarted = !doubleQuotesStarted
+		case '\'':
+			if doubleQuotesStarted {
+				continue
+			}
+			singleQuotesStarted = !singleQuotesStarted
 		case '.':
 			{
 				if singleQuotesStarted || doubleQuotesStarted {
 					continue
 				}
 				if pos != prevPos+1 {
-					result.AddField(fullName[prevPos : pos-1])
+					err := result.AddField(fullName[prevPos : pos-1])
+					if err != nil {
+						return nil, err
+					}
 				}
 				prevPos = pos
 			}
@@ -43,7 +40,10 @@ func ParseDotRef(fullName string) ([]RefField, error) {
 					continue
 				}
 				if pos != prevPos+1 {
-					result.AddField(fullName[prevPos : pos-1])
+					err := result.AddField(fullName[prevPos : pos-1])
+					if err != nil {
+						return nil, err
+					}
 				}
 				result.OpenInner()
 				startedBrackets++
@@ -55,12 +55,14 @@ func ParseDotRef(fullName string) ([]RefField, error) {
 					continue
 				}
 				if pos != prevPos+1 {
-					result.AddField(fullName[prevPos : pos-1])
+					err := result.AddField(fullName[prevPos : pos-1])
+					if err != nil {
+						return nil, err
+					}
 				}
 				result.CloseInner()
 				startedBrackets--
 				prevPos = pos
-				// TODO: check started and closed brackets
 			}
 		}
 	}
