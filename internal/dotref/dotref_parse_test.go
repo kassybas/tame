@@ -21,9 +21,21 @@ func TestParseDotRef(t *testing.T) {
 			"test1",
 			args{fullName: "hello"},
 			[]RefField{
+				RefField{FieldName: "hello", Type: reftype.Literal},
+			},
+			false,
+		},
+		{
+			"test1v",
+			args{fullName: "$hello.foo[$okay]"},
+			[]RefField{
+				RefField{FieldName: "$hello", Type: reftype.VarName},
+				RefField{FieldName: "foo", Type: reftype.Literal},
 				RefField{
-					FieldName: "hello",
-					Type:      reftype.Literal,
+					Type: reftype.InnerRef,
+					InnerRefs: []RefField{
+						RefField{FieldName: "$okay", Type: reftype.VarName},
+					},
 				},
 			},
 			false,
