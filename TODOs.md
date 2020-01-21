@@ -4,9 +4,11 @@
 - logging
 - create extensive documentation
 
-- resolve expressions everywhere
+- resolve expressions and vars everywhere
+  - variable assignemnt
+  - opts
+  - load/dump
 - make append to list possible
-- load yaml/dump yaml
 - overwrites in cli and in include
 - make all field separators configurable
 - make globals r/w?

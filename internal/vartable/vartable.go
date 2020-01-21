@@ -5,6 +5,7 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/antonmedv/expr"
 	"github.com/kassybas/tame/internal/dotref"
 	"github.com/kassybas/tame/internal/keywords"
 	"github.com/kassybas/tame/internal/tvar"
@@ -96,6 +97,7 @@ func (vt *VarTable) Append(names []string, values []interface{}) error {
 		}
 		if vt.Exists(nameFields[0].FieldName) {
 			// variable exists
+			//
 			oldVar, err := vt.GetVarByFields(nameFields)
 			if err != nil {
 				return err
@@ -149,23 +151,33 @@ func (vt *VarTable) ResolveValue(val interface{}) (interface{}, error) {
 				// No resolution needed for constant value
 				return val, nil
 			}
-			valueVar, err := vt.GetVar(val)
+			env := vt.GetAllValues()
+			program, err := expr.Compile(val, expr.Env(env))
 			if err != nil {
-				return nil, err
+				return nil, fmt.Errorf("could not parse variable reference: %s", err.Error())
 			}
-			if !dotref.IsDotRef(val) {
-				return valueVar.Value(), nil
-			}
-			fields, err := dotref.ParseFields(val)
+			result, err := expr.Run(program, env)
 			if err != nil {
-				return nil, err
+				return nil, fmt.Errorf("could not resolve variable reference: %s", err.Error())
 			}
-			// resolve each field
-			fields, err = vt.resolveEachField(fields)
-			if err != nil {
-				return nil, err
-			}
-			return valueVar.GetInnerValue(fields)
+			return result, nil
+			// valueVar, err := vt.GetVar(val)
+			// if err != nil {
+			// 	return nil, err
+			// }
+			// if !dotref.IsDotRef(val) {
+			// 	return valueVar.Value(), nil
+			// }
+			// fields, err := dotref.ParseFields(val)
+			// if err != nil {
+			// 	return nil, err
+			// }
+			// // resolve each field
+			// fields, err = vt.resolveEachField(fields)
+			// if err != nil {
+			// 	return nil, err
+			// }
+			// return valueVar.GetInnerValue(fields)
 		}
 	default:
 		{

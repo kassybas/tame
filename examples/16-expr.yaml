@@ -26,3 +26,19 @@ TestExprMember:
   - expr: len($foo)
     =: $len
   - sh: echo "lenght of array is ${len}"
+
+TestVarFields:
+  run:
+  - $config:
+      mac:
+        os: darwin
+      linux:
+        os: ubuntu
+  - $selected:
+      now: "mac"
+
+  - $sConf: $config[$selected.now].os
+  - expr: $config[$selected["now"]].os
+    =: $result
+  - sh: echo result is $sConf
+  - sh: echo result is $result
