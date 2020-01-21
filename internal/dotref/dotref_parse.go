@@ -1,5 +1,7 @@
 package dotref
 
+import "fmt"
+
 func ParseDotRef(fullName string) ([]RefField, error) {
 	// var cur string
 	prevPos := 0
@@ -65,6 +67,9 @@ func ParseDotRef(fullName string) ([]RefField, error) {
 				prevPos = pos
 			}
 		}
+	}
+	if startedBrackets != 0 {
+		return nil, fmt.Errorf("unclosed brackets in variable reference: %s", fullName)
 	}
 	if prevPos != pos {
 		result.AddField(fullName[prevPos:])

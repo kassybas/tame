@@ -200,6 +200,12 @@ func TestParseDotRef(t *testing.T) {
 			},
 			false,
 		},
+		{
+			"test11",
+			args{fullName: `hello[tourist[dubist]`},
+			nil,
+			true,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
