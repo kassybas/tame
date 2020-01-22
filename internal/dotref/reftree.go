@@ -7,23 +7,23 @@ import (
 	"github.com/kassybas/tame/internal/dotref/reftype"
 )
 
-type RefTree struct {
-	cur    *RefTree
-	parent *RefTree
+type RefTreeParse struct {
+	cur    *RefTreeParse
+	parent *RefTreeParse
 	count  int
 	nodes  []RefField
 }
 
 type RefField struct {
-	FieldName string
-	InnerTree *RefTree
+	FieldName interface{}
+	InnerTree *RefTreeParse
 	InnerRefs []RefField
 	Index     int
 	Type      reftype.RefType
 }
 
-func NewRefTree(parent *RefTree) *RefTree {
-	newTree := RefTree{
+func NewRefTree(parent *RefTreeParse) *RefTreeParse {
+	newTree := RefTreeParse{
 		nodes:  []RefField{},
 		parent: parent,
 	}
@@ -46,7 +46,7 @@ func trimLiteralQuotes(field string) (string, error) {
 	return field, nil
 }
 
-func (r *RefTree) AddField(field string) error {
+func (r *RefTreeParse) AddField(field string) error {
 	var err error
 	rt := reftype.Unset
 	if strings.HasPrefix(field, "$") {
@@ -65,12 +65,12 @@ func (r *RefTree) AddField(field string) error {
 	return nil
 }
 
-func (r *RefTree) AddNode(rf RefField) {
+func (r *RefTreeParse) AddNode(rf RefField) {
 	r.cur.nodes = append(r.cur.nodes, rf)
 	r.cur.count++
 }
 
-func (r *RefTree) CloseInner() error {
+func (r *RefTreeParse) CloseInner() error {
 	if r.parent == nil {
 		return fmt.Errorf("closing bracket without opeing one")
 	}
@@ -79,7 +79,7 @@ func (r *RefTree) CloseInner() error {
 	return nil
 }
 
-func (r *RefTree) OpenInner() error {
+func (r *RefTreeParse) OpenInner() error {
 	innterTree := NewRefTree(r)
 	r.AddNode(RefField{InnerTree: innterTree, Type: reftype.InnerRef})
 	// set cur to inner until bracket is closed
@@ -88,7 +88,7 @@ func (r *RefTree) OpenInner() error {
 	return nil
 }
 
-func (r *RefTree) CreateResultFields() []RefField {
+func (r *RefTreeParse) CreateResultFields() []RefField {
 	for i := range r.nodes {
 		if r.nodes[i].Type == reftype.InnerRef {
 			r.nodes[i].InnerRefs = r.nodes[i].InnerTree.CreateResultFields()

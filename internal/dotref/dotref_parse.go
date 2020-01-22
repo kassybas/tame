@@ -2,14 +2,17 @@ package dotref
 
 import "fmt"
 
-func ParseDotRef(fullName string) ([]RefField, error) {
+func ParseVarRef(fullName string) ([]RefField, error) {
 	// var cur string
+	if len(fullName) == 0 {
+		return nil, fmt.Errorf("empty variable reference")
+	}
 	prevPos := 0
 	pos := 0
 	singleQuotesStarted := false
 	doubleQuotesStarted := false
 	var startedBrackets int
-	result := NewRefTree(nil)
+	tree := NewRefTree(nil)
 	for _, ch := range fullName {
 		pos++
 		switch ch {
@@ -29,7 +32,7 @@ func ParseDotRef(fullName string) ([]RefField, error) {
 					continue
 				}
 				if pos != prevPos+1 {
-					err := result.AddField(fullName[prevPos : pos-1])
+					err := tree.AddField(fullName[prevPos : pos-1])
 					if err != nil {
 						return nil, err
 					}
@@ -42,12 +45,12 @@ func ParseDotRef(fullName string) ([]RefField, error) {
 					continue
 				}
 				if pos != prevPos+1 {
-					err := result.AddField(fullName[prevPos : pos-1])
+					err := tree.AddField(fullName[prevPos : pos-1])
 					if err != nil {
 						return nil, err
 					}
 				}
-				result.OpenInner()
+				tree.OpenInner()
 				startedBrackets++
 				prevPos = pos
 			}
@@ -57,12 +60,12 @@ func ParseDotRef(fullName string) ([]RefField, error) {
 					continue
 				}
 				if pos != prevPos+1 {
-					err := result.AddField(fullName[prevPos : pos-1])
+					err := tree.AddField(fullName[prevPos : pos-1])
 					if err != nil {
 						return nil, err
 					}
 				}
-				result.CloseInner()
+				tree.CloseInner()
 				startedBrackets--
 				prevPos = pos
 			}
@@ -72,7 +75,11 @@ func ParseDotRef(fullName string) ([]RefField, error) {
 		return nil, fmt.Errorf("unclosed brackets in variable reference: %s", fullName)
 	}
 	if prevPos != pos {
-		result.AddField(fullName[prevPos:])
+		tree.AddField(fullName[prevPos:])
 	}
-	return result.CreateResultFields(), nil
+	allFields := tree.CreateResultFields()
+	if allFields[0].FieldName == "" {
+		return nil, fmt.Errorf("illegal variable reference: %s", fullName)
+	}
+	return allFields, nil
 }
