@@ -6,11 +6,40 @@ settings:
 
 # this is a case study to experiment with tame
 # based on: https://github.com/mrako/wait-for/blob/master/wait-for
-WaitForIt:
+WaitForItShell:
   summary: Use this script to test if a given TCP host/port are available
   args: { $host, $port, $quiet: false, $timeout: 15, $cmd: "" }
   run:
-  - sh: echo "Running for $host:$port quiet:$quiet timeout:$timeout -- cmd:$cmd"
+  - sh: |
+      echo "Waiting for $host:$port
+        quiet: $quiet
+        timeout: $timeout
+        -- cmd: $cmd"
+  - sh: |
+        for i in `seq $timeout` ; do
+          printf "."
+          nc -z "$host" "$port" > /dev/null 2>&1
+          result=$?
+          if [ $result -eq 0 ] ; then
+            if [ -n "$cmd" ] ; then
+              exec $cmd
+            fi
+            exit 0
+          fi
+          sleep 1
+        done
+        echo "Operation timed out" >&2
+        exit 1
+
+WaitForItTame:
+  summary: Use this script to test if a given TCP host/port are available
+  args: { $host, $port, $quiet: false, $timeout: 15, $cmd: "" }
+  run:
+  - sh: |
+      echo "Waiting for $host:$port
+        quiet: $quiet
+        timeout: $timeout
+        -- cmd: $cmd"
   - sh: |
         for i in `seq $timeout` ; do
           printf "."
