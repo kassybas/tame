@@ -3,7 +3,6 @@ package exprstep
 import (
 	"fmt"
 
-	"github.com/antonmedv/expr"
 	"github.com/kassybas/tame/internal/step"
 	"github.com/kassybas/tame/internal/step/basestep"
 	"github.com/kassybas/tame/internal/tcontext"
@@ -30,12 +29,7 @@ func NewExprStep(stepDef schema.MergedStepSchema) (*ExprStep, error) {
 
 func (s *ExprStep) RunStep(ctx tcontext.Context, vt *vartable.VarTable) step.StepStatus {
 	var err error
-	env := vt.GetAllValues()
-	program, err := expr.Compile(s.expr, expr.Env(env))
-	if err != nil {
-		return step.StepStatus{Err: err}
-	}
-	result, err := expr.Run(program, env)
+	result, err := vt.EvaluateExpression(s.expr)
 	return step.StepStatus{
 		Results:   []interface{}{result},
 		Stdstatus: 0,

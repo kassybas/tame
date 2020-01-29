@@ -6,7 +6,6 @@ import (
 	"github.com/kassybas/tame/internal/stepblock"
 	"github.com/kassybas/tame/internal/steprunner"
 
-	"github.com/antonmedv/expr"
 	"github.com/kassybas/tame/internal/step"
 	"github.com/kassybas/tame/internal/step/basestep"
 	"github.com/kassybas/tame/internal/tcontext"
@@ -45,14 +44,9 @@ func (s *IfStep) GetElseSteps() *stepblock.StepBlock {
 }
 
 func (s *IfStep) evalCondition(vt *vartable.VarTable) (bool, error) {
-	env := vt.GetAllValues()
-	program, err := expr.Compile(s.condition, expr.Env(env))
+	result, err := vt.EvaluateExpression(s.condition)
 	if err != nil {
-		return false, err
-	}
-	result, err := expr.Run(program, env)
-	if err != nil {
-		return false, err
+		return false, fmt.Errorf("failed to evaluate if condition: %s\n\t%s", s.condition, err.Error())
 	}
 	resBool, isBool := result.(bool)
 	if !isBool {
