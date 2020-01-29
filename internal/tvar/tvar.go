@@ -1,7 +1,7 @@
 package tvar
 
 import (
-	"github.com/kassybas/tame/internal/dotref"
+	"github.com/kassybas/tame/internal/texpression"
 	"github.com/kassybas/tame/types/vartype"
 	"github.com/sirupsen/logrus"
 )
@@ -12,8 +12,8 @@ type TVariable interface {
 	ToStr() string
 	Value() interface{}
 	ToEnvVars(string) []string
-	SetValue([]dotref.RefField, interface{}) (TVariable, error)
-	GetInnerValue([]dotref.RefField) (interface{}, error)
+	SetValue([]texpression.RefField, interface{}) (TVariable, error)
+	GetInnerValue([]texpression.RefField) (interface{}, error)
 }
 
 func NewVariable(name string, value interface{}) TVariable {

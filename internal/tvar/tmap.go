@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/kassybas/tame/internal/dotref"
+	"github.com/kassybas/tame/internal/texpression"
 	"github.com/kassybas/tame/internal/keywords"
 	"github.com/kassybas/tame/types/vartype"
 	"github.com/sirupsen/logrus"
@@ -17,7 +17,7 @@ type TMap struct {
 
 func ConvertKeyToString(key interface{}) string {
 	// TODO: using map or list as a key can be difficult to figure out
-	//       refering to it via the "%v" in a dotref is cumbersome, fix that
+	//       refering to it via the "%v" in a texpression is cumbersome, fix that
 	return fmt.Sprintf("%v", key)
 }
 
@@ -81,10 +81,10 @@ func (v TMap) Value() interface{} {
 	return ifValues
 }
 
-func (v TMap) SetValue(fields []dotref.RefField, value interface{}) (TVariable, error) {
+func (v TMap) SetValue(fields []texpression.RefField, value interface{}) (TVariable, error) {
 	var err error
 	if len(fields) == 0 {
-		// this should never happen, since this would mean that dotref field was called with empty string
+		// this should never happen, since this would mean that texpression field was called with empty string
 		// which is an invalid variable name, which fails at parsing
 		return nil, fmt.Errorf("internal error: getting member with a non-reference field")
 	}
@@ -111,9 +111,9 @@ func (v TMap) SetValue(fields []dotref.RefField, value interface{}) (TVariable, 
 	return v, err
 }
 
-func (v TMap) GetInnerValue(fields []dotref.RefField) (interface{}, error) {
+func (v TMap) GetInnerValue(fields []texpression.RefField) (interface{}, error) {
 	if len(fields) == 0 {
-		// this should never happen, since this would mean that dotref field was called with empty string
+		// this should never happen, since this would mean that texpression field was called with empty string
 		// which is an invalid variable name, which fails at parsing
 		return nil, fmt.Errorf("internal error: empty reference")
 	}

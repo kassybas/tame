@@ -126,3 +126,18 @@ func BuildOpts(optsDef []string) (opts.ExecutionOpts, error) {
 	}
 	return opts, nil
 }
+
+func TrimLiteralQuotes(field string) (string, error) {
+	if strings.HasPrefix(field, `"`) {
+		if !strings.HasSuffix(field, `"`) {
+			return "", fmt.Errorf("missing closing bracket: %s", field)
+		}
+		field = strings.Trim(field, `"`)
+	} else if strings.HasPrefix(field, `'`) {
+		if !strings.HasSuffix(field, `"`) {
+			return "", fmt.Errorf("missing closing bracket: %s", field)
+		}
+		field = strings.Trim(field, `'`)
+	}
+	return field, nil
+}

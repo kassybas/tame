@@ -1,9 +1,9 @@
 package exprtype
 
-type RefType int
+type ExprType int
 
 const (
-	Unset RefType = iota
+	Unset ExprType = iota
 	Literal
 	VarName
 	InnerRef

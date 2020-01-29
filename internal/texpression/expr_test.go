@@ -1,4 +1,4 @@
-package dotref
+package texpression
 
 import (
 	"reflect"
@@ -7,9 +7,9 @@ import (
 	"github.com/kassybas/tame/types/exprtype"
 )
 
-func TestParseDotRef(t *testing.T) {
+func TestNewExpression(t *testing.T) {
 	type args struct {
-		fullName string
+		expression string
 	}
 	tests := []struct {
 		name    string
@@ -19,15 +19,16 @@ func TestParseDotRef(t *testing.T) {
 	}{
 		{
 			"test1",
-			args{fullName: "hello"},
+			args{expression: "hello"},
 			[]RefField{
 				RefField{FieldName: "hello", Type: exprtype.Literal},
 			},
 			false,
 		},
+
 		{
 			"test1v",
-			args{fullName: "$hello.foo[$okay]"},
+			args{expression: "$hello.foo[$okay]"},
 			[]RefField{
 				RefField{FieldName: "$hello", Type: exprtype.VarName},
 				RefField{FieldName: "foo", Type: exprtype.Literal},
@@ -42,7 +43,7 @@ func TestParseDotRef(t *testing.T) {
 		},
 		{
 			"test2",
-			args{fullName: "hello.tourist"},
+			args{expression: "hello.tourist"},
 			[]RefField{
 				RefField{
 					FieldName: "hello",
@@ -57,7 +58,7 @@ func TestParseDotRef(t *testing.T) {
 		},
 		{
 			"test4",
-			args{fullName: "hello[tourist]"},
+			args{expression: "hello[tourist]"},
 			[]RefField{
 				RefField{FieldName: "hello", Type: exprtype.Literal},
 				RefField{
@@ -71,7 +72,7 @@ func TestParseDotRef(t *testing.T) {
 		},
 		{
 			"test5",
-			args{fullName: "hello[tourist.dubist]"},
+			args{expression: "hello[tourist.dubist]"},
 			[]RefField{
 				RefField{FieldName: "hello", Type: exprtype.Literal},
 				RefField{
@@ -86,7 +87,7 @@ func TestParseDotRef(t *testing.T) {
 		},
 		{
 			"test6",
-			args{fullName: "hello[tourist[dubist]]"},
+			args{expression: "hello[tourist[dubist]]"},
 			[]RefField{
 				RefField{FieldName: "hello", Type: exprtype.Literal},
 				RefField{
@@ -106,7 +107,7 @@ func TestParseDotRef(t *testing.T) {
 		},
 		{
 			"test7",
-			args{fullName: "hello[tourist[dubist[in[budapest.capitol]]]]"},
+			args{expression: "hello[tourist[dubist[in[budapest.capitol]]]]"},
 			[]RefField{
 				RefField{FieldName: "hello", Type: exprtype.Literal},
 				RefField{
@@ -139,7 +140,7 @@ func TestParseDotRef(t *testing.T) {
 		},
 		{
 			"test8",
-			args{fullName: "hello[tourist[dubist]].in.budapest[capitol]"},
+			args{expression: "hello[tourist[dubist]].in.budapest[capitol]"},
 			[]RefField{
 				RefField{FieldName: "hello", Type: exprtype.Literal},
 				RefField{
@@ -167,7 +168,7 @@ func TestParseDotRef(t *testing.T) {
 		},
 		{
 			"test9",
-			args{fullName: "hello[tourist[dubist]].in"},
+			args{expression: "hello[tourist[dubist]].in"},
 			[]RefField{
 				RefField{FieldName: "hello", Type: exprtype.Literal},
 				RefField{
@@ -188,7 +189,7 @@ func TestParseDotRef(t *testing.T) {
 		},
 		{
 			"test10",
-			args{fullName: `hello["tourist.dubist"]`},
+			args{expression: `hello["tourist.dubist"]`},
 			[]RefField{
 				RefField{FieldName: "hello", Type: exprtype.Literal},
 				RefField{
@@ -202,20 +203,20 @@ func TestParseDotRef(t *testing.T) {
 		},
 		{
 			"test11",
-			args{fullName: `hello[tourist[dubist]`},
+			args{expression: `hello[tourist[dubist]`},
 			nil,
 			true,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := ParseVarRef(tt.args.fullName)
+			got, err := NewExpression(tt.args.expression)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("ParseDotRef() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("NewExpression() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("ParseDotRef() = \n\t\t%+v, \nwant\t%+v", got, tt.want)
+				t.Errorf("NewExpression() = %v, want %v", got, tt.want)
 			}
 		})
 	}

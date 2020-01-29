@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/kassybas/tame/internal/dotref"
+	"github.com/kassybas/tame/internal/texpression"
 	"github.com/sirupsen/logrus"
 
 	"github.com/kassybas/tame/internal/keywords"
@@ -90,10 +90,10 @@ func (v TList) ToEnvVars(ShellFieldSeparator string) []string {
 	return envVars
 }
 
-func (v TList) SetValue(fields []dotref.RefField, value interface{}) (TVariable, error) {
+func (v TList) SetValue(fields []texpression.RefField, value interface{}) (TVariable, error) {
 	var err error
 	if len(fields) == 0 {
-		// this should never happen, since this would mean that dotref field was called with empty string
+		// this should never happen, since this would mean that texpression field was called with empty string
 		// which is an invalid variable name, which fails at parsing
 		return nil, fmt.Errorf("internal error: empty reference")
 	}
@@ -113,9 +113,9 @@ func (v TList) SetValue(fields []dotref.RefField, value interface{}) (TVariable,
 	return v, err
 }
 
-func (v TList) GetInnerValue(fields []dotref.RefField) (interface{}, error) {
+func (v TList) GetInnerValue(fields []texpression.RefField) (interface{}, error) {
 	if len(fields) == 0 {
-		// this should never happen, since this would mean that dotref field was called with empty string
+		// this should never happen, since this would mean that texpression field was called with empty string
 		// which is an invalid variable name, which fails at parsing
 		return nil, fmt.Errorf("internal error: empty reference")
 	}

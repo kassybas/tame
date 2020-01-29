@@ -1,7 +1,7 @@
 package vartable
 
 import (
-	"github.com/kassybas/tame/internal/dotref"
+	"github.com/kassybas/tame/internal/texpression"
 	"github.com/kassybas/tame/internal/tvar"
 )
 
@@ -32,7 +32,7 @@ func (vt *VarTable) Append(names []string, values []interface{}) error {
 			// ignored
 			continue
 		}
-		nameFields, err := dotref.ParseVarRef(names[i])
+		nameFields, err := texpression.NewExpression(names[i])
 		if err != nil {
 			return err
 		}

@@ -4,20 +4,20 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/kassybas/tame/internal/dotref"
 	"github.com/kassybas/tame/internal/keywords"
+	"github.com/kassybas/tame/internal/texpression"
 	"github.com/kassybas/tame/internal/tvar"
 	"github.com/kassybas/tame/types/exprtype"
 )
 
-func (vt *VarTable) resolveFieldsVar(refFields []dotref.RefField) (tvar.TVariable, error) {
+func (vt *VarTable) resolveFieldsVar(refFields []texpression.RefField) (tvar.TVariable, error) {
 	for i := range refFields {
 		if refFields[i].Type == exprtype.InnerRef {
 			innerVal, err := vt.resolveFieldsValue(refFields[i].InnerRefs)
 			if err != nil {
 				return nil, err
 			}
-			refFields[i], err = dotref.NewField(innerVal)
+			refFields[i], err = texpression.NewField(innerVal)
 			if err != nil {
 				return nil, err
 			}
@@ -26,7 +26,7 @@ func (vt *VarTable) resolveFieldsVar(refFields []dotref.RefField) (tvar.TVariabl
 	return vt.GetVarByFields(refFields)
 }
 
-func (vt *VarTable) resolveFieldsValue(refFields []dotref.RefField) (interface{}, error) {
+func (vt *VarTable) resolveFieldsValue(refFields []texpression.RefField) (interface{}, error) {
 	v, err := vt.resolveFieldsVar(refFields)
 	if err != nil {
 		return nil, err
@@ -46,7 +46,7 @@ func (vt *VarTable) ResolveValue(val interface{}) (interface{}, error) {
 				// No resolution needed for constant value
 				return val, nil
 			}
-			fields, err := dotref.ParseVarRef(val)
+			fields, err := texpression.NewExpression(val)
 			if err != nil {
 				return nil, err
 			}

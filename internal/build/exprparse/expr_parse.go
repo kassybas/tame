@@ -1,11 +1,13 @@
-package dotref
+package exprparse
 
-import "fmt"
+import (
+	"fmt"
+)
 
-func ParseVarRef(fullName string) ([]RefField, error) {
+func ParseExpression(fullName string) (ParseTree, error) {
 	// var cur string
 	if len(fullName) == 0 {
-		return nil, fmt.Errorf("empty variable reference")
+		return ParseTree{}, fmt.Errorf("empty variable reference")
 	}
 	prevPos := 0
 	pos := 0
@@ -34,7 +36,7 @@ func ParseVarRef(fullName string) ([]RefField, error) {
 				if pos != prevPos+1 {
 					err := tree.AddField(fullName[prevPos : pos-1])
 					if err != nil {
-						return nil, err
+						return ParseTree{}, err
 					}
 				}
 				prevPos = pos
@@ -47,7 +49,7 @@ func ParseVarRef(fullName string) ([]RefField, error) {
 				if pos != prevPos+1 {
 					err := tree.AddField(fullName[prevPos : pos-1])
 					if err != nil {
-						return nil, err
+						return ParseTree{}, err
 					}
 				}
 				tree.OpenInner()
@@ -62,7 +64,7 @@ func ParseVarRef(fullName string) ([]RefField, error) {
 				if pos != prevPos+1 {
 					err := tree.AddField(fullName[prevPos : pos-1])
 					if err != nil {
-						return nil, err
+						return ParseTree{}, err
 					}
 				}
 				tree.CloseInner()
@@ -72,14 +74,12 @@ func ParseVarRef(fullName string) ([]RefField, error) {
 		}
 	}
 	if startedBrackets != 0 {
-		return nil, fmt.Errorf("unclosed brackets in variable reference: %s", fullName)
+		return ParseTree{}, fmt.Errorf("unclosed brackets in expression: %s", fullName)
 	}
 	if prevPos != pos {
 		tree.AddField(fullName[prevPos:])
 	}
-	allFields := tree.CreateResultFields()
-	if allFields[0].FieldName == "" {
-		return nil, fmt.Errorf("illegal variable reference: %s", fullName)
-	}
-	return allFields, nil
+	tree.cur = nil
+	tree.parent = nil
+	return *tree, nil
 }

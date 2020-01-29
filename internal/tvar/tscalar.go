@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/kassybas/tame/internal/dotref"
+	"github.com/kassybas/tame/internal/texpression"
 
 	"github.com/kassybas/tame/internal/keywords"
 	"github.com/kassybas/tame/types/vartype"
@@ -32,9 +32,9 @@ func (v TScalar) Value() interface{} {
 	return v.value
 }
 
-func (v TScalar) SetValue(fields []dotref.RefField, value interface{}) (TVariable, error) {
+func (v TScalar) SetValue(fields []texpression.RefField, value interface{}) (TVariable, error) {
 	if len(fields) == 0 {
-		// this should never happen, since this would mean that dotref field was called with empty string
+		// this should never happen, since this would mean that texpression field was called with empty string
 		// which is an invalid variable name, which fails at parsing
 		return nil, fmt.Errorf("internal error: empty reference")
 	}
@@ -45,9 +45,9 @@ func (v TScalar) SetValue(fields []dotref.RefField, value interface{}) (TVariabl
 	return v, nil
 }
 
-func (v TScalar) GetInnerValue(fields []dotref.RefField) (interface{}, error) {
+func (v TScalar) GetInnerValue(fields []texpression.RefField) (interface{}, error) {
 	if len(fields) == 0 {
-		// this should never happen, since this would mean that dotref field was called with empty string
+		// this should never happen, since this would mean that texpression field was called with empty string
 		// which is an invalid variable name, which fails at parsing
 		return nil, fmt.Errorf("internal error: empty reference")
 	}

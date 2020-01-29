@@ -3,12 +3,12 @@ package vartable
 import (
 	"fmt"
 
-	"github.com/kassybas/tame/internal/dotref"
+	"github.com/kassybas/tame/internal/texpression"
 	"github.com/kassybas/tame/internal/tvar"
 )
 
 func (vt *VarTable) GetVar(fullName string) (tvar.TVariable, error) {
-	fields, err := dotref.ParseVarRef(fullName)
+	fields, err := texpression.NewExpression(fullName)
 	if err != nil || fields[0].FieldName == "" {
 		return nil, fmt.Errorf("failed to parse variable name:%s\n%s", fullName, err)
 	}
@@ -25,6 +25,6 @@ func (vt *VarTable) GetVarByName(name string) (tvar.TVariable, error) {
 	return val, nil
 }
 
-func (vt *VarTable) GetVarByFields(fields []dotref.RefField) (tvar.TVariable, error) {
+func (vt *VarTable) GetVarByFields(fields []texpression.RefField) (tvar.TVariable, error) {
 	return vt.GetVarByName(fields[0].FieldName)
 }
