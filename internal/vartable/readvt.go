@@ -12,10 +12,10 @@ func (vt *VarTable) GetVar(fullName string) (tvar.TVariable, error) {
 	if err != nil || fields[0].FieldName == "" {
 		return nil, fmt.Errorf("failed to parse variable name:%s\n%s", fullName, err)
 	}
-	return vt.GetVarByFields(fields)
+	return vt.getVarByFields(fields)
 }
 
-func (vt *VarTable) GetVarByName(name string) (tvar.TVariable, error) {
+func (vt *VarTable) getVarByName(name string) (tvar.TVariable, error) {
 	vt.RLock()
 	val, exists := vt.vars[name]
 	vt.RUnlock()
@@ -25,6 +25,6 @@ func (vt *VarTable) GetVarByName(name string) (tvar.TVariable, error) {
 	return val, nil
 }
 
-func (vt *VarTable) GetVarByFields(fields []texpression.ExprField) (tvar.TVariable, error) {
-	return vt.GetVarByName(fields[0].FieldName)
+func (vt *VarTable) getVarByFields(fields []texpression.ExprField) (tvar.TVariable, error) {
+	return vt.getVarByName(fields[0].FieldName)
 }

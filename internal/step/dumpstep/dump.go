@@ -111,5 +111,8 @@ func (s *DumpStep) RunStep(ctx tcontext.Context, vt *vartable.VarTable) step.Ste
 			return step.StepStatus{Err: fmt.Errorf("failed to save file in dump step: %s\n\t%s", s.GetName(), err.Error())}
 		}
 	}
+	if !s.GetOpts().Silent {
+		fmt.Println(dumpedValue)
+	}
 	return step.StepStatus{Results: []interface{}{dumpedValue}}
 }

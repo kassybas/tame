@@ -23,7 +23,7 @@ func (vt *VarTable) resolveFieldsVar(refFields []texpression.ExprField) (tvar.TV
 			}
 		}
 	}
-	return vt.GetVarByFields(refFields)
+	return vt.getVarByFields(refFields)
 }
 
 func (vt *VarTable) resolveFieldsValue(refFields []texpression.ExprField) (interface{}, error) {

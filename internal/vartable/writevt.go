@@ -29,7 +29,6 @@ func (vt *VarTable) Add(name string, value interface{}) error {
 func (vt *VarTable) Append(names []string, values []interface{}) error {
 	for i := range names {
 		if names[i] == "" {
-			// ignored
 			continue
 		}
 		nameFields, err := texpression.NewExpression(names[i])
