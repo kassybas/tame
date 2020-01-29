@@ -12,12 +12,14 @@ import (
 
 type ExprField struct {
 	Val       string
+	Result    interface{}
 	InnerRefs []ExprField
 	Index     int
 	Type      exprtype.ExprType
 }
 
 func NewField(val interface{}) (ExprField, error) {
+	var err error
 	var newField ExprField
 	switch val := val.(type) {
 	case string:
@@ -25,12 +27,23 @@ func NewField(val interface{}) (ExprField, error) {
 			// variable
 			newField.Type = exprtype.VarName
 			newField.Val = val
+		} else if strings.HasPrefix(val, "(") {
+			// variable
+			newField.Type = exprtype.Expression
+			newField.Val, err = helpers.TrimRoundBrackets(val)
+			if err != nil {
+				return newField, err
+			}
 		} else if idx, err := strconv.Atoi(val); err == nil {
 			// index
 			newField.Type = exprtype.Index
 			newField.Index = idx
 		} else {
 			// literal
+			// remove escape sign from before $ and (
+			if strings.HasPrefix(val, "\\$") || strings.HasPrefix(val, "\\(") {
+				val = strings.TrimPrefix(val, "\\")
+			}
 			newField.Type = exprtype.Literal
 			newField.Val, err = helpers.TrimLiteralQuotes(val)
 			if err != nil {
@@ -41,7 +54,7 @@ func NewField(val interface{}) (ExprField, error) {
 		newField.Type = exprtype.Index
 		newField.Index = val
 	default:
-		return newField, fmt.Errorf("unknown field type: %T", val)
+		return newField, fmt.Errorf("unknown field type: %v (type %T)", val, val)
 	}
 	return newField, nil
 }

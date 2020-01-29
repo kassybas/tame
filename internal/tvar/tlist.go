@@ -99,7 +99,6 @@ func (v TList) SetValue(fields []texpression.ExprField, value interface{}) (TVar
 	}
 	if len(fields) == 1 {
 		// overdefine list with different type
-		// if no fieldname??
 		return NewVariable(fields[0].Val, value), nil
 	}
 	field := fields[1]

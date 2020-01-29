@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/kassybas/tame/internal/helpers"
 	"github.com/kassybas/tame/internal/keywords"
 	"github.com/kassybas/tame/internal/step"
 	"github.com/kassybas/tame/internal/step/basestep"
@@ -45,14 +46,29 @@ func (s *ForStep) getIterableValues(vt *vartable.VarTable) ([]interface{}, error
 	var iterableVal []interface{}
 	resIterable, err := vt.ResolveValue(s.iterable)
 	if err != nil {
-		return nil, fmt.Errorf("could not resolve iterable expression: %s", s.iterable)
+		return nil, fmt.Errorf("could not resolve iterable expression: %s\n\t%s", s.iterable, err.Error())
 	}
 	switch iterableV := resIterable.(type) {
 	case []interface{}:
 		{
 			iterableVal = iterableV
 		}
+	case []int, []string, []float64, []bool:
+		{
+			iterableVal, err = helpers.ConvertSliceToInterfaceSlice(resIterable)
+			if err != nil {
+				return nil, fmt.Errorf("could not determine iterable: %s\n\t%s", s.iterable, err.Error())
+			}
+		}
 	case map[interface{}]interface{}:
+		{
+			iterableVal = []interface{}{}
+			// in map we iterate through the keys
+			for k := range iterableV {
+				iterableVal = append(iterableVal, k)
+			}
+		}
+	case map[string]interface{}:
 		{
 			iterableVal = []interface{}{}
 			// in map we iterate through the keys

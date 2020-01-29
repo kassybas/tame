@@ -8,4 +8,5 @@ const (
 	VarName
 	InnerRef
 	Index
+	Expression
 )

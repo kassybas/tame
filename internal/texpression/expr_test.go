@@ -18,6 +18,15 @@ func TestNewExpression(t *testing.T) {
 		wantErr bool
 	}{
 		{
+			"test1exp",
+			args{expression: "(1..100)"},
+			[]ExprField{
+				ExprField{Val: "1..100", Type: exprtype.Expression},
+			},
+			false,
+		},
+
+		{
 			"test1",
 			args{expression: "hello"},
 			[]ExprField{
@@ -25,7 +34,6 @@ func TestNewExpression(t *testing.T) {
 			},
 			false,
 		},
-
 		{
 			"test1v",
 			args{expression: "$hello.foo[$okay]"},
@@ -36,6 +44,21 @@ func TestNewExpression(t *testing.T) {
 					Type: exprtype.InnerRef,
 					InnerRefs: []ExprField{
 						ExprField{Val: "$okay", Type: exprtype.VarName},
+					},
+				},
+			},
+			false,
+		},
+		{
+			"test1exprin",
+			args{expression: "$hello.foo[(2-3)]"},
+			[]ExprField{
+				ExprField{Val: "$hello", Type: exprtype.VarName},
+				ExprField{Val: "foo", Type: exprtype.Literal},
+				ExprField{
+					Type: exprtype.InnerRef,
+					InnerRefs: []ExprField{
+						ExprField{Val: "2-3", Type: exprtype.Expression},
 					},
 				},
 			},

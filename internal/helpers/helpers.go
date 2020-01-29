@@ -53,6 +53,36 @@ func IsPublic(targetName string) bool {
 	return true
 }
 
+func ConvertSliceToInterfaceSlice(slice interface{}) ([]interface{}, error) {
+	switch slice := slice.(type) {
+	case []int:
+		interfaceSlice := make([]interface{}, len(slice))
+		for i := range slice {
+			interfaceSlice[i] = slice[i]
+		}
+		return interfaceSlice, nil
+	case []string:
+		interfaceSlice := make([]interface{}, len(slice))
+		for i := range slice {
+			interfaceSlice[i] = slice[i]
+		}
+		return interfaceSlice, nil
+	case []bool:
+		interfaceSlice := make([]interface{}, len(slice))
+		for i := range slice {
+			interfaceSlice[i] = slice[i]
+		}
+		return interfaceSlice, nil
+	case []float64:
+		interfaceSlice := make([]interface{}, len(slice))
+		for i := range slice {
+			interfaceSlice[i] = slice[i]
+		}
+		return interfaceSlice, nil
+	}
+	return nil, fmt.Errorf("unknown list type: %s (type %T)", slice, slice)
+}
+
 func DeepConvertInterToMapStrInter(inter interface{}) (interface{}, error) {
 	var err error
 	res := make(map[string]interface{})
@@ -130,14 +160,25 @@ func BuildOpts(optsDef []string) (opts.ExecutionOpts, error) {
 func TrimLiteralQuotes(field string) (string, error) {
 	if strings.HasPrefix(field, `"`) {
 		if !strings.HasSuffix(field, `"`) {
-			return "", fmt.Errorf("missing closing bracket: %s", field)
+			return "", fmt.Errorf("missing closing quote: %s", field)
 		}
 		field = strings.Trim(field, `"`)
 	} else if strings.HasPrefix(field, `'`) {
 		if !strings.HasSuffix(field, `"`) {
-			return "", fmt.Errorf("missing closing bracket: %s", field)
+			return "", fmt.Errorf("missing closing quote: %s", field)
 		}
 		field = strings.Trim(field, `'`)
+	}
+	return field, nil
+}
+
+func TrimRoundBrackets(field string) (string, error) {
+	if strings.HasPrefix(field, `(`) {
+		if !strings.HasSuffix(field, `)`) {
+			return "", fmt.Errorf("missing closing bracket: %s", field)
+		}
+		field = strings.TrimSuffix(field, ")")
+		field = strings.TrimPrefix(field, "(")
 	}
 	return field, nil
 }
