@@ -83,6 +83,10 @@ func (vt *VarTable) resolveValueString(val string) (interface{}, error) {
 		return res, nil
 	}
 	// No resolution needed for constant value
+	// remove escape sign from before $ and (
+	if strings.HasPrefix(val, "\\$") || strings.HasPrefix(val, "\\(") {
+		val = strings.TrimPrefix(val, "\\")
+	}
 	return val, nil
 }
 

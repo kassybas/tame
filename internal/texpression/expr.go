@@ -40,10 +40,6 @@ func NewField(val interface{}) (ExprField, error) {
 			newField.Index = idx
 		} else {
 			// literal
-			// remove escape sign from before $ and (
-			if strings.HasPrefix(val, "\\$") || strings.HasPrefix(val, "\\(") {
-				val = strings.TrimPrefix(val, "\\")
-			}
 			newField.Type = exprtype.Literal
 			newField.Val, err = helpers.TrimLiteralQuotes(val)
 			if err != nil {

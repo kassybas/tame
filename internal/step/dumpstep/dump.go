@@ -20,17 +20,17 @@ import (
 
 type DumpStep struct {
 	basestep.BaseStep
-	sourceVarName string
-	path          string
-	format        string
+	sourceValue string
+	path        string
+	format      string
 }
 
 func NewDumpStep(stepDef schema.MergedStepSchema) (*DumpStep, error) {
 	var newStep DumpStep
 	var err error
-	name := fmt.Sprintf("dump %s -> %s [format: %s]", stepDef.Dump.SourceVarName, stepDef.Dump.Path, stepDef.Dump.Format)
+	name := fmt.Sprintf("dump %s -> %s [format: %s]", stepDef.Dump.SourceValue, stepDef.Dump.Path, stepDef.Dump.Format)
 	newStep.BaseStep, err = basestep.NewBaseStep(stepDef, steptype.Wait, name)
-	newStep.sourceVarName = stepDef.Dump.SourceVarName
+	newStep.sourceValue = stepDef.Dump.SourceValue
 	newStep.format = stepDef.Dump.Format
 	newStep.path = stepDef.Dump.Path
 	return &newStep, err
@@ -97,7 +97,7 @@ func writeToFile(path string, data string) error {
 
 func (s *DumpStep) RunStep(ctx tcontext.Context, vt *vartable.VarTable) step.StepStatus {
 	var err error
-	sourceVal, err := vt.ResolveValue(s.sourceVarName)
+	sourceVal, err := vt.ResolveValue(s.sourceValue)
 	if err != nil {
 		return step.StepStatus{Err: fmt.Errorf("source variable cannot be resolved dump step: %s\n\t%s", s.GetName(), err.Error())}
 	}

@@ -36,9 +36,9 @@ type SettingsShema struct {
 }
 
 type DumpSchema struct {
-	SourceVarName string `mapstructure:"value,omitempty"`
-	Path          string `mapstructure:"path,omitempty"`
-	Format        string `mapstructure:"format,omitempty"`
+	SourceValue string `mapstructure:"value,omitempty"`
+	Path        string `mapstructure:"path,omitempty"`
+	Format      string `mapstructure:"format,omitempty"`
 }
 
 type LoadSchema struct {
