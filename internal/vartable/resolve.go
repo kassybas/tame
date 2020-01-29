@@ -56,6 +56,8 @@ func (vt *VarTable) resolveFieldsValue(refFields []texpression.ExprField) (inter
 		return res, nil
 	}
 
+	// resolveFields resolves the fields in refFields in place
+	// note: refFields slice is passed by reference
 	v, err := vt.resolveFieldsVar(refFields)
 	if err != nil {
 		return nil, err
