@@ -1,6 +1,8 @@
 package vartable
 
 import (
+	"fmt"
+
 	"github.com/kassybas/tame/internal/texpression"
 	"github.com/kassybas/tame/internal/tvar"
 )
@@ -51,6 +53,19 @@ func (vt *VarTable) Append(names []string, values []interface{}) error {
 			vt.Add(names[i], values[i])
 		}
 	}
+	return nil
+}
+func (vt *VarTable) Delete(varName interface{}) error {
+	s, ok := varName.(string)
+	if !ok {
+		return fmt.Errorf("non-string variable name: %v", varName)
+	}
+	if !vt.Exists(s) {
+		return fmt.Errorf("variable does not exist: %v", varName)
+	}
+	vt.Lock()
+	delete(vt.vars, s)
+	vt.Unlock()
 	return nil
 }
 

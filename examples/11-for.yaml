@@ -27,7 +27,7 @@ Builder:
   run:
   - for: {$platform: $config}
     do:
-    - BuildBin: {$os: $config.$platform.os, $arch: $config.$platform.arch}
+    - BuildBin: {$os: "$config[$platform].os", $arch: "$config.[$platform].arch"}
   - for: {$tag: $tags}
     do:
     - DockerTag: {$tag: $tag}

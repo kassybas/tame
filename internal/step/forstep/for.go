@@ -14,7 +14,6 @@ import (
 	"github.com/kassybas/tame/internal/vartable"
 	"github.com/kassybas/tame/schema"
 	"github.com/kassybas/tame/types/steptype"
-	"github.com/kassybas/tame/types/vartype"
 )
 
 type ForStep struct {
@@ -38,32 +37,17 @@ func NewForStep(stepDef schema.MergedStepSchema, forSteps []step.Step) (*ForStep
 		newStep.iterable = v
 	}
 	newStep.forSteps = stepblock.NewStepBlock(forSteps)
-	newStep.BaseStep, err = basestep.NewBaseStep(stepDef, steptype.For, fmt.Sprintf("for %s in %v", newStep.iteratorName, newStep.iterable))
+	newStep.BaseStep, err = basestep.NewBaseStep(stepDef, steptype.For, fmt.Sprintf("for %s: %v", newStep.iteratorName, newStep.iterable))
 	return &newStep, err
 }
-func (s *ForStep) getIterableValues(vt *vartable.VarTable) ([]interface{}, error) {
 
+func (s *ForStep) getIterableValues(vt *vartable.VarTable) ([]interface{}, error) {
 	var iterableVal []interface{}
-	switch iterableV := s.iterable.(type) {
-	case string:
-		{
-			iterable, err := vt.GetVar(iterableV)
-			if err != nil {
-				return nil, fmt.Errorf("defined iterable variable does not exist: '%s'\n\t%s", iterableV, err.Error())
-			}
-			if iterable.Type() != vartype.TListType && iterable.Type() != vartype.TMapType {
-				return nil, fmt.Errorf("variable %s is not list or map (type: %T)", iterable.Name(), iterable)
-			}
-			var isList bool
-			iterableVal, isList = iterable.Value().([]interface{})
-			if !isList {
-				iterableMap := iterable.Value().(map[interface{}]interface{})
-				iterableVal = []interface{}{}
-				for k := range iterableMap {
-					iterableVal = append(iterableVal, k)
-				}
-			}
-		}
+	resIterable, err := vt.ResolveValue(s.iterable)
+	if err != nil {
+		return nil, fmt.Errorf("could not resolve iterable expression: %s", s.iterable)
+	}
+	switch iterableV := resIterable.(type) {
 	case []interface{}:
 		{
 			iterableVal = iterableV

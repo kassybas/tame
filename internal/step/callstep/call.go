@@ -71,7 +71,7 @@ func createArgsVartable(argDefs []tvar.TVariable, calledTarget target.Target, vt
 		}
 		resolvedValue, err := vt.ResolveValue(arg.Value())
 		if err != nil {
-			return nil, fmt.Errorf("passed parameter value cannot be resolved: %s", arg.Value())
+			return nil, fmt.Errorf("passed parameter value cannot be resolved: %s\n\t%s", arg.Value(), err.Error())
 		}
 		newVt.Add(arg.Name(), resolvedValue)
 	}

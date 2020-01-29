@@ -1,0 +1,12 @@
+
+
+
+Example:
+  run:
+  - $myvar: hello
+  - $config:
+      windows: nt
+      mac: darwin
+      linux: $myvar
+  - dump:
+      var: $config
