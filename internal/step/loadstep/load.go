@@ -80,17 +80,21 @@ func parseContents(contents string, format string) (interface{}, error) {
 func (s *LoadStep) RunStep(ctx tcontext.Context, vt *vartable.VarTable) step.StepStatus {
 	var contents string
 	if s.path != "" {
-		// load from file
-		cbytes, err := loader.ReadFile(s.path)
+		path, err := vt.ResolveValueToStr(s.path)
 		if err != nil {
-			return step.StepStatus{Err: fmt.Errorf("failed to load file in step: %s\n\t", s.GetName(), err.Error())}
+			return step.StepStatus{Err: fmt.Errorf("could not resolve expression in path: %s\n\t%s", s.path, err.Error())}
+		}
+		// load from file
+		cbytes, err := loader.ReadFile(path)
+		if err != nil {
+			return step.StepStatus{Err: fmt.Errorf("failed to load file in step: %s\n\t%s", s.GetName(), err.Error())}
 		}
 		contents = string(cbytes)
 	} else {
 		// load from variable
 		v, err := vt.GetVar(s.sourceVarName)
 		if err != nil {
-			return step.StepStatus{Err: fmt.Errorf("failed to resolve variable load step: %s\n\t", s.GetName(), err.Error())}
+			return step.StepStatus{Err: fmt.Errorf("failed to resolve variable load step: %s\n\t%s", s.GetName(), err.Error())}
 		}
 		if v.Type() != vartype.TScalarType {
 			return step.StepStatus{Err: fmt.Errorf("only scalar variables can be loaded and parsed in step: %s\n\tgot:%s", s.GetName(), v.Type().Name())}

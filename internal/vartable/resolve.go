@@ -106,3 +106,15 @@ func (vt *VarTable) ResolveValue(val interface{}) (interface{}, error) {
 		}
 	}
 }
+
+func (vt *VarTable) ResolveValueToStr(val interface{}) (string, error) {
+	v, err := vt.ResolveValue(val)
+	if err != nil {
+		return "", err
+	}
+	sVal, ok := v.(string)
+	if !ok {
+		return "", fmt.Errorf("expression does not resolve to string: %v", val)
+	}
+	return sVal, nil
+}

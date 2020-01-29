@@ -29,7 +29,7 @@ func runStep(s step.Step, ctx tcontext.Context, vt *vartable.VarTable, parentOpt
 
 	status := s.RunStep(ctx, vt)
 	if status.Err != nil {
-		return step.StepStatus{Err: fmt.Errorf("[step: %s]:: %s", s.GetName(), status.Err.Error())}
+		return step.StepStatus{Err: fmt.Errorf("[step: %s]:\n\t%s", s.GetName(), status.Err.Error())}
 	}
 	status.ResultNames = s.ResultNames()
 	status.AllowedLessResults = s.Kind() == steptype.Shell

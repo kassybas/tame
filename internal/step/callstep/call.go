@@ -62,6 +62,7 @@ func (s *CallStep) RunStep(ctx tcontext.Context, vt *vartable.VarTable) step.Ste
 
 func createArgsVartable(argDefs []tvar.TVariable, calledTarget target.Target, vt *vartable.VarTable) (*vartable.VarTable, error) {
 	newVt := vartable.NewVarTable()
+	newVt.AddVariables(calledTarget.Ctx.Globals)
 	for _, arg := range argDefs {
 		if arg.Value() == nil {
 			return nil, fmt.Errorf("passing empty(null) argument for target is not allowed %s: '%s: %v'", calledTarget.Name, arg.Name(), arg.Value())

@@ -23,9 +23,14 @@ func ResolveParams(vt *vartable.VarTable, params []Param) error {
 			continue
 		}
 		if p.HasDefault {
-			err := vt.Add(p.Name, p.DefaultValue)
+			// resolving default value for possible global variables
+			val, err := vt.ResolveValue(p.DefaultValue)
 			if err != nil {
-				return fmt.Errorf("error adding default parameter: %s\n\t", p.Name, err.Error())
+				return fmt.Errorf("error while resolving default parameter: %s\n\t%s", p.Name, err.Error())
+			}
+			err = vt.Add(p.Name, val)
+			if err != nil {
+				return fmt.Errorf("error while creating default parameter: %s\n\t%s", p.Name, err.Error())
 			}
 			continue
 		}

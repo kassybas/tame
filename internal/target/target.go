@@ -25,7 +25,6 @@ type Target struct {
 }
 
 func (t Target) Make(vt *vartable.VarTable, parentOpts opts.ExecutionOpts) step.StepStatus {
-	vt.AddVariables(t.Ctx.Globals)
 	// inherit silent
 	t.Opts.Silent = parentOpts.Silent
 

@@ -1,4 +1,5 @@
 
+$GLOBALBAR: "barbarbar"
 
 
 Example:
@@ -8,5 +9,25 @@ Example:
       windows: nt
       mac: darwin
       linux: $myvar
+      servers:
+        - "10.0.0.1"
+        - "10.0.0.2"
+        - "$myvar"
   - dump:
       var: $config
+
+Example2:
+  args: {$foo: "$GLOBALBAR"}
+  run:
+  - sh: echo "$foo"
+
+Example3:
+  run:
+  - $list:
+      servers:
+      - "10.0.0.1"
+      - "10.0.0.2"
+      - "10.0.0.3"
+  - for: {$server: $(1..10)}
+    do:
+    - sh: echo "ping ${server}"

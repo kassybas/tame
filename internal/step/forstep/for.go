@@ -93,7 +93,7 @@ func (s *ForStep) RunStep(ctx tcontext.Context, vt *vartable.VarTable) step.Step
 	iterator, iterable, err := s.getIters(vt)
 	if err != nil {
 		return step.StepStatus{
-			Err: fmt.Errorf("could not determine iteration in step: %s\n\t", s.GetName(), err.Error()),
+			Err: fmt.Errorf("could not determine iteration in step: '%s'\n\t%s", s.GetName(), err.Error()),
 		}
 	}
 	var status step.StepStatus

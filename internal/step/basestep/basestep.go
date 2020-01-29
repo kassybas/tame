@@ -11,7 +11,6 @@ type BaseStep struct {
 	kind        steptype.Steptype
 	resultNames []string
 	opts        opts.ExecutionOpts
-	ifCondition string
 	iteratorVar tvar.TVariable
 }
 

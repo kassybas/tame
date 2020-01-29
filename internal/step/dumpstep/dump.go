@@ -106,7 +106,11 @@ func (s *DumpStep) RunStep(ctx tcontext.Context, vt *vartable.VarTable) step.Ste
 		return step.StepStatus{Err: fmt.Errorf("failed to encode in dump step: %s\n\t%s", s.GetName(), err.Error())}
 	}
 	if s.path != "" {
-		err = writeToFile(s.path, dumpedValue)
+		path, err := vt.ResolveValueToStr(s.path)
+		if err != nil {
+			return step.StepStatus{Err: fmt.Errorf("could not resolve expression in path: %s\n\t%s", s.path, err.Error())}
+		}
+		err = writeToFile(path, dumpedValue)
 		if err != nil {
 			return step.StepStatus{Err: fmt.Errorf("failed to save file in dump step: %s\n\t%s", s.GetName(), err.Error())}
 		}
