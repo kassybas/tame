@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/kassybas/tame/internal/texpression"
 	"github.com/kassybas/tame/internal/keywords"
+	"github.com/kassybas/tame/internal/texpression"
 	"github.com/kassybas/tame/types/vartype"
 	"github.com/sirupsen/logrus"
 )
@@ -81,7 +81,7 @@ func (v TMap) Value() interface{} {
 	return ifValues
 }
 
-func (v TMap) SetValue(fields []texpression.RefField, value interface{}) (TVariable, error) {
+func (v TMap) SetValue(fields []texpression.ExprField, value interface{}) (TVariable, error) {
 	var err error
 	if len(fields) == 0 {
 		// this should never happen, since this would mean that texpression field was called with empty string
@@ -111,7 +111,7 @@ func (v TMap) SetValue(fields []texpression.RefField, value interface{}) (TVaria
 	return v, err
 }
 
-func (v TMap) GetInnerValue(fields []texpression.RefField) (interface{}, error) {
+func (v TMap) GetInnerValue(fields []texpression.ExprField) (interface{}, error) {
 	if len(fields) == 0 {
 		// this should never happen, since this would mean that texpression field was called with empty string
 		// which is an invalid variable name, which fails at parsing

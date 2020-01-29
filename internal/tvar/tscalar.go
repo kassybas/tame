@@ -32,7 +32,7 @@ func (v TScalar) Value() interface{} {
 	return v.value
 }
 
-func (v TScalar) SetValue(fields []texpression.RefField, value interface{}) (TVariable, error) {
+func (v TScalar) SetValue(fields []texpression.ExprField, value interface{}) (TVariable, error) {
 	if len(fields) == 0 {
 		// this should never happen, since this would mean that texpression field was called with empty string
 		// which is an invalid variable name, which fails at parsing
@@ -45,7 +45,7 @@ func (v TScalar) SetValue(fields []texpression.RefField, value interface{}) (TVa
 	return v, nil
 }
 
-func (v TScalar) GetInnerValue(fields []texpression.RefField) (interface{}, error) {
+func (v TScalar) GetInnerValue(fields []texpression.ExprField) (interface{}, error) {
 	if len(fields) == 0 {
 		// this should never happen, since this would mean that texpression field was called with empty string
 		// which is an invalid variable name, which fails at parsing

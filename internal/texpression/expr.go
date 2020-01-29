@@ -10,15 +10,15 @@ import (
 	"github.com/kassybas/tame/types/exprtype"
 )
 
-type RefField struct {
+type ExprField struct {
 	FieldName string
-	InnerRefs []RefField
+	InnerRefs []ExprField
 	Index     int
 	Type      exprtype.ExprType
 }
 
-func NewField(val interface{}) (RefField, error) {
-	var newField RefField
+func NewField(val interface{}) (ExprField, error) {
+	var newField ExprField
 	switch val := val.(type) {
 	case string:
 		if strings.HasPrefix(val, "$") {
@@ -46,7 +46,7 @@ func NewField(val interface{}) (RefField, error) {
 	return newField, nil
 }
 
-func NewExpression(expression string) ([]RefField, error) {
+func NewExpression(expression string) ([]ExprField, error) {
 	tree, err := exprparse.ParseExpression(expression)
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse expression: %s\n\t%s", expression, err.Error())
@@ -58,15 +58,15 @@ func NewExpression(expression string) ([]RefField, error) {
 	return fields, nil
 }
 
-func newInnerExpression(tree exprparse.ParseTree) ([]RefField, error) {
-	fields := []RefField{}
+func newInnerExpression(tree exprparse.ParseTree) ([]ExprField, error) {
+	fields := []ExprField{}
 	for i := range tree.Nodes {
 		if tree.Nodes[i].InnerTree != nil {
 			innerFields, err := newInnerExpression(*tree.Nodes[i].InnerTree)
 			if err != nil {
 				return nil, err
 			}
-			newField := RefField{
+			newField := ExprField{
 				Type:      exprtype.InnerRef,
 				InnerRefs: innerFields,
 			}

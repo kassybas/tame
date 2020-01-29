@@ -10,7 +10,7 @@ import (
 	"github.com/kassybas/tame/types/exprtype"
 )
 
-func (vt *VarTable) resolveFieldsVar(refFields []texpression.RefField) (tvar.TVariable, error) {
+func (vt *VarTable) resolveFieldsVar(refFields []texpression.ExprField) (tvar.TVariable, error) {
 	for i := range refFields {
 		if refFields[i].Type == exprtype.InnerRef {
 			innerVal, err := vt.resolveFieldsValue(refFields[i].InnerRefs)
@@ -26,7 +26,7 @@ func (vt *VarTable) resolveFieldsVar(refFields []texpression.RefField) (tvar.TVa
 	return vt.GetVarByFields(refFields)
 }
 
-func (vt *VarTable) resolveFieldsValue(refFields []texpression.RefField) (interface{}, error) {
+func (vt *VarTable) resolveFieldsValue(refFields []texpression.ExprField) (interface{}, error) {
 	v, err := vt.resolveFieldsVar(refFields)
 	if err != nil {
 		return nil, err

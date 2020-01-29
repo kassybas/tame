@@ -12,8 +12,8 @@ type TVariable interface {
 	ToStr() string
 	Value() interface{}
 	ToEnvVars(string) []string
-	SetValue([]texpression.RefField, interface{}) (TVariable, error)
-	GetInnerValue([]texpression.RefField) (interface{}, error)
+	SetValue([]texpression.ExprField, interface{}) (TVariable, error)
+	GetInnerValue([]texpression.ExprField) (interface{}, error)
 }
 
 func NewVariable(name string, value interface{}) TVariable {

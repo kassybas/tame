@@ -90,7 +90,7 @@ func (v TList) ToEnvVars(ShellFieldSeparator string) []string {
 	return envVars
 }
 
-func (v TList) SetValue(fields []texpression.RefField, value interface{}) (TVariable, error) {
+func (v TList) SetValue(fields []texpression.ExprField, value interface{}) (TVariable, error) {
 	var err error
 	if len(fields) == 0 {
 		// this should never happen, since this would mean that texpression field was called with empty string
@@ -113,7 +113,7 @@ func (v TList) SetValue(fields []texpression.RefField, value interface{}) (TVari
 	return v, err
 }
 
-func (v TList) GetInnerValue(fields []texpression.RefField) (interface{}, error) {
+func (v TList) GetInnerValue(fields []texpression.ExprField) (interface{}, error) {
 	if len(fields) == 0 {
 		// this should never happen, since this would mean that texpression field was called with empty string
 		// which is an invalid variable name, which fails at parsing

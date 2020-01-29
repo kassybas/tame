@@ -25,6 +25,6 @@ func (vt *VarTable) GetVarByName(name string) (tvar.TVariable, error) {
 	return val, nil
 }
 
-func (vt *VarTable) GetVarByFields(fields []texpression.RefField) (tvar.TVariable, error) {
+func (vt *VarTable) GetVarByFields(fields []texpression.ExprField) (tvar.TVariable, error) {
 	return vt.GetVarByName(fields[0].FieldName)
 }

@@ -14,14 +14,14 @@ func TestNewExpression(t *testing.T) {
 	tests := []struct {
 		name    string
 		args    args
-		want    []RefField
+		want    []ExprField
 		wantErr bool
 	}{
 		{
 			"test1",
 			args{expression: "hello"},
-			[]RefField{
-				RefField{FieldName: "hello", Type: exprtype.Literal},
+			[]ExprField{
+				ExprField{FieldName: "hello", Type: exprtype.Literal},
 			},
 			false,
 		},
@@ -29,13 +29,13 @@ func TestNewExpression(t *testing.T) {
 		{
 			"test1v",
 			args{expression: "$hello.foo[$okay]"},
-			[]RefField{
-				RefField{FieldName: "$hello", Type: exprtype.VarName},
-				RefField{FieldName: "foo", Type: exprtype.Literal},
-				RefField{
+			[]ExprField{
+				ExprField{FieldName: "$hello", Type: exprtype.VarName},
+				ExprField{FieldName: "foo", Type: exprtype.Literal},
+				ExprField{
 					Type: exprtype.InnerRef,
-					InnerRefs: []RefField{
-						RefField{FieldName: "$okay", Type: exprtype.VarName},
+					InnerRefs: []ExprField{
+						ExprField{FieldName: "$okay", Type: exprtype.VarName},
 					},
 				},
 			},
@@ -44,12 +44,12 @@ func TestNewExpression(t *testing.T) {
 		{
 			"test2",
 			args{expression: "hello.tourist"},
-			[]RefField{
-				RefField{
+			[]ExprField{
+				ExprField{
 					FieldName: "hello",
 					Type:      exprtype.Literal,
 				},
-				RefField{
+				ExprField{
 					FieldName: "tourist",
 					Type:      exprtype.Literal,
 				},
@@ -59,12 +59,12 @@ func TestNewExpression(t *testing.T) {
 		{
 			"test4",
 			args{expression: "hello[tourist]"},
-			[]RefField{
-				RefField{FieldName: "hello", Type: exprtype.Literal},
-				RefField{
+			[]ExprField{
+				ExprField{FieldName: "hello", Type: exprtype.Literal},
+				ExprField{
 					Type: exprtype.InnerRef,
-					InnerRefs: []RefField{
-						RefField{FieldName: "tourist", Type: exprtype.Literal},
+					InnerRefs: []ExprField{
+						ExprField{FieldName: "tourist", Type: exprtype.Literal},
 					},
 				},
 			},
@@ -73,13 +73,13 @@ func TestNewExpression(t *testing.T) {
 		{
 			"test5",
 			args{expression: "hello[tourist.dubist]"},
-			[]RefField{
-				RefField{FieldName: "hello", Type: exprtype.Literal},
-				RefField{
+			[]ExprField{
+				ExprField{FieldName: "hello", Type: exprtype.Literal},
+				ExprField{
 					Type: exprtype.InnerRef,
-					InnerRefs: []RefField{
-						RefField{FieldName: "tourist", Type: exprtype.Literal},
-						RefField{FieldName: "dubist", Type: exprtype.Literal},
+					InnerRefs: []ExprField{
+						ExprField{FieldName: "tourist", Type: exprtype.Literal},
+						ExprField{FieldName: "dubist", Type: exprtype.Literal},
 					},
 				},
 			},
@@ -88,16 +88,16 @@ func TestNewExpression(t *testing.T) {
 		{
 			"test6",
 			args{expression: "hello[tourist[dubist]]"},
-			[]RefField{
-				RefField{FieldName: "hello", Type: exprtype.Literal},
-				RefField{
+			[]ExprField{
+				ExprField{FieldName: "hello", Type: exprtype.Literal},
+				ExprField{
 					Type: exprtype.InnerRef,
-					InnerRefs: []RefField{
-						RefField{FieldName: "tourist", Type: exprtype.Literal},
-						RefField{
+					InnerRefs: []ExprField{
+						ExprField{FieldName: "tourist", Type: exprtype.Literal},
+						ExprField{
 							Type: exprtype.InnerRef,
-							InnerRefs: []RefField{
-								RefField{FieldName: "dubist", Type: exprtype.Literal},
+							InnerRefs: []ExprField{
+								ExprField{FieldName: "dubist", Type: exprtype.Literal},
 							},
 						},
 					},
@@ -108,25 +108,25 @@ func TestNewExpression(t *testing.T) {
 		{
 			"test7",
 			args{expression: "hello[tourist[dubist[in[budapest.capitol]]]]"},
-			[]RefField{
-				RefField{FieldName: "hello", Type: exprtype.Literal},
-				RefField{
+			[]ExprField{
+				ExprField{FieldName: "hello", Type: exprtype.Literal},
+				ExprField{
 					Type: exprtype.InnerRef,
-					InnerRefs: []RefField{
-						RefField{FieldName: "tourist", Type: exprtype.Literal},
-						RefField{
+					InnerRefs: []ExprField{
+						ExprField{FieldName: "tourist", Type: exprtype.Literal},
+						ExprField{
 							Type: exprtype.InnerRef,
-							InnerRefs: []RefField{
-								RefField{FieldName: "dubist", Type: exprtype.Literal},
-								RefField{
+							InnerRefs: []ExprField{
+								ExprField{FieldName: "dubist", Type: exprtype.Literal},
+								ExprField{
 									Type: exprtype.InnerRef,
-									InnerRefs: []RefField{
-										RefField{FieldName: "in", Type: exprtype.Literal},
-										RefField{
+									InnerRefs: []ExprField{
+										ExprField{FieldName: "in", Type: exprtype.Literal},
+										ExprField{
 											Type: exprtype.InnerRef,
-											InnerRefs: []RefField{
-												RefField{FieldName: "budapest", Type: exprtype.Literal},
-												RefField{FieldName: "capitol", Type: exprtype.Literal},
+											InnerRefs: []ExprField{
+												ExprField{FieldName: "budapest", Type: exprtype.Literal},
+												ExprField{FieldName: "capitol", Type: exprtype.Literal},
 											},
 										},
 									},
@@ -141,26 +141,26 @@ func TestNewExpression(t *testing.T) {
 		{
 			"test8",
 			args{expression: "hello[tourist[dubist]].in.budapest[capitol]"},
-			[]RefField{
-				RefField{FieldName: "hello", Type: exprtype.Literal},
-				RefField{
+			[]ExprField{
+				ExprField{FieldName: "hello", Type: exprtype.Literal},
+				ExprField{
 					Type: exprtype.InnerRef,
-					InnerRefs: []RefField{
-						RefField{FieldName: "tourist", Type: exprtype.Literal},
-						RefField{
+					InnerRefs: []ExprField{
+						ExprField{FieldName: "tourist", Type: exprtype.Literal},
+						ExprField{
 							Type: exprtype.InnerRef,
-							InnerRefs: []RefField{
-								RefField{FieldName: "dubist", Type: exprtype.Literal},
+							InnerRefs: []ExprField{
+								ExprField{FieldName: "dubist", Type: exprtype.Literal},
 							},
 						},
 					},
 				},
-				RefField{FieldName: "in", Type: exprtype.Literal},
-				RefField{FieldName: "budapest", Type: exprtype.Literal},
-				RefField{
+				ExprField{FieldName: "in", Type: exprtype.Literal},
+				ExprField{FieldName: "budapest", Type: exprtype.Literal},
+				ExprField{
 					Type: exprtype.InnerRef,
-					InnerRefs: []RefField{
-						RefField{FieldName: "capitol", Type: exprtype.Literal},
+					InnerRefs: []ExprField{
+						ExprField{FieldName: "capitol", Type: exprtype.Literal},
 					},
 				},
 			},
@@ -169,33 +169,33 @@ func TestNewExpression(t *testing.T) {
 		{
 			"test9",
 			args{expression: "hello[tourist[dubist]].in"},
-			[]RefField{
-				RefField{FieldName: "hello", Type: exprtype.Literal},
-				RefField{
+			[]ExprField{
+				ExprField{FieldName: "hello", Type: exprtype.Literal},
+				ExprField{
 					Type: exprtype.InnerRef,
-					InnerRefs: []RefField{
-						RefField{FieldName: "tourist", Type: exprtype.Literal},
-						RefField{
+					InnerRefs: []ExprField{
+						ExprField{FieldName: "tourist", Type: exprtype.Literal},
+						ExprField{
 							Type: exprtype.InnerRef,
-							InnerRefs: []RefField{
-								RefField{FieldName: "dubist", Type: exprtype.Literal},
+							InnerRefs: []ExprField{
+								ExprField{FieldName: "dubist", Type: exprtype.Literal},
 							},
 						},
 					},
 				},
-				RefField{FieldName: "in", Type: exprtype.Literal},
+				ExprField{FieldName: "in", Type: exprtype.Literal},
 			},
 			false,
 		},
 		{
 			"test10",
 			args{expression: `hello["tourist.dubist"]`},
-			[]RefField{
-				RefField{FieldName: "hello", Type: exprtype.Literal},
-				RefField{
+			[]ExprField{
+				ExprField{FieldName: "hello", Type: exprtype.Literal},
+				ExprField{
 					Type: exprtype.InnerRef,
-					InnerRefs: []RefField{
-						RefField{FieldName: "tourist.dubist", Type: exprtype.Literal},
+					InnerRefs: []ExprField{
+						ExprField{FieldName: "tourist.dubist", Type: exprtype.Literal},
 					},
 				},
 			},
