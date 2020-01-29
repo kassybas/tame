@@ -4,7 +4,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/kassybas/tame/internal/dotref/reftype"
+	"github.com/kassybas/tame/types/reftype"
 )
 
 func TestParseDotRef(t *testing.T) {

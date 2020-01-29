@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/kassybas/tame/internal/dotref/reftype"
+	"github.com/kassybas/tame/types/reftype"
 )
 
 type RefField struct {
