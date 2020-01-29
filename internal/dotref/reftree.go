@@ -14,14 +14,6 @@ type RefTreeParse struct {
 	nodes  []RefField
 }
 
-type RefField struct {
-	FieldName interface{}
-	InnerTree *RefTreeParse
-	InnerRefs []RefField
-	Index     int
-	Type      reftype.RefType
-}
-
 func NewRefTree(parent *RefTreeParse) *RefTreeParse {
 	newTree := RefTreeParse{
 		nodes:  []RefField{},
@@ -47,21 +39,14 @@ func trimLiteralQuotes(field string) (string, error) {
 }
 
 func (r *RefTreeParse) AddField(field string) error {
-	var err error
-	rt := reftype.Unset
-	if strings.HasPrefix(field, "$") {
-		if r.cur.count > 0 {
-			return fmt.Errorf("variable field is not allowed in dot-format reference: %s", field)
-		}
-		rt = reftype.VarName
-	} else {
-		field, err = trimLiteralQuotes(field)
-		if err != nil {
-			return err
-		}
-		rt = reftype.Literal
+	newField, err := NewField(field)
+	if err != nil {
+		return err
 	}
-	r.AddNode(RefField{FieldName: field, Type: rt})
+	if newField.Type == reftype.VarName && r.cur.count > 0 {
+		return fmt.Errorf("variable field is not allowed in dot-format reference: %s", field)
+	}
+	r.AddNode(newField)
 	return nil
 }
 

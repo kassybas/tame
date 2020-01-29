@@ -1,8 +1,6 @@
 package vartable
 
 import (
-	"fmt"
-
 	"github.com/kassybas/tame/internal/dotref"
 	"github.com/kassybas/tame/internal/tvar"
 )
@@ -38,13 +36,9 @@ func (vt *VarTable) Append(names []string, values []interface{}) error {
 		if err != nil {
 			return err
 		}
-		nameFields, err = vt.resolveEachField(nameFields)
-		if err != nil {
-			return fmt.Errorf("could not resolve variable names in fields: %s\n\t%s", names[i], err.Error())
-		}
 		if vt.Exists(nameFields[0].FieldName) {
 			// variable exists
-			oldVar, err := vt.GetVarByFields(nameFields)
+			oldVar, err := vt.resolveFieldsVar(nameFields)
 			if err != nil {
 				return err
 			}
