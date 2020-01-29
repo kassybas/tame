@@ -4,7 +4,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/kassybas/tame/types/reftype"
+	"github.com/kassybas/tame/types/exprtype"
 )
 
 func TestParseDotRef(t *testing.T) {
@@ -21,7 +21,7 @@ func TestParseDotRef(t *testing.T) {
 			"test1",
 			args{fullName: "hello"},
 			[]RefField{
-				RefField{FieldName: "hello", Type: reftype.Literal},
+				RefField{FieldName: "hello", Type: exprtype.Literal},
 			},
 			false,
 		},
@@ -29,12 +29,12 @@ func TestParseDotRef(t *testing.T) {
 			"test1v",
 			args{fullName: "$hello.foo[$okay]"},
 			[]RefField{
-				RefField{FieldName: "$hello", Type: reftype.VarName},
-				RefField{FieldName: "foo", Type: reftype.Literal},
+				RefField{FieldName: "$hello", Type: exprtype.VarName},
+				RefField{FieldName: "foo", Type: exprtype.Literal},
 				RefField{
-					Type: reftype.InnerRef,
+					Type: exprtype.InnerRef,
 					InnerRefs: []RefField{
-						RefField{FieldName: "$okay", Type: reftype.VarName},
+						RefField{FieldName: "$okay", Type: exprtype.VarName},
 					},
 				},
 			},
@@ -46,11 +46,11 @@ func TestParseDotRef(t *testing.T) {
 			[]RefField{
 				RefField{
 					FieldName: "hello",
-					Type:      reftype.Literal,
+					Type:      exprtype.Literal,
 				},
 				RefField{
 					FieldName: "tourist",
-					Type:      reftype.Literal,
+					Type:      exprtype.Literal,
 				},
 			},
 			false,
@@ -59,11 +59,11 @@ func TestParseDotRef(t *testing.T) {
 			"test4",
 			args{fullName: "hello[tourist]"},
 			[]RefField{
-				RefField{FieldName: "hello", Type: reftype.Literal},
+				RefField{FieldName: "hello", Type: exprtype.Literal},
 				RefField{
-					Type: reftype.InnerRef,
+					Type: exprtype.InnerRef,
 					InnerRefs: []RefField{
-						RefField{FieldName: "tourist", Type: reftype.Literal},
+						RefField{FieldName: "tourist", Type: exprtype.Literal},
 					},
 				},
 			},
@@ -73,12 +73,12 @@ func TestParseDotRef(t *testing.T) {
 			"test5",
 			args{fullName: "hello[tourist.dubist]"},
 			[]RefField{
-				RefField{FieldName: "hello", Type: reftype.Literal},
+				RefField{FieldName: "hello", Type: exprtype.Literal},
 				RefField{
-					Type: reftype.InnerRef,
+					Type: exprtype.InnerRef,
 					InnerRefs: []RefField{
-						RefField{FieldName: "tourist", Type: reftype.Literal},
-						RefField{FieldName: "dubist", Type: reftype.Literal},
+						RefField{FieldName: "tourist", Type: exprtype.Literal},
+						RefField{FieldName: "dubist", Type: exprtype.Literal},
 					},
 				},
 			},
@@ -88,15 +88,15 @@ func TestParseDotRef(t *testing.T) {
 			"test6",
 			args{fullName: "hello[tourist[dubist]]"},
 			[]RefField{
-				RefField{FieldName: "hello", Type: reftype.Literal},
+				RefField{FieldName: "hello", Type: exprtype.Literal},
 				RefField{
-					Type: reftype.InnerRef,
+					Type: exprtype.InnerRef,
 					InnerRefs: []RefField{
-						RefField{FieldName: "tourist", Type: reftype.Literal},
+						RefField{FieldName: "tourist", Type: exprtype.Literal},
 						RefField{
-							Type: reftype.InnerRef,
+							Type: exprtype.InnerRef,
 							InnerRefs: []RefField{
-								RefField{FieldName: "dubist", Type: reftype.Literal},
+								RefField{FieldName: "dubist", Type: exprtype.Literal},
 							},
 						},
 					},
@@ -108,24 +108,24 @@ func TestParseDotRef(t *testing.T) {
 			"test7",
 			args{fullName: "hello[tourist[dubist[in[budapest.capitol]]]]"},
 			[]RefField{
-				RefField{FieldName: "hello", Type: reftype.Literal},
+				RefField{FieldName: "hello", Type: exprtype.Literal},
 				RefField{
-					Type: reftype.InnerRef,
+					Type: exprtype.InnerRef,
 					InnerRefs: []RefField{
-						RefField{FieldName: "tourist", Type: reftype.Literal},
+						RefField{FieldName: "tourist", Type: exprtype.Literal},
 						RefField{
-							Type: reftype.InnerRef,
+							Type: exprtype.InnerRef,
 							InnerRefs: []RefField{
-								RefField{FieldName: "dubist", Type: reftype.Literal},
+								RefField{FieldName: "dubist", Type: exprtype.Literal},
 								RefField{
-									Type: reftype.InnerRef,
+									Type: exprtype.InnerRef,
 									InnerRefs: []RefField{
-										RefField{FieldName: "in", Type: reftype.Literal},
+										RefField{FieldName: "in", Type: exprtype.Literal},
 										RefField{
-											Type: reftype.InnerRef,
+											Type: exprtype.InnerRef,
 											InnerRefs: []RefField{
-												RefField{FieldName: "budapest", Type: reftype.Literal},
-												RefField{FieldName: "capitol", Type: reftype.Literal},
+												RefField{FieldName: "budapest", Type: exprtype.Literal},
+												RefField{FieldName: "capitol", Type: exprtype.Literal},
 											},
 										},
 									},
@@ -141,25 +141,25 @@ func TestParseDotRef(t *testing.T) {
 			"test8",
 			args{fullName: "hello[tourist[dubist]].in.budapest[capitol]"},
 			[]RefField{
-				RefField{FieldName: "hello", Type: reftype.Literal},
+				RefField{FieldName: "hello", Type: exprtype.Literal},
 				RefField{
-					Type: reftype.InnerRef,
+					Type: exprtype.InnerRef,
 					InnerRefs: []RefField{
-						RefField{FieldName: "tourist", Type: reftype.Literal},
+						RefField{FieldName: "tourist", Type: exprtype.Literal},
 						RefField{
-							Type: reftype.InnerRef,
+							Type: exprtype.InnerRef,
 							InnerRefs: []RefField{
-								RefField{FieldName: "dubist", Type: reftype.Literal},
+								RefField{FieldName: "dubist", Type: exprtype.Literal},
 							},
 						},
 					},
 				},
-				RefField{FieldName: "in", Type: reftype.Literal},
-				RefField{FieldName: "budapest", Type: reftype.Literal},
+				RefField{FieldName: "in", Type: exprtype.Literal},
+				RefField{FieldName: "budapest", Type: exprtype.Literal},
 				RefField{
-					Type: reftype.InnerRef,
+					Type: exprtype.InnerRef,
 					InnerRefs: []RefField{
-						RefField{FieldName: "capitol", Type: reftype.Literal},
+						RefField{FieldName: "capitol", Type: exprtype.Literal},
 					},
 				},
 			},
@@ -169,20 +169,20 @@ func TestParseDotRef(t *testing.T) {
 			"test9",
 			args{fullName: "hello[tourist[dubist]].in"},
 			[]RefField{
-				RefField{FieldName: "hello", Type: reftype.Literal},
+				RefField{FieldName: "hello", Type: exprtype.Literal},
 				RefField{
-					Type: reftype.InnerRef,
+					Type: exprtype.InnerRef,
 					InnerRefs: []RefField{
-						RefField{FieldName: "tourist", Type: reftype.Literal},
+						RefField{FieldName: "tourist", Type: exprtype.Literal},
 						RefField{
-							Type: reftype.InnerRef,
+							Type: exprtype.InnerRef,
 							InnerRefs: []RefField{
-								RefField{FieldName: "dubist", Type: reftype.Literal},
+								RefField{FieldName: "dubist", Type: exprtype.Literal},
 							},
 						},
 					},
 				},
-				RefField{FieldName: "in", Type: reftype.Literal},
+				RefField{FieldName: "in", Type: exprtype.Literal},
 			},
 			false,
 		},
@@ -190,11 +190,11 @@ func TestParseDotRef(t *testing.T) {
 			"test10",
 			args{fullName: `hello["tourist.dubist"]`},
 			[]RefField{
-				RefField{FieldName: "hello", Type: reftype.Literal},
+				RefField{FieldName: "hello", Type: exprtype.Literal},
 				RefField{
-					Type: reftype.InnerRef,
+					Type: exprtype.InnerRef,
 					InnerRefs: []RefField{
-						RefField{FieldName: "tourist.dubist", Type: reftype.Literal},
+						RefField{FieldName: "tourist.dubist", Type: exprtype.Literal},
 					},
 				},
 			},

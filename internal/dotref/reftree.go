@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/kassybas/tame/types/reftype"
+	"github.com/kassybas/tame/types/exprtype"
 )
 
 type RefTreeParse struct {
@@ -43,7 +43,7 @@ func (r *RefTreeParse) AddField(field string) error {
 	if err != nil {
 		return err
 	}
-	if newField.Type == reftype.VarName && r.cur.count > 0 {
+	if newField.Type == exprtype.VarName && r.cur.count > 0 {
 		return fmt.Errorf("variable field is not allowed in dot-format reference: %s", field)
 	}
 	r.AddNode(newField)
@@ -66,7 +66,7 @@ func (r *RefTreeParse) CloseInner() error {
 
 func (r *RefTreeParse) OpenInner() error {
 	innterTree := NewRefTree(r)
-	r.AddNode(RefField{InnerTree: innterTree, Type: reftype.InnerRef})
+	r.AddNode(RefField{InnerTree: innterTree, Type: exprtype.InnerRef})
 	// set cur to inner until bracket is closed
 	r.parent = r.cur
 	r.cur = innterTree
@@ -75,7 +75,7 @@ func (r *RefTreeParse) OpenInner() error {
 
 func (r *RefTreeParse) CreateResultFields() []RefField {
 	for i := range r.nodes {
-		if r.nodes[i].Type == reftype.InnerRef {
+		if r.nodes[i].Type == exprtype.InnerRef {
 			r.nodes[i].InnerRefs = r.nodes[i].InnerTree.CreateResultFields()
 			r.nodes[i].InnerTree = nil
 		}

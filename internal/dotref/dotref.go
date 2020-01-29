@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/kassybas/tame/types/reftype"
+	"github.com/kassybas/tame/types/exprtype"
 )
 
 type RefField struct {
@@ -14,7 +14,7 @@ type RefField struct {
 	InnerTree *RefTreeParse
 	InnerRefs []RefField
 	Index     int
-	Type      reftype.RefType
+	Type      exprtype.RefType
 }
 
 func NewField(val interface{}) (RefField, error) {
@@ -23,22 +23,22 @@ func NewField(val interface{}) (RefField, error) {
 	case string:
 		if strings.HasPrefix(val, "$") {
 			// variable
-			newField.Type = reftype.VarName
+			newField.Type = exprtype.VarName
 			newField.FieldName = val
 		} else if idx, err := strconv.Atoi(val); err == nil {
 			// index
-			newField.Type = reftype.Index
+			newField.Type = exprtype.Index
 			newField.Index = idx
 		} else {
 			// literal
-			newField.Type = reftype.Literal
+			newField.Type = exprtype.Literal
 			newField.FieldName, err = trimLiteralQuotes(val)
 			if err != nil {
 				return newField, err
 			}
 		}
 	case int:
-		newField.Type = reftype.Index
+		newField.Type = exprtype.Index
 		newField.Index = val
 	default:
 		return newField, fmt.Errorf("unknown field type: %T", val)

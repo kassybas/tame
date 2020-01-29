@@ -1,4 +1,4 @@
-package reftype
+package exprtype
 
 type RefType int
 

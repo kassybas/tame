@@ -7,12 +7,12 @@ import (
 	"github.com/kassybas/tame/internal/dotref"
 	"github.com/kassybas/tame/internal/keywords"
 	"github.com/kassybas/tame/internal/tvar"
-	"github.com/kassybas/tame/types/reftype"
+	"github.com/kassybas/tame/types/exprtype"
 )
 
 func (vt *VarTable) resolveFieldsVar(refFields []dotref.RefField) (tvar.TVariable, error) {
 	for i := range refFields {
-		if refFields[i].Type == reftype.InnerRef {
+		if refFields[i].Type == exprtype.InnerRef {
 			innerVal, err := vt.resolveFieldsValue(refFields[i].InnerRefs)
 			if err != nil {
 				return nil, err
