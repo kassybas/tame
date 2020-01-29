@@ -100,10 +100,10 @@ func (v TList) SetValue(fields []texpression.ExprField, value interface{}) (TVar
 	if len(fields) == 1 {
 		// overdefine list with different type
 		// if no fieldname??
-		return NewVariable(fields[0].FieldName, value), nil
+		return NewVariable(fields[0].Val, value), nil
 	}
 	field := fields[1]
-	if field.FieldName != "" {
+	if field.Val != "" {
 		return nil, fmt.Errorf("referencing field on a list: %s %v ", v.name, fields)
 	}
 	if field.Index >= len(v.values) || field.Index < 0 {
@@ -125,7 +125,7 @@ func (v TList) GetInnerValue(fields []texpression.ExprField) (interface{}, error
 	}
 	// field[1] is the first actual field, should be the index
 	field := fields[1]
-	if field.FieldName != "" {
+	if field.Val != "" {
 		return nil, fmt.Errorf("referencing field on a list: %s %v ", v.name, fields)
 	}
 	if field.Index >= len(v.values) || field.Index < 0 {

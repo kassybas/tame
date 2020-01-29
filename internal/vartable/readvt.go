@@ -9,7 +9,7 @@ import (
 
 func (vt *VarTable) GetVar(fullName string) (tvar.TVariable, error) {
 	fields, err := texpression.NewExpression(fullName)
-	if err != nil || fields[0].FieldName == "" {
+	if err != nil || fields[0].Val == "" {
 		return nil, fmt.Errorf("failed to parse variable name:%s\n%s", fullName, err)
 	}
 	return vt.getVarByFields(fields)
@@ -26,5 +26,5 @@ func (vt *VarTable) getVarByName(name string) (tvar.TVariable, error) {
 }
 
 func (vt *VarTable) getVarByFields(fields []texpression.ExprField) (tvar.TVariable, error) {
-	return vt.getVarByName(fields[0].FieldName)
+	return vt.getVarByName(fields[0].Val)
 }

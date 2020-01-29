@@ -11,7 +11,7 @@ import (
 )
 
 type ExprField struct {
-	FieldName string
+	Val       string
 	InnerRefs []ExprField
 	Index     int
 	Type      exprtype.ExprType
@@ -24,7 +24,7 @@ func NewField(val interface{}) (ExprField, error) {
 		if strings.HasPrefix(val, "$") {
 			// variable
 			newField.Type = exprtype.VarName
-			newField.FieldName = val
+			newField.Val = val
 		} else if idx, err := strconv.Atoi(val); err == nil {
 			// index
 			newField.Type = exprtype.Index
@@ -32,7 +32,7 @@ func NewField(val interface{}) (ExprField, error) {
 		} else {
 			// literal
 			newField.Type = exprtype.Literal
-			newField.FieldName, err = helpers.TrimLiteralQuotes(val)
+			newField.Val, err = helpers.TrimLiteralQuotes(val)
 			if err != nil {
 				return newField, err
 			}

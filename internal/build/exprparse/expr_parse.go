@@ -4,6 +4,37 @@ import (
 	"fmt"
 )
 
+type ParseState struct {
+	inSingleQuotes  bool
+	inDoubleQuotes  bool
+	squareBrStarted int
+	roundBrStarted  int
+}
+
+func (s *ParseState) InQuotes() bool {
+	return s.inSingleQuotes || s.inDoubleQuotes
+}
+
+func (s *ParseState) InQuotesOrRoundBrackets() bool {
+	return s.inSingleQuotes || s.inDoubleQuotes || s.roundBrStarted > 0
+}
+
+func (s *ParseState) InRoundBracket() bool {
+	return s.roundBrStarted > 0
+}
+
+func (s *ParseState) CloseRoundBracket() error {
+	s.roundBrStarted--
+	if s.roundBrStarted < 0 {
+		return fmt.Errorf("closing round bracket without opening")
+	}
+	return nil
+}
+
+func (s *ParseState) OpenRoundBracket() {
+	s.roundBrStarted++
+}
+
 func ParseExpression(fullName string) (ParseTree, error) {
 	// var cur string
 	if len(fullName) == 0 {
@@ -11,26 +42,37 @@ func ParseExpression(fullName string) (ParseTree, error) {
 	}
 	prevPos := 0
 	pos := 0
-	singleQuotesStarted := false
-	doubleQuotesStarted := false
-	var startedBrackets int
+	state := ParseState{}
 	tree := NewRefTree(nil)
 	for _, ch := range fullName {
 		pos++
 		switch ch {
+		case '(':
+			if state.InQuotes() {
+				continue
+			}
+			state.OpenRoundBracket()
+		case ')':
+			if state.InQuotes() {
+				continue
+			}
+			err := state.CloseRoundBracket()
+			if err != nil {
+				return ParseTree{}, fmt.Errorf("failed to parse expression: %s\n\t%s", fullName, err.Error())
+			}
 		case '"':
-			if singleQuotesStarted {
+			if state.inSingleQuotes || state.InRoundBracket() {
 				continue
 			}
-			doubleQuotesStarted = !doubleQuotesStarted
+			state.inDoubleQuotes = !state.inDoubleQuotes
 		case '\'':
-			if doubleQuotesStarted {
+			if state.inDoubleQuotes || state.InRoundBracket() {
 				continue
 			}
-			singleQuotesStarted = !singleQuotesStarted
+			state.inSingleQuotes = !state.inSingleQuotes
 		case '.':
 			{
-				if singleQuotesStarted || doubleQuotesStarted {
+				if state.InQuotesOrRoundBrackets() {
 					continue
 				}
 				if pos != prevPos+1 {
@@ -43,7 +85,7 @@ func ParseExpression(fullName string) (ParseTree, error) {
 			}
 		case '[':
 			{
-				if singleQuotesStarted || doubleQuotesStarted {
+				if state.InQuotesOrRoundBrackets() {
 					continue
 				}
 				if pos != prevPos+1 {
@@ -53,12 +95,12 @@ func ParseExpression(fullName string) (ParseTree, error) {
 					}
 				}
 				tree.OpenInner()
-				startedBrackets++
+				state.squareBrStarted++
 				prevPos = pos
 			}
 		case ']':
 			{
-				if singleQuotesStarted || doubleQuotesStarted {
+				if state.InQuotesOrRoundBrackets() {
 					continue
 				}
 				if pos != prevPos+1 {
@@ -68,12 +110,12 @@ func ParseExpression(fullName string) (ParseTree, error) {
 					}
 				}
 				tree.CloseInner()
-				startedBrackets--
+				state.squareBrStarted--
 				prevPos = pos
 			}
 		}
 	}
-	if startedBrackets != 0 {
+	if state.squareBrStarted != 0 || state.InRoundBracket() {
 		return ParseTree{}, fmt.Errorf("unclosed brackets in expression: %s", fullName)
 	}
 	if prevPos != pos {

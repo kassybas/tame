@@ -37,7 +37,7 @@ func (vt *VarTable) Append(names []string, values []interface{}) error {
 		if err != nil {
 			return err
 		}
-		if vt.Exists(nameFields[0].FieldName) {
+		if vt.Exists(nameFields[0].Val) {
 			// variable exists
 			oldVar, err := vt.resolveFieldsVar(nameFields)
 			if err != nil {

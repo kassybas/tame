@@ -39,7 +39,7 @@ func (v TScalar) SetValue(fields []texpression.ExprField, value interface{}) (TV
 		return nil, fmt.Errorf("internal error: empty reference")
 	}
 	if len(fields) > 1 {
-		return nil, fmt.Errorf("field reference on scalar variable (only allowed on map or list): '%s'.'%v'", v.name, fields[1].FieldName)
+		return nil, fmt.Errorf("field reference on scalar variable (only allowed on map or list): '%s'.'%v'", v.name, fields[1].Val)
 	}
 	v.value = value
 	return v, nil
@@ -52,7 +52,7 @@ func (v TScalar) GetInnerValue(fields []texpression.ExprField) (interface{}, err
 		return nil, fmt.Errorf("internal error: empty reference")
 	}
 	if len(fields) > 1 {
-		return nil, fmt.Errorf("field reference on scalar variable (only allowed on map or list): '%s'.'%v'", v.name, fields[1].FieldName)
+		return nil, fmt.Errorf("field reference on scalar variable (only allowed on map or list): '%s'.'%v'", v.name, fields[1].Val)
 	}
 	return v.value, nil
 }

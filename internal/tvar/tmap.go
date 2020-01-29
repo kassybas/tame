@@ -90,24 +90,24 @@ func (v TMap) SetValue(fields []texpression.ExprField, value interface{}) (TVari
 	}
 	if len(fields) == 1 {
 		// cast value of map to different value
-		return NewVariable(fields[0].FieldName, value), nil
+		return NewVariable(fields[0].Val, value), nil
 	}
 	// Field 0 is the name of the variable
 	field := fields[1]
-	if field.FieldName == "" {
+	if field.Val == "" {
 		return nil, fmt.Errorf("empty field name -- indexing not allowed on map type: %s index: %d", v.name, field.Index)
 	}
 	// Map field
-	if !v.IsMember(field.FieldName) {
+	if !v.IsMember(field.Val) {
 		if len(fields) == 2 {
 			// last field's key's can be extended
-			v.values[fields[1].FieldName] = NewVariable(fields[1].FieldName, value)
+			v.values[fields[1].Val] = NewVariable(fields[1].Val, value)
 			return v, nil
 		}
-		return nil, fmt.Errorf("field does not exist in map: %s: %s.%s ", v.name, fields[0].FieldName, fields[1].FieldName)
+		return nil, fmt.Errorf("field does not exist in map: %s: %s.%s ", v.name, fields[0].Val, fields[1].Val)
 	}
 	// Setting an existing member
-	v.values[field.FieldName], err = v.values[field.FieldName].SetValue(fields[1:], value)
+	v.values[field.Val], err = v.values[field.Val].SetValue(fields[1:], value)
 	return v, err
 }
 
@@ -123,13 +123,13 @@ func (v TMap) GetInnerValue(fields []texpression.ExprField) (interface{}, error)
 	}
 	// field[1] is the first actual field
 	field := fields[1]
-	if field.FieldName == "" {
+	if field.Val == "" {
 		return nil, fmt.Errorf("empty field name -- indexing not allowed on map type: %s index: %d", v.name, field.Index)
 	}
-	if !v.IsMember(field.FieldName) {
-		return nil, fmt.Errorf("field does not exist %s.%s", v.name, field.FieldName)
+	if !v.IsMember(field.Val) {
+		return nil, fmt.Errorf("field does not exist %s.%s", v.name, field.Val)
 	}
-	return v.values[field.FieldName].GetInnerValue(fields[1:])
+	return v.values[field.Val].GetInnerValue(fields[1:])
 }
 
 func (v TMap) ToEnvVars(ShellFieldSeparator string) []string {

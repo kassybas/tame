@@ -36,6 +36,26 @@ func TestParseExpression(t *testing.T) {
 				}},
 			false,
 		},
+		{
+			"test2",
+			args{fullName: "$hello.(foo.hello('ok'))"},
+			ParseTree{
+				Nodes: []Node{
+					Node{Val: "$hello"},
+					Node{Val: "(foo.hello('ok'))"},
+				}},
+			false,
+		},
+		{
+			"test3",
+			args{fullName: "$hello.(foo)"},
+			ParseTree{
+				Nodes: []Node{
+					Node{Val: "$hello"},
+					Node{Val: "(foo)"},
+				}},
+			false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
