@@ -18,6 +18,7 @@ var (
 
 	ShellFieldSeparator = "_"
 	TameFieldSeparator  = "."
+	AppendToList        = "+"
 	IndexingSeparatorL  = "["
 	IndexingSeparatorR  = "]"
 

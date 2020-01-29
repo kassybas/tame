@@ -1,0 +1,18 @@
+
+$GLOBALBAR: "barbarbar"
+$CHANGEME: "changeme"
+
+
+Example:
+  run:
+  - $myvar: hello
+  - $config:
+      servers:
+        - "10.0.0.1"
+        - "10.0.0.2"
+        - "$myvar"
+  - dump:
+      value: $config
+  - $config.servers+: "100000"
+  - dump:
+      value: $config

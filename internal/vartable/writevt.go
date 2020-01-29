@@ -28,7 +28,7 @@ func (vt *VarTable) Add(name string, value interface{}) error {
 	return nil
 }
 
-func (vt *VarTable) Append(names []string, values []interface{}) error {
+func (vt *VarTable) AddMultiple(names []string, values []interface{}) error {
 	for i := range names {
 		if names[i] == "" {
 			continue

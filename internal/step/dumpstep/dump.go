@@ -116,7 +116,7 @@ func (s *DumpStep) RunStep(ctx tcontext.Context, vt *vartable.VarTable) step.Ste
 		}
 	}
 	if !s.GetOpts().Silent {
-		fmt.Println(dumpedValue)
+		fmt.Print(dumpedValue)
 	}
 	return step.StepStatus{Results: []interface{}{dumpedValue}}
 }

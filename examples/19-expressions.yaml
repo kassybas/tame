@@ -1,5 +1,6 @@
 
 $GLOBALBAR: "barbarbar"
+$CHANGEME: "changeme"
 
 
 Example:
@@ -20,6 +21,7 @@ Example2:
   args: {$foo: "$GLOBALBAR"}
   run:
   - sh: echo "$foo"
+  - sh: echo $CHANGEME
 
 Example3:
   run:
@@ -35,3 +37,6 @@ Example3:
     - sh: echo "ping ${server}"
   - dump:
       value: $list.hello
+  - $CHANGEME: okidok
+  - sh: echo "local $CHANGEME"
+  - Example2: {}
