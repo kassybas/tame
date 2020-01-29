@@ -15,8 +15,8 @@ $user:
 
 PrintUser:
   run:
+    # maps fields are separated by `_` in shell context which is confugrable, see examples/07-maps-in-shell.yaml
   - sh: |
-      # maps fields are separated by `_` in shell context which should configurable sooner or later
       echo "${user_name} is ${user_age} years old. Lives in ${user_address_city}"
 
 TestSilence:
