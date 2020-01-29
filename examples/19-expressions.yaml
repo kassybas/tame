@@ -28,6 +28,10 @@ Example3:
       - "10.0.0.1"
       - "10.0.0.2"
       - "10.0.0.3"
-  - for: {$server: (1..3)}
+      minutes: (0..59)
+  - for: {$server: $list.servers}
     do:
     - sh: echo "ping ${server}"
+  - dump:
+      var: "hello tourist"
+      format: json

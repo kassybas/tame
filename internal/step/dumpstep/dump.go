@@ -97,11 +97,11 @@ func writeToFile(path string, data string) error {
 
 func (s *DumpStep) RunStep(ctx tcontext.Context, vt *vartable.VarTable) step.StepStatus {
 	var err error
-	source, err := vt.GetVar(s.sourceVarName)
+	sourceVal, err := vt.ResolveValue(s.sourceVarName)
 	if err != nil {
-		return step.StepStatus{Err: fmt.Errorf("source variable does not exist in dump step: %s\n\t%s", s.GetName(), err.Error())}
+		return step.StepStatus{Err: fmt.Errorf("source variable cannot be resolved dump step: %s\n\t%s", s.GetName(), err.Error())}
 	}
-	dumpedValue, err := getFormattedValue(source.Value(), s.format)
+	dumpedValue, err := getFormattedValue(sourceVal, s.format)
 	if err != nil {
 		return step.StepStatus{Err: fmt.Errorf("failed to encode in dump step: %s\n\t%s", s.GetName(), err.Error())}
 	}

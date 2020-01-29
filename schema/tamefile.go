@@ -36,7 +36,7 @@ type SettingsShema struct {
 }
 
 type DumpSchema struct {
-	SourceVarName string `mapstructure:"var,omitempty"`
+	SourceVarName string `mapstructure:"value,omitempty"`
 	Path          string `mapstructure:"path,omitempty"`
 	Format        string `mapstructure:"format,omitempty"`
 }
