@@ -25,12 +25,26 @@ func TestNewExpression(t *testing.T) {
 			},
 			false,
 		},
-
 		{
 			"test1",
 			args{expression: "hello"},
 			[]ExprField{
 				ExprField{Val: "hello", Type: exprtype.Literal},
+			},
+			false,
+		},
+		{
+			"test1num",
+			args{expression: "$hello.foo[42]"},
+			[]ExprField{
+				ExprField{Val: "$hello", Type: exprtype.VarName},
+				ExprField{Val: "foo", Type: exprtype.Literal},
+				ExprField{
+					Type: exprtype.InnerRef,
+					InnerRefs: []ExprField{
+						ExprField{Index: 42, Type: exprtype.Index},
+					},
+				},
 			},
 			false,
 		},
@@ -253,7 +267,7 @@ func TestNewExpression(t *testing.T) {
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("NewExpression() = %v, want %v", got, tt.want)
+				t.Errorf("NewExpression() = %+v, want %+v", got, tt.want)
 			}
 		})
 	}

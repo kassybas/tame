@@ -2,7 +2,9 @@ package vartable
 
 import (
 	"fmt"
+	"strings"
 
+	"github.com/kassybas/tame/internal/keywords"
 	"github.com/kassybas/tame/internal/texpression"
 	"github.com/kassybas/tame/internal/tvar"
 )
@@ -20,7 +22,11 @@ func (vt *VarTable) getVarByName(name string) (tvar.TVariable, error) {
 	val, exists := vt.vars[name]
 	vt.RUnlock()
 	if !exists {
-		return nil, fmt.Errorf("variable '%s' does not exist", name)
+		msg := fmt.Sprintf("variable '%s' does not exist", name)
+		if !strings.HasPrefix(name, keywords.PrefixReference) {
+			msg = fmt.Sprintf("%s: variable should start with $ '$%s', or quoted if literal in field '\"%s\"'", msg, name, name)
+		}
+		return nil, fmt.Errorf(msg)
 	}
 	return val, nil
 }

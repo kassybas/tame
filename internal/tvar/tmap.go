@@ -100,7 +100,7 @@ func (v TMap) SetValue(fields []texpression.ExprField, value interface{}) (TVari
 	// Map field
 	if !v.IsMember(field.Val) {
 		if len(fields) == 2 {
-			// last field's key's can be extended
+			// maps key's can be extended
 			v.values[fields[1].Val] = NewVariable(fields[1].Val, value)
 			return v, nil
 		}

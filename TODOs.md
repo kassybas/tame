@@ -6,9 +6,7 @@
 
 - overwrites in cli and in include
 - make all field separators configurable
-- make globals r/w?
 - while loop
-- target-specific shell
 
 - optimizations
     - vartable creates env_vars even if nothing has changes (should reuse previous one)

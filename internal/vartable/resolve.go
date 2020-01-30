@@ -42,16 +42,28 @@ func (vt *VarTable) resolveFieldsVar(refFields []texpression.ExprField) (tvar.TV
 	return vt.getVarByFields(refFields)
 }
 
-func (vt *VarTable) resolveFieldsValue(refFields []texpression.ExprField) (interface{}, error) {
-	// single pure expression
-	if refFields[0].Type == exprtype.Expression && len(refFields) == 1 {
-		res, err := vt.EvaluateExpression(refFields[0].Val)
+func (vt *VarTable) resolveSingleField(field texpression.ExprField) (interface{}, error) {
+	switch field.Type {
+	case exprtype.Expression:
+		res, err := vt.EvaluateExpression(field.Val)
 		if err != nil {
-			return nil, fmt.Errorf("failed to resolve expression: %s\n\t%s", refFields[0].Val, err.Error())
+			return nil, fmt.Errorf("failed to resolve expression: %s\n\t%s", field.Val, err.Error())
 		}
 		return res, nil
+	case exprtype.Index:
+		return field.Index, nil
+	case exprtype.Literal:
+		return field.Val, nil
+	default:
+		return nil, fmt.Errorf("internal error: could not resolve single field: %+v", field)
 	}
+}
 
+func (vt *VarTable) resolveFieldsValue(refFields []texpression.ExprField) (interface{}, error) {
+	if len(refFields) == 1 && refFields[0].Type != exprtype.VarName {
+		// last field is end of recursion
+		return vt.resolveSingleField(refFields[0])
+	}
 	// resolveFields resolves the fields in refFields in place
 	// note: refFields slice is passed by reference
 	v, err := vt.resolveFieldsVar(refFields)

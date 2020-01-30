@@ -71,6 +71,9 @@ func processStatuses(statusChan, resultChan chan step.StepStatus, syncStepDone c
 			resultChan <- curStatus
 		}
 		curStatus.Err = updateVarsWithResultVariables(vt, status.ResultNames, status.Results, status.AllowedLessResults)
+		if curStatus.Err != nil {
+			resultChan <- curStatus
+		}
 		if curStatus.IsBreaking {
 			resultChan <- curStatus
 		}
