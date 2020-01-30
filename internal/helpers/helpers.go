@@ -80,7 +80,7 @@ func ConvertSliceToInterfaceSlice(slice interface{}) ([]interface{}, error) {
 		}
 		return interfaceSlice, nil
 	}
-	return nil, fmt.Errorf("unknown list type: %s (type %T)", slice, slice)
+	return nil, fmt.Errorf("unknown list type: %v (type %T)", slice, slice)
 }
 
 func DeepConvertInterToMapStrInter(inter interface{}) (interface{}, error) {

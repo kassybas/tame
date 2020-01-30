@@ -1,18 +1,43 @@
 
-$GLOBALBAR: "barbarbar"
-$CHANGEME: "changeme"
 
-
-Example:
+ExampleSplit:
   run:
-  - $myvar: hello
-  - $config:
-      servers:
-        - "10.0.0.1"
-        - "10.0.0.2"
-        - "$myvar"
+  - $myText: |
+      hi
+      there
+      was
+      a
   - dump:
-      value: $config
-  - $config.servers+: "100000"
+      value: (stringsSplit($myText, "\n"))
+
+ExampleUpper:
+  run:
+  - $s: hello world
+  - $n: "42"
   - dump:
-      value: $config
+      value: (stringsToUpper($n))
+
+ExampleAppend:
+  run:
+  - $list: [1,2,3,4]
+  - dump:
+      value: (append($list,5)) #-> [1,2,3,4,5]
+  - dump:
+      value: (append($list,[5])) #-> [1,2,3,4,[5]]
+
+ExampleExtend:
+  run:
+  - $list: [1,2,3,4]
+  - dump:
+      value: (extend($list,[5]))  #-> [1,2,3,4,5]
+
+ExampleMapExtend:
+  run:
+  - $conf:
+    - name: HOST
+      value: localhost
+  - $origin:
+    - name: ORIGIN
+      value: remote.com
+  - dump:
+      value: (extend($conf, $origin))

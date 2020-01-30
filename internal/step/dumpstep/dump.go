@@ -99,7 +99,7 @@ func (s *DumpStep) RunStep(ctx tcontext.Context, vt *vartable.VarTable) step.Ste
 	var err error
 	sourceVal, err := vt.ResolveValue(s.sourceValue)
 	if err != nil {
-		return step.StepStatus{Err: fmt.Errorf("source variable cannot be resolved dump step: %s\n\t%s", s.GetName(), err.Error())}
+		return step.StepStatus{Err: fmt.Errorf("source value cannot be resolved dump step: %s\n\t%s", s.GetName(), err.Error())}
 	}
 	dumpedValue, err := getFormattedValue(sourceVal, s.format)
 	if err != nil {

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/antonmedv/expr"
+	"github.com/kassybas/tame/internal/eval"
 	"github.com/kassybas/tame/internal/keywords"
 	"github.com/kassybas/tame/internal/texpression"
 	"github.com/kassybas/tame/internal/tvar"
@@ -13,11 +13,7 @@ import (
 
 func (vt *VarTable) EvaluateExpression(expression string) (interface{}, error) {
 	env := vt.GetAllValues()
-	program, err := expr.Compile(expression, expr.Env(env))
-	if err != nil {
-		return nil, fmt.Errorf("failed to evaluate expression: %s\n\t%s", expression, err.Error())
-	}
-	return expr.Run(program, env)
+	return eval.EvaluateExpression(expression, env)
 }
 
 func (vt *VarTable) resolveFieldsVar(refFields []texpression.ExprField) (tvar.TVariable, error) {

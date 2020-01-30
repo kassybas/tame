@@ -4,7 +4,6 @@
 - logging
 - create extensive documentation
 
-- append to list
 - overwrites in cli and in include
 - make all field separators configurable
 - make globals r/w?
