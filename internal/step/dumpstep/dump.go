@@ -1,13 +1,10 @@
 package dumpstep
 
 import (
-	"bytes"
-	"encoding/json"
 	"fmt"
 	"io"
 	"os"
 
-	"github.com/BurntSushi/toml"
 	"github.com/kassybas/tame/internal/helpers"
 	"github.com/kassybas/tame/internal/step"
 	"github.com/kassybas/tame/internal/step/basestep"
@@ -15,7 +12,6 @@ import (
 	"github.com/kassybas/tame/internal/vartable"
 	"github.com/kassybas/tame/schema"
 	"github.com/kassybas/tame/types/steptype"
-	"gopkg.in/yaml.v2"
 )
 
 type DumpStep struct {
@@ -36,51 +32,6 @@ func NewDumpStep(stepDef schema.MergedStepSchema) (*DumpStep, error) {
 	return &newStep, err
 }
 
-func getFormattedValue(v interface{}, format string) (string, error) {
-	var dumpedValue string
-	switch format {
-	case "yaml", "":
-		{
-			dumpedValueBytes, err := yaml.Marshal(&v)
-			if err != nil {
-				return "", fmt.Errorf("could not encode source variable to yaml in dump step: %s", err.Error())
-			}
-			dumpedValue = string(dumpedValueBytes)
-		}
-	case "json":
-		{
-			// json does not support map[interface{}]interface{}
-			// so we need to convert it to map[string]interface{}
-			strMapValue, err := helpers.DeepConvertInterToMapStrInter(v)
-			if err != nil {
-				return "", fmt.Errorf("could not encode source variable to json in dump step: %s", err.Error())
-			}
-			dumpedValueBytes, err := json.Marshal(&strMapValue)
-			if err != nil {
-				return "", fmt.Errorf("could not encode source variable to json in dump step: %s", err.Error())
-			}
-			dumpedValue = string(dumpedValueBytes)
-		}
-	case "toml":
-		{
-			// toml does not support map[interface{}] interface{}
-			// so we need to convert it to map[string]interface{}
-			strMapValue, err := helpers.DeepConvertInterToMapStrInter(v)
-			if err != nil {
-				return "", fmt.Errorf("could not encode source variable to toml in dump step: %s", err.Error())
-			}
-			buf := new(bytes.Buffer)
-			if err := toml.NewEncoder(buf).Encode(strMapValue); err != nil {
-				return "", fmt.Errorf("could not encode source variable to toml in dump step: %s", err.Error())
-			}
-			dumpedValue = buf.String()
-		}
-	default:
-		return "", fmt.Errorf("unknown encoding in dump step, possible: yaml|json|toml, got: %s", format)
-	}
-	return dumpedValue, nil
-
-}
 func writeToFile(path string, data string) error {
 	file, err := os.Create(path)
 	if err != nil {
@@ -101,7 +52,7 @@ func (s *DumpStep) RunStep(ctx tcontext.Context, vt *vartable.VarTable) step.Ste
 	if err != nil {
 		return step.StepStatus{Err: fmt.Errorf("source value cannot be resolved dump step: %s\n\t%s", s.GetName(), err.Error())}
 	}
-	dumpedValue, err := getFormattedValue(sourceVal, s.format)
+	dumpedValue, err := helpers.GetFormattedValue(sourceVal, s.format)
 	if err != nil {
 		return step.StepStatus{Err: fmt.Errorf("failed to encode in dump step: %s\n\t%s", s.GetName(), err.Error())}
 	}

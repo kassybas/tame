@@ -59,6 +59,7 @@ type MergedStepSchema struct {
 	Wait             *interface{}            `mapstructure:"wait"`
 	Dump             *DumpSchema             `mapstructure:"dump"`
 	Load             *LoadSchema             `mapstructure:"load"`
+	Print            interface{}             `mapstructure:"print"`
 
 	// loaded dynamically since the yaml key defines the step type or step data
 	ForSteps            []MergedStepSchema     `mapstructure:"-"` // do: [ForSteps]

@@ -158,6 +158,12 @@ func ParseStepSchema(raw interface{}) (schema.MergedStepSchema, error) {
 		return mergedSchema, err
 	}
 	// Determine step type
+	if mergedSchema.Print != nil {
+		mergedSchema.StepType, err = setStepType(mergedSchema.StepType, steptype.Print)
+		if err != nil {
+			return mergedSchema, err
+		}
+	}
 	if mergedSchema.Load != nil {
 		mergedSchema.StepType, err = setStepType(mergedSchema.StepType, steptype.Load)
 		if err != nil {

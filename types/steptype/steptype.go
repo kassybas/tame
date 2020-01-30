@@ -14,6 +14,7 @@ const (
 	For
 	Dump
 	Load
+	Print
 )
 
 func (t Steptype) ToStr() string {
@@ -40,6 +41,8 @@ func (t Steptype) ToStr() string {
 		return "dump"
 	case Load:
 		return "load"
+	case Print:
+		return "print"
 	default:
 		panic("internal error: non-steptype steptype")
 	}

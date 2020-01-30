@@ -1,11 +1,15 @@
 package helpers
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"strings"
 
+	"github.com/BurntSushi/toml"
 	"github.com/kassybas/tame/internal/keywords"
 	"github.com/kassybas/tame/types/opts"
+	"gopkg.in/yaml.v2"
 )
 
 func GetKeyValueFromEnvString(envStr string) (string, interface{}, error) {
@@ -181,4 +185,49 @@ func TrimRoundBrackets(field string) (string, error) {
 		field = strings.TrimPrefix(field, "(")
 	}
 	return field, nil
+}
+
+func GetFormattedValue(v interface{}, format string) (string, error) {
+	var dumpedValue string
+	switch format {
+	case "yaml", "":
+		{
+			dumpedValueBytes, err := yaml.Marshal(&v)
+			if err != nil {
+				return "", fmt.Errorf("could not encode source variable to yaml in dump step: %s", err.Error())
+			}
+			dumpedValue = string(dumpedValueBytes)
+		}
+	case "json":
+		{
+			// json does not support map[interface{}]interface{}
+			// so we need to convert it to map[string]interface{}
+			strMapValue, err := DeepConvertInterToMapStrInter(v)
+			if err != nil {
+				return "", fmt.Errorf("could not encode source variable to json in dump step: %s", err.Error())
+			}
+			dumpedValueBytes, err := json.Marshal(&strMapValue)
+			if err != nil {
+				return "", fmt.Errorf("could not encode source variable to json in dump step: %s", err.Error())
+			}
+			dumpedValue = string(dumpedValueBytes)
+		}
+	case "toml":
+		{
+			// toml does not support map[interface{}] interface{}
+			// so we need to convert it to map[string]interface{}
+			strMapValue, err := DeepConvertInterToMapStrInter(v)
+			if err != nil {
+				return "", fmt.Errorf("could not encode source variable to toml in dump step: %s", err.Error())
+			}
+			buf := new(bytes.Buffer)
+			if err := toml.NewEncoder(buf).Encode(strMapValue); err != nil {
+				return "", fmt.Errorf("could not encode source variable to toml in dump step: %s", err.Error())
+			}
+			dumpedValue = buf.String()
+		}
+	default:
+		return "", fmt.Errorf("unknown encoding in dump step, possible: yaml|json|toml, got: %s", format)
+	}
+	return dumpedValue, nil
 }

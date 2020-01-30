@@ -17,7 +17,6 @@ func AllFunctions() map[string]interface{} {
 		"stringsHasSuffix":    strings.HasSuffix,
 		"stringsIndex":        strings.Index,
 		"stringsIndexAny":     strings.IndexAny,
-		"stringsJoin":         strings.Join,
 		"stringsLastIndex":    strings.LastIndex,
 		"stringsLastIndexAny": strings.LastIndexAny,
 		"stringsRepeat":       strings.Repeat,

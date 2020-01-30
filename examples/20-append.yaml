@@ -40,19 +40,14 @@ ExampleMapExtend:
     - dump:
         value: (extend($conf, $origin))
 
-ExampleComplex:
+ExamplePrint:
   run:
     - $names:
-        users:
           - Alan
           - Bob
           - Cate
-    - $names.users[0]: YOLO
-    - dump:
-        value: $names
-    - $conf:
-        user:
-          name: Bob
-    - $conf["user"].name: YOLO
-    - dump:
-        value: $conf
+    - $result: ""
+    - for: {$name: $names}
+      do:
+      - $result: ($result +" "+ $name)
+    - print: $result
