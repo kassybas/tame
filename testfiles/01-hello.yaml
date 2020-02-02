@@ -1,8 +1,25 @@
+$FOO: "bar"
 
-
-# args: hello
-# out:Hello world Foo!
-hello:
+Hello:
   args: {$mynameis: "Foo"}
   run:
   - sh: echo "Hello world ${mynameis}!"
+
+HelloGlobal:
+  run:
+  - sh: echo "Hello world ${FOO}!"
+
+OverwriteGlobal:
+  run:
+  - $FOO: "changed"
+  - sh: echo "it is $FOO"
+
+IndexAList:
+  run:
+  - $myList:
+    - darkness
+    - my old
+    - friend
+  - $i: 2
+  - $line: $myList[$i]
+  - sh: echo "line is ${line}"

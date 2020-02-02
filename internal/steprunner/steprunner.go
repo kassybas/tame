@@ -116,7 +116,5 @@ func RunAllSteps(steps stepblock.StepBlock, ctx tcontext.Context, vt *vartable.V
 	go startIterations(steps, statusChan, resultChan, syncStepDone, ctx, vt, parentOpts)
 
 	status := <-resultChan
-	// setting it to false so it does not break the parent execution
-	status.IsBreaking = false
 	return status
 }

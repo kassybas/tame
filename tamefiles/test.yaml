@@ -1,24 +1,64 @@
-include:
-- path: "testcases.yaml"
-  as: testcases
-
 UnitTest:
   run:
-  - sh: go test ./...
+    - sh: go test ./...
 
 BlackBoxTest:
+  args: { $testConfigPath: "tamefiles/testcases.yaml" }
   run:
-  - testcases.GetTests: {}
-    =: $tests
-  - for: {$path: $tests}
-    do:
-    - for: {$tc: "$tests[$path]"}
+    - load: { path: $testConfigPath, format: yaml }
+      =: $tests
+
+    - $failed: {}
+    - $passed: []
+    - $countFail: 0
+
+    - name: "Run all tests"
+      for: { $path: $tests }
       do:
-      - sh: bin/tame -f $path "${tc_target}" ${tc_args}
-        opts: [allow-fail]
-        =: [$result, $resErr, $rc]
-      - if: $result != $tc.res
-        then:
-          print: FAILED
-        else:
-          print: OK
+        - for: { $tc: "$tests[$path]" }
+          do:
+            - $name: ($path+"::"+$tc.name)
+            - runBlackBoxTest: { $tc: $tc, $path: $path }
+              =: [$pass, $msg]
+            - if: $pass
+              then:
+                - $passed: (append($passed, $name))
+              else:
+                - $failed[$name]: {}
+                - $failed[$name].msg: $msg
+                - $countFail: ($countFail + 1)
+    - print: |
+        (format("Ran tests: %d", len($passed)+$countFail))
+    - if: $countFail >0
+      then:
+        - print: "Failed Tests"
+        - print: "$failed"
+
+$errorMsgFormat: |
+  Failure type [%v]: %v::%v
+    Expected: %v
+    Got: %v
+
+runBlackBoxTest:
+  args: { $tc, $path }
+  run:
+    - if: "'args' not in $tc"
+      then: { $tc.args: "" }
+    - sh: bin/tame -f $path "${tc_target}" ${tc_args}
+      opts: [silent, allow-fail]
+      =: [$result, $resErr, $resRc]
+
+    - if: "'res' in $tc and $result != $tc.res"
+      then:
+        - return:
+            [ false, '(format($errorMsgFormat, ["stdout", $path, $tc.name, $tc.res, $result]))' ]
+
+    - if: "'resRc' in $tc and $resRc != $tc.resRc"
+      then:
+        - return:
+            [ false, '(format($errorMsgFormat, ["status", $path, $tc.name, $tc.resRc, $resRc]))']
+    - if: "'resErr' in $tc and $resErr != $tc.resErr"
+      then:
+        - return:
+            [ false, '(format($errorMsgFormat, ["stderr", $path, $tc.name, $tc.resErr, $resErr]))' ]
+    - return: [true, "OK"]

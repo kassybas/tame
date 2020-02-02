@@ -22,6 +22,9 @@ func Make(path, targetName string, targetArgs map[string]interface{}) {
 	status := root.RunStep(ctx, vartable.NewVarTable())
 	if status.Err != nil {
 		logrus.Errorf(status.Err.Error())
+		if status.Stdstatus == 0 {
+			status.Stdstatus = 1
+		}
 	}
 	// pass through the status code
 	if status.Stdstatus != 0 {

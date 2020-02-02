@@ -104,7 +104,7 @@ func (v TMap) SetValue(fields []texpression.ExprField, value interface{}) (TVari
 			v.values[fields[1].Val] = NewVariable(fields[1].Val, value)
 			return v, nil
 		}
-		return nil, fmt.Errorf("field does not exist in map: %s: %s.%s ", v.name, fields[0].Val, fields[1].Val)
+		return nil, fmt.Errorf("field does not exist in map: %s: %s[%s]", v.name, fields[0].Val, fields[1].Val)
 	}
 	// Setting an existing member
 	v.values[field.Val], err = v.values[field.Val].SetValue(fields[1:], value)

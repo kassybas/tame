@@ -43,6 +43,7 @@ func CheckParseFloat(s string, bitSize int) bool {
 func Format(fmtString string, vals interface{}) string {
 	vInterSlice, err := helpers.ConvertSliceToInterfaceSlice(vals)
 	if err != nil {
+		// fallback to non-interable interface{}
 		return fmt.Sprintf(fmtString, vals)
 	}
 	return fmt.Sprintf(fmtString, vInterSlice...)

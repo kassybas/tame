@@ -25,3 +25,13 @@
         else:
           print: "OK
 ```
+- BUG: race condition when returning error: next step is still being run
+- BUG: this should create a new map, but it does nothing in for loop
+``` yaml
+            - runBlackBoxTest: { $tc: $tc, $path: $path }
+              =: [$passed, $msg]
+            - print: (format("PASSED %v", $passed))
+            - $result[($path+"::"+$tc.name)]:
+                passed: $passed
+```
+- BUG: async does not wait in parallel exec

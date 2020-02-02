@@ -29,6 +29,8 @@ func (t Target) Make(vt *vartable.VarTable, parentOpts opts.ExecutionOpts) step.
 	t.Opts.Silent = parentOpts.Silent
 
 	status := steprunner.RunAllSteps(t.Steps, *t.Ctx, vt, t.Opts)
+	// setting it to false so it does not break the parent execution
+	status.IsBreaking = false
 	return status
 }
 

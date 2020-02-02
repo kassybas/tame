@@ -30,7 +30,7 @@ func NewIfStep(stepDef schema.MergedStepSchema, ifSteps, elseSteps []step.Step) 
 	newStep.condition = fmt.Sprintf("%v", stepDef.IfCondition)
 	newStep.ifSteps = stepblock.NewStepBlock(ifSteps)
 	newStep.elseSteps = stepblock.NewStepBlock(elseSteps)
-	newStep.BaseStep, err = basestep.NewBaseStep(stepDef, steptype.If, "if "+newStep.condition)
+	newStep.BaseStep, err = basestep.NewBaseStep(stepDef, steptype.If, "if: "+newStep.condition)
 
 	return &newStep, err
 }
@@ -61,7 +61,7 @@ func (s *IfStep) RunStep(ctx tcontext.Context, vt *vartable.VarTable) step.StepS
 	}
 	res, err := s.evalCondition(vt)
 	if err != nil {
-		return step.StepStatus{Err: fmt.Errorf("\n\t while evaluating condition %s:\n\t%s", s.GetName(), err.Error())}
+		return step.StepStatus{Err: fmt.Errorf("while evaluating condition %s:\n\t%s", s.GetName(), err.Error())}
 	}
 	var status step.StepStatus
 	if res {

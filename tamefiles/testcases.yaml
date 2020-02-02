@@ -1,10 +1,26 @@
+"testfiles/01-hello.yaml":
+  - name: "default-arg"
+    target: Hello
+    res: Hello world Foo!
 
-GetTests:
-  run:
-  - return:
-      "testfiles/01-hello.yaml":
-      - target: Hello
-        args: ""
-        res: Hello world Foo!
-        # resErr: ""
-        # resRc: 0
+  - name: "cli-arg"
+    target: Hello
+    args: "--mynameis=acliarg"
+    res: Hello world acliarg!
+
+  - name: "unknown-arg"
+    target: Hello
+    args: "--XXXX=acliarg"
+    resRc: 1
+
+  - name: "global-var"
+    target: HelloGlobal
+    res: Hello world bar!
+
+  - name: "index-a-list"
+    target: IndexAList
+    res: line is friend
+
+  - name: "owerwrite global"
+    target: OverwriteGlobal
+    res: "it is changed XXX"
