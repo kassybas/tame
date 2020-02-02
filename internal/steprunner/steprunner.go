@@ -29,7 +29,7 @@ func runStep(s step.Step, ctx tcontext.Context, vt *vartable.VarTable, parentOpt
 
 	status := s.RunStep(ctx, vt)
 	if status.Err != nil {
-		return step.StepStatus{Err: fmt.Errorf("[step: %s]:\n\t%s", s.GetName(), status.Err.Error())}
+		return status
 	}
 	status.ResultNames = s.ResultNames()
 	status.AllowedLessResults = s.Kind() == steptype.Shell
@@ -40,9 +40,6 @@ func runStep(s step.Step, ctx tcontext.Context, vt *vartable.VarTable, parentOpt
 
 func orchestrateIteration(s step.Step, ctx tcontext.Context, vt *vartable.VarTable, wg *sync.WaitGroup, statusChan chan step.StepStatus, parentOpts opts.ExecutionOpts) step.StepStatus {
 	status := runStep(s, ctx, vt, parentOpts)
-	if status.Err != nil {
-		status.Err = fmt.Errorf("in step: %s\n\t%s", s.GetName(), status.Err.Error())
-	}
 	status.IsSync = !s.GetOpts().Async
 	statusChan <- status
 	wg.Done()

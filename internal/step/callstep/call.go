@@ -55,7 +55,7 @@ func (s *CallStep) RunStep(ctx tcontext.Context, vt *vartable.VarTable) step.Ste
 	}
 	status := s.calledTarget.Make(newVt, s.GetOpts())
 	if status.Err != nil {
-		return step.StepStatus{Err: fmt.Errorf("step: %s\n\t%s", s.GetName(), status.Err.Error())}
+		return step.StepStatus{Err: fmt.Errorf("target: %s\n\t%s", s.calledTargetName, status.Err.Error())}
 	}
 	return status
 }

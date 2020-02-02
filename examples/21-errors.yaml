@@ -1,2 +1,10 @@
 
 
+
+Example:
+  run:
+  - sh: echo Hello
+  - $foo: (failme)
+
+
+
