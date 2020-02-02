@@ -1,8 +1,11 @@
 package eval
 
 import (
+	"fmt"
 	"strconv"
 	"strings"
+
+	"github.com/kassybas/tame/internal/helpers"
 )
 
 func Split(in, sep string) []string {
@@ -35,4 +38,12 @@ func ParseFloat(s string, bitSize int) float64 {
 func CheckParseFloat(s string, bitSize int) bool {
 	_, err := strconv.ParseFloat(s, bitSize)
 	return err == nil
+}
+
+func Format(fmtString string, vals interface{}) string {
+	vInterSlice, err := helpers.ConvertSliceToInterfaceSlice(vals)
+	if err != nil {
+		return fmt.Sprintf(fmtString, vals)
+	}
+	return fmt.Sprintf(fmtString, vInterSlice...)
 }

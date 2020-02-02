@@ -30,10 +30,15 @@ func (s *PrintStep) RunStep(ctx tcontext.Context, vt *vartable.VarTable) step.St
 	if err != nil {
 		return step.StepStatus{Err: fmt.Errorf("source value cannot be resolved print step: %s\n\t%s", s.GetName(), err.Error())}
 	}
-	ymlVal, err := helpers.GetFormattedValue(sourceVal, "yaml")
-	if err != nil {
-		return step.StepStatus{Err: fmt.Errorf("source value cannot be converted in print: %s\n\t%s", s.GetName(), err.Error())}
+	strVal, isStr := sourceVal.(string)
+	if isStr {
+		fmt.Println(strVal)
+	} else {
+		ymlVal, err := helpers.GetFormattedValue(sourceVal, "yaml")
+		if err != nil {
+			return step.StepStatus{Err: fmt.Errorf("source value cannot be converted in print: %s\n\t%s", s.GetName(), err.Error())}
+		}
+		fmt.Print(ymlVal)
 	}
-	fmt.Print(ymlVal)
 	return step.StepStatus{}
 }

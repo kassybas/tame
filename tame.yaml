@@ -1,52 +1,73 @@
 settings:
-  init: "set -e"
+  init: "set -eu"
+  shieldEnv: true
 
-globals:
-  $platforms:
-    linux:
-      os: "linux"
-      arch: "amd64"
-    mac:
-      os: "darwin"
-      arch: "amd64"
-  $docker:
-    image: "kassybas/tame"
+$version:
+  major: "0"
+  minor: "2"
+  patch: "0"
+$platforms:
+  - os: "linux"
+    arch: "amd64"
+  - os: "linux"
+    arch: "386"
+  - os: "darwin"
+    arch: "amd64"
+  - os: "darwin"
+    arch: "386"
+  - os: "freebsd"
+    arch: "amd64"
+  - os: "freebsd"
+    arch: "386"
 
-targets:
+$dockerImage: "kassybas/tame"
 
-  echo:
-    run:
-      - sh: echo $platforms_linux_arch
+Version:
+  run:
+  - sh: awk -F'"' '/app.Version/{print $2}' main.go
+    =: $cliVersion
+    opts: silent
+  - $relVersion: (format("%v.%v.%v", [$version.major, $version.minor, $version.patch]))
+  - if: ($cliVersion != $relVersion)
+    then:
+      sh: |
+        echo "ERROR CLI version does not match release version"
+        echo "$cliVersion (cli) != $relVersion (release)"
+        exit 1
+    else:
+    - return: $relVersion
 
-  local-build:
-    run:
-    - call build: { $platform: $platforms.mac}
+LocalBuild:
+  run:
+  - sh: go build -o bin/tame -ldflags "-s -w"
 
-  build-all:
-    run:
-    - call build: { $platform: $platforms.mac}
-    - call build: { $platform: $platforms.linux}
+BuildAll:
+  run:
+  - cleanBin: {}
+  - for: {$platform: $platforms}
+    do:
+    - Build: { $os: $platform.os, $arch: $platform.arch}
+      opts: async
 
-  build:
-    args: { $platform }
-    run:
-    - sh: |
-        echo "Building for ${platform_os}:${platform_arch}..."
-        mkdir -p bin
-        GOOS=${platform_os} GOARCH=${platform_arch} go build -o bin/tame_${platform_os}_${platform_arch}
+Build:
+  args: { $os, $arch }
+  run:
+  - sh: |
+      echo "Building: ${os}:${arch}..."
+      mkdir -p bin
+      GOOS=${os} GOARCH=${arch} go build -o bin/tame_${os}_${arch} -ldflags "-s -w"
 
-  docker-build:
-    args: { $version: "latest"}
-    run:
-    - call build: { $platform: $platforms.linux }
-    - var $os: $platforms.linux.os
-    - var $arch: $platforms.linux.arch
-    - sh: docker build --build-arg=bin/tame_${os}_${arch} -t ${docker_image}:${version} .
+DockerBuild:
+  run:
+  - Version: {}
+    =: $tag
+  - sh: |
+      docker build -t ${dockerImage}:${tag} .
 
-  clean-bin:
-    run:
-      - sh: rm -rf ./bin/*
+cleanBin:
+  run:
+    - sh: rm -rf ./bin/*
 
-  test:
-    run:
-    - sh: go test ./...
+Test:
+  run:
+  - sh: go test ./...

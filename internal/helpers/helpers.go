@@ -59,6 +59,8 @@ func IsPublic(targetName string) bool {
 
 func ConvertSliceToInterfaceSlice(slice interface{}) ([]interface{}, error) {
 	switch slice := slice.(type) {
+	case []interface{}:
+		return slice, nil
 	case []int:
 		interfaceSlice := make([]interface{}, len(slice))
 		for i := range slice {
@@ -177,6 +179,7 @@ func TrimLiteralQuotes(field string) (string, error) {
 }
 
 func TrimRoundBrackets(field string) (string, error) {
+	field = strings.TrimSpace(field)
 	if strings.HasPrefix(field, `(`) {
 		if !strings.HasSuffix(field, `)`) {
 			return "", fmt.Errorf("missing closing bracket: %s", field)

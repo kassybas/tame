@@ -6,7 +6,6 @@ import (
 	"github.com/kassybas/tame/cmd"
 	"github.com/kassybas/tame/internal/helpers"
 	"github.com/sirupsen/logrus"
-	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli"
 )
 
@@ -14,7 +13,7 @@ func main() {
 	app := cli.NewApp()
 	app.Name = "tame"
 	app.Usage = "tame executes targets defined in tame.yaml"
-	app.Version = "0.1.4"
+	app.Version = "0.2.0"
 
 	var tameFile string
 	var targetName string
@@ -42,6 +41,6 @@ func main() {
 
 	err := app.Run(os.Args)
 	if err != nil {
-		log.Error(err)
+		logrus.Error(err)
 	}
 }

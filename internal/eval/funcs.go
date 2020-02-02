@@ -48,5 +48,6 @@ func AllFunctions() map[string]interface{} {
 		// builtins
 		"append": Append,
 		"extend": Extend,
+		"format": Format,
 	}
 }
