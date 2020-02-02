@@ -87,34 +87,31 @@ func loadSubSteps(rawSteps interface{}) ([]schema.MergedStepSchema, error) {
 	return steps, nil
 }
 
-func loadIfStepSchema(raw map[string]interface{}, result *schema.MergedStepSchema) error {
-	var err error
-	if len(raw) > 2 {
-		return fmt.Errorf("unknown key(s) in if-else step: %v", raw)
-	}
-	for k, v := range raw {
-		if strings.HasPrefix(k, keywords.IfStepPrefix) {
-			condition := strings.TrimPrefix(k, keywords.IfStepPrefix)
-			result.IfCondition = condition
-			if result.IfSteps, err = loadSubSteps(v); err != nil {
-				return err
-			}
-		} else if k == keywords.IfStepElse {
-			if result.ElseSteps, err = loadSubSteps(v); err != nil {
-				return err
-			}
-		}
-	}
-	return nil
-}
+// func loadIfStepSchema(raw map[string]interface{}, result *schema.MergedStepSchema) error {
+// 	var err error
+// 	if len(raw) > 2 {
+// 		return fmt.Errorf("unknown key(s) in if-else step: %v", raw)
+// 	}
+// 	for k, v := range raw {
+// 		if strings.HasPrefix(k, keywords.IfStepPrefix) {
+// 			condition := strings.TrimPrefix(k, keywords.IfStepPrefix)
+// 			result.IfCondition = condition
+// 			if result.IfSteps, err = loadSubSteps(v); err != nil {
+// 				return err
+// 			}
+// 		} else if k == keywords.IfStepElse {
+// 			if result.ElseSteps, err = loadSubSteps(v); err != nil {
+// 				return err
+// 			}
+// 		}
+// 	}
+// 	return nil
+// }
 
 func loadDynamicKey(raw map[string]interface{}, dynamicKey string, result *schema.MergedStepSchema) error {
 	// starting with $ -> it's a var
 	if strings.HasPrefix(dynamicKey, keywords.PrefixReference) && len(dynamicKey) > 1 {
 		return loadVarStepSchema(raw, dynamicKey, result)
-	}
-	if strings.HasPrefix(dynamicKey, keywords.IfStepPrefix) || dynamicKey == keywords.IfStepElse {
-		return loadIfStepSchema(raw, result)
 	}
 	// not starting with $ -> it's a call
 	return loadCallStepSchema(raw, dynamicKey, result)
@@ -131,9 +128,8 @@ func loadMergedStepSchema(raw interface{}) (schema.MergedStepSchema, error) {
 	if err != nil {
 		return result, err
 	}
-	// 2: if and else
-	if len(md.Unused) > 2 {
-		return result, fmt.Errorf("multiple unknown keys found in step, expect: $varname, targetname, if, else; got: %v", md.Unused)
+	if len(md.Unused) > 1 {
+		return result, fmt.Errorf("multiple dynamic keys found in step, expect: $varname, targetname, got: %v", md.Unused)
 	}
 	if len(md.Unused) > 0 {
 		err = loadDynamicKey(rawMap, md.Unused[0], &result)
@@ -176,17 +172,19 @@ func ParseStepSchema(raw interface{}) (schema.MergedStepSchema, error) {
 			return mergedSchema, err
 		}
 	}
+	if mergedSchema.IfCondition != nil {
+		mergedSchema.StepType, err = setStepType(mergedSchema.StepType, steptype.If)
+		mergedSchema.ThenSteps, err = loadSubSteps(mergedSchema.ThenRawSteps)
+		mergedSchema.ElseSteps, err = loadSubSteps(mergedSchema.ElseRawSteps)
+		if err != nil {
+			return mergedSchema, err
+		}
+	}
 	if mergedSchema.ForLoop != nil {
 		if mergedSchema.ForSteps, err = loadSubSteps(mergedSchema.ForRawSteps); err != nil {
 			return mergedSchema, fmt.Errorf("failed to parse for-do block steps: %s", err.Error())
 		}
 		mergedSchema.StepType, err = setStepType(mergedSchema.StepType, steptype.For)
-		if err != nil {
-			return mergedSchema, err
-		}
-	}
-	if mergedSchema.IfCondition != "" {
-		mergedSchema.StepType, err = setStepType(mergedSchema.StepType, steptype.If)
 		if err != nil {
 			return mergedSchema, err
 		}

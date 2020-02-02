@@ -24,13 +24,13 @@ type IfStep struct {
 func NewIfStep(stepDef schema.MergedStepSchema, ifSteps, elseSteps []step.Step) (*IfStep, error) {
 	var newStep IfStep
 	var err error
-	if stepDef.IfCondition == "" {
+	if stepDef.IfCondition == nil {
 		return nil, fmt.Errorf("no condition in if step")
 	}
-	newStep.condition = stepDef.IfCondition
+	newStep.condition = fmt.Sprintf("%v", stepDef.IfCondition)
 	newStep.ifSteps = stepblock.NewStepBlock(ifSteps)
 	newStep.elseSteps = stepblock.NewStepBlock(elseSteps)
-	newStep.BaseStep, err = basestep.NewBaseStep(stepDef, steptype.If, stepDef.IfCondition)
+	newStep.BaseStep, err = basestep.NewBaseStep(stepDef, steptype.If, "if "+newStep.condition)
 
 	return &newStep, err
 }

@@ -62,7 +62,7 @@ func NewStep(stepDef schema.MergedStepSchema) (step.Step, error) {
 		}
 	case steptype.If:
 		{
-			ifSteps, err := buildSubSteps(stepDef.IfSteps)
+			thenSteps, err := buildSubSteps(stepDef.ThenSteps)
 			if err != nil {
 				return nil, fmt.Errorf("error parsing step in if block:\n\t%s", err.Error())
 			}
@@ -70,7 +70,7 @@ func NewStep(stepDef schema.MergedStepSchema) (step.Step, error) {
 			if err != nil {
 				return nil, fmt.Errorf("error parsing step in else block:\n\t%s", err.Error())
 			}
-			return ifstep.NewIfStep(stepDef, ifSteps, elseSteps)
+			return ifstep.NewIfStep(stepDef, thenSteps, elseSteps)
 		}
 	case steptype.For:
 		{

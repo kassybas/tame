@@ -60,11 +60,13 @@ type MergedStepSchema struct {
 	Dump             *DumpSchema             `mapstructure:"dump"`
 	Load             *LoadSchema             `mapstructure:"load"`
 	Print            interface{}             `mapstructure:"print"`
+	IfCondition      interface{}             `mapstructure:"if"`
+	ThenRawSteps     []interface{}           `mapstructure:"then"` // then: IfSteps
+	ElseRawSteps     []interface{}           `mapstructure:"else"` // else: ElseSteps
 
 	// loaded dynamically since the yaml key defines the step type or step data
 	ForSteps            []MergedStepSchema     `mapstructure:"-"` // do: [ForSteps]
-	IfCondition         string                 `mapstructure:"-"` // if IfCondition
-	IfSteps             []MergedStepSchema     `mapstructure:"-"` // if IfCondition: IfSteps
+	ThenSteps           []MergedStepSchema     `mapstructure:"-"` // then: IfSteps
 	ElseSteps           []MergedStepSchema     `mapstructure:"-"` // else: ElseSteps
 	CalledTargetName    string                 `mapstructure:"-"` // CalledTargetName: {}
 	CallArgumentsPassed map[string]interface{} `mapstructure:"-"` // CalledTargetName: {CallArgumentsPassed}

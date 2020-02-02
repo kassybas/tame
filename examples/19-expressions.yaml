@@ -37,6 +37,3 @@ Example3:
     - sh: echo "ping ${server}"
   - dump:
       value: $list.hello
-  - $CHANGEME: okidok
-  - sh: echo "local $CHANGEME"
-  - Example2: {}
