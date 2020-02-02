@@ -7,7 +7,7 @@ SoundOfSilence:
   - sh: |
       echo "i fail but.."
       exit 66
-    opts: allowed-fail # allow non-zero return codes and continue execution
+    opts: allow-fail # allow non-zero return codes and continue execution
   - sh: echo "target execution still finished"
 
 # tame -f examples/02-options.yaml MultipleOpts
@@ -16,7 +16,7 @@ MultipleOpts:
     - sh: |
         echo "verbose cmd"
         exit 42
-      opts: [silent, allowed-fail]
+      opts: [silent, allow-fail]
 
 
 

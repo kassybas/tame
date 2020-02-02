@@ -18,7 +18,7 @@ ShellStatus:
   run:
   - sh: exit 42
     =: [null, null, $exit_code]  # save return code to $exit_code (stdout and stderr is ignored using null yaml value)
-    opts: allowed-fail   # allowing failure because exit status 42 would halt execution by default
+    opts: allow-fail   # allowing failure because exit status 42 would halt execution by default
   - sh: echo "the previous process exited with ${exit_code}"
 
 

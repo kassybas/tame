@@ -25,10 +25,10 @@ ParallelJobsFailure:
 
 ParallelJobsAllowedFailure:
   # the second step will finish, even though the first one failed,
-  # this is due to the allowed-fail option
+  # this is due to the allow-fail option
   run:
     - sh: echo "i will fail in 2 sec"; sleep 2; exit 42
-      opts: [async, allowed-fail]
+      opts: [async, allow-fail]
     - sh: for i in {1..4}; do echo "second job...$i"; sleep 1; done
       opts: async
 

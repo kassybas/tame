@@ -4,7 +4,7 @@ var (
 	PrefixReference = "$"
 
 	OptSilent  = "silent"
-	OptCanFail = "allowed-fail"
+	OptCanFail = "allow-fail"
 	OptAsync   = "async"
 	OptsNotSet = "not-set"
 
