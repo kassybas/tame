@@ -24,19 +24,25 @@ func loadCalledTargetInclude(name string, includes []schema.IncludeSchema, targe
 			if err != nil {
 				return target.Target{}, fmt.Errorf("error while loading include: %s\n\t%s", name, err.Error())
 			}
-			return s.(*callstep.CallStep).GetCalledTarget(), err
+			trg := s.(*callstep.CallStep).GetCalledTarget()
+			return trg, err
 		}
 	}
 	return target.Target{}, fmt.Errorf("namespace of referenced target not found in includes: no alias matching '%s'", namespace)
 }
 
 func findCalledTarget(name string, targets map[string]target.Target, includes []schema.IncludeSchema) (target.Target, error) {
-	if strings.Contains(name, keywords.TameFieldSeparator) {
-		return loadCalledTargetInclude(name, includes, targets)
-	}
 	v, exists := targets[name]
 	if exists {
 		return v, nil
+	}
+	if strings.Contains(name, keywords.TameFieldSeparator) {
+		var err error
+		targets[name], err = loadCalledTargetInclude(name, includes, targets)
+		if err != nil {
+			return target.Target{}, err
+		}
+		return targets[name], nil
 	}
 	return target.Target{}, fmt.Errorf("target not found: '%s'", name)
 }

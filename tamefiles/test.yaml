@@ -1,0 +1,24 @@
+include:
+- path: "testcases.yaml"
+  as: testcases
+
+UnitTest:
+  run:
+  - sh: go test ./...
+
+BlackBoxTest:
+  run:
+  - testcases.GetTests: {}
+    =: $tests
+  - for: {$path: $tests}
+    do:
+    - for: {$tc: "$tests[$path]"}
+      do:
+      - sh: bin/tame -f $path "${tc_target}" ${tc_args}
+        opts: [allow-fail]
+        =: [$result, $resErr, $rc]
+      - if: $result != $tc.res
+        then:
+          print: FAILED
+        else:
+          print: OK

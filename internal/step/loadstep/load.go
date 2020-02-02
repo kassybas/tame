@@ -94,7 +94,7 @@ func (s *LoadStep) RunStep(ctx tcontext.Context, vt *vartable.VarTable) step.Ste
 		// load from variable
 		v, err := vt.GetVar(s.sourceVarName)
 		if err != nil {
-			return step.StepStatus{Err: fmt.Errorf("failed to resolve variable load step: %s\n\t", s.GetName(), err.Error())}
+			return step.StepStatus{Err: fmt.Errorf("failed to resolve variable load step: %s\n\t%s", s.GetName(), err.Error())}
 		}
 		if v.Type() != vartype.TScalarType {
 			return step.StepStatus{Err: fmt.Errorf("only scalar variables can be loaded and parsed in step: %s\n\tgot:%s", s.GetName(), v.Type().Name())}

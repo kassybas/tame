@@ -14,7 +14,6 @@ import (
 	"github.com/kassybas/tame/internal/tcontext"
 	"github.com/kassybas/tame/internal/tvar"
 	"github.com/kassybas/tame/types/settings"
-	"github.com/sirupsen/logrus"
 )
 
 func createContext(globals []tvar.TVariable, sts settings.Settings) (tcontext.Context, error) {
@@ -66,7 +65,7 @@ func PrepareStep(path, targetName string, targetArgs map[string]interface{}) (st
 	}
 	root, err := CompileTarget(tf, targetName, targetArgs, &ctx)
 	if err != nil {
-		logrus.Fatal(err)
+		return root, ctx, err
 	}
 	return root, ctx, nil
 }

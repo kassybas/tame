@@ -182,7 +182,7 @@ func ParseStepSchema(raw interface{}) (schema.MergedStepSchema, error) {
 	}
 	if mergedSchema.ForLoop != nil {
 		if mergedSchema.ForSteps, err = loadSubSteps(mergedSchema.ForRawSteps); err != nil {
-			return mergedSchema, fmt.Errorf("failed to parse for-do block steps: %s", err.Error())
+			return mergedSchema, fmt.Errorf("failed to parse for-do block steps:\n\t%s", err.Error())
 		}
 		mergedSchema.StepType, err = setStepType(mergedSchema.StepType, steptype.For)
 		if err != nil {

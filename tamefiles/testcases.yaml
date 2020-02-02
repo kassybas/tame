@@ -1,0 +1,10 @@
+
+GetTests:
+  run:
+  - return:
+      "testfiles/01-hello.yaml":
+      - target: Hello
+        args: ""
+        res: Hello world Foo!
+        # resErr: ""
+        # resRc: 0

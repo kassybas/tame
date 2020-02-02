@@ -14,7 +14,8 @@ func Make(path, targetName string, targetArgs map[string]interface{}) {
 
 	root, ctx, err := compile.PrepareStep(path, targetName, targetArgs)
 	if err != nil {
-		logrus.Fatal(err)
+		logrus.Errorf(err.Error())
+		os.Exit(1)
 	}
 
 	// TODO: put cli args in here

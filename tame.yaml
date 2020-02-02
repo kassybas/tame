@@ -1,6 +1,9 @@
 settings:
   init: "set -eu"
-  shieldEnv: true
+
+include:
+  - path: tamefiles/test.yaml
+    as: test
 
 $version:
   major: "0"
@@ -24,50 +27,53 @@ $dockerImage: "kassybas/tame"
 
 Version:
   run:
-  - sh: awk -F'"' '/app.Version/{print $2}' main.go
-    =: $cliVersion
-    opts: silent
-  - $relVersion: (format("%v.%v.%v", [$version.major, $version.minor, $version.patch]))
-  - if: ($cliVersion != $relVersion)
-    then:
-      sh: |
-        echo "ERROR CLI version does not match release version"
-        echo "$cliVersion (cli) != $relVersion (release)"
-        exit 1
-    else:
-    - return: $relVersion
+    - sh: awk -F'"' '/app.Version/{print $2}' main.go
+      =: $cliVersion
+      opts: silent
+    - $relVersion: (format("%v.%v.%v", [$version.major, $version.minor, $version.patch]))
+    - if: ($cliVersion != $relVersion)
+      then:
+        sh: |
+          echo "ERROR CLI version does not match release version"
+          echo "$cliVersion (cli) != $relVersion (release)"
+          exit 1
+      else:
+        - return: $relVersion
 
-LocalBuild:
-  run:
-  - sh: go build -o bin/tame -ldflags "-s -w"
+LocalBuild: go build -o bin/tame -ldflags "-s -w"
 
 BuildAll:
   run:
-  - cleanBin: {}
-  - for: {$platform: $platforms}
-    do:
-    - Build: { $os: $platform.os, $arch: $platform.arch}
-      opts: async
+    - cleanBin: {}
+    - for: { $platform: $platforms }
+      do:
+        - Build: { $os: $platform.os, $arch: $platform.arch }
+          opts: async
 
 Build:
   args: { $os, $arch }
   run:
-  - sh: |
-      echo "Building: ${os}:${arch}..."
-      mkdir -p bin
-      GOOS=${os} GOARCH=${arch} go build -o bin/tame_${os}_${arch} -ldflags "-s -w"
+    - sh: |
+        echo "Building: ${os}:${arch}..."
+        mkdir -p bin
+        GOOS=${os} GOARCH=${arch} go build -o bin/tame_${os}_${arch} -ldflags "-s -w"
+        echo "Done: ${os}:${arch}"
 
 DockerBuild:
   run:
-  - Version: {}
-    =: $tag
-  - sh: |
-      docker build -t ${dockerImage}:${tag} .
+    - Version: {}
+      =: $tag
+    - sh: |
+        docker build -t ${dockerImage}:${tag} .
 
-cleanBin:
-  run:
-    - sh: rm -rf ./bin/*
+Install: |
+  cp bin/tame /usr/local/bin/tame
+  chmod +x /usr/local/bin/tame
+  echo "OK"
 
-Test:
+cleanBin: rm -rf ./bin/*
+
+TestAll:
   run:
-  - sh: go test ./...
+    # - test.UnitTest: {}
+    - test.BlackBoxTest: {}

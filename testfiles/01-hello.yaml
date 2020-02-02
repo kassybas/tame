@@ -1,0 +1,8 @@
+
+
+# args: hello
+# out:Hello world Foo!
+hello:
+  args: {$mynameis: "Foo"}
+  run:
+  - sh: echo "Hello world ${mynameis}!"
