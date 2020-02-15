@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/kassybas/tame/internal/helpers"
+	"github.com/sirupsen/logrus"
 )
 
 func Split(in, sep string) []string {
@@ -47,4 +48,12 @@ func Format(fmtString string, vals interface{}) string {
 		return fmt.Sprintf(fmtString, vals)
 	}
 	return fmt.Sprintf(fmtString, vInterSlice...)
+}
+
+func stringsTrimSpace(s interface{}) string {
+	v, ok := s.(string)
+	if !ok {
+		logrus.Fatal("cannot trim non-space: %s (type: %T)", s, s)
+	}
+	return strings.TrimSpace(v)
 }

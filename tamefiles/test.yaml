@@ -50,7 +50,7 @@ runTestCase:
       opts: [silent, allow-fail]
       =: [$result, $resErr, $resRc]
 
-    - if: "'res' in $tc and $result != $tc.res"
+    - if: "'res' in $tc and $result != stringsTrimSpace($tc.res)"
       then:
         - return:
             [ false, '(format($errorMsgFormat, ["stdout", $path, $tc.name, $tc.res, $result]))' ]

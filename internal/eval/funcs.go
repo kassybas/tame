@@ -34,7 +34,7 @@ func AllFunctions() map[string]interface{} {
 		"stringsTrimLeft":     strings.TrimLeft,
 		"stringsTrimPrefix":   strings.TrimPrefix,
 		"stringsTrimRight":    strings.TrimRight,
-		"stringsTrimSpace":    strings.TrimSpace,
+		"stringsTrimSpace":    stringsTrimSpace,
 		"stringsTrimSuffix":   strings.TrimSuffix,
 		// strconv
 		"strconvAtoi":            Atoi,

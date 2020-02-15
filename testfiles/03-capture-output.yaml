@@ -1,0 +1,48 @@
+
+# tame -f examples/03-capture-output.yaml ShellOut
+ShellOut:
+  run:
+  - sh: echo "hello world"
+    opts: silent
+    =: $welcome  # save stdout to $welcome variable
+  - sh: echo "welcome ${welcome}"
+
+# tame -f examples/03-capture-output.yaml ShellErr
+ShellErr:
+  run:
+  - sh: echo "hello std error" >&2  # redirect output to stderr
+    =: [null, $welcome]  # save stderr to $welcome variable, stdout is ignored using null yaml value
+
+# tame -f examples/03-capture-output.yaml ShellStatus
+ShellStatus:
+  run:
+  - sh: exit 42
+    =: [null, null, $exit_code]  # save return code to $exit_code (stdout and stderr is ignored using null yaml value)
+
+Combined:
+  run:
+  - sh: |
+      echo hello out
+      echo hello err >&2
+    =: [$out, $err]
+    opts: silent
+  - sh: echo $out $err
+
+CombinedStatus:
+  run:
+  - sh: |
+      echo hello
+      exit 42
+    opts: allow-fail
+    =: [$out, null, $status]
+  - sh: echo $out and $status
+
+CombinedAll:
+  run:
+  - sh: |
+      echo hello out
+      echo hello err >&2
+      exit 66
+    opts: allow-fail
+    =: [$out, $err, $status]
+  - sh: echo $out and $err and $status

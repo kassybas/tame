@@ -49,7 +49,38 @@ testfiles/02-opts.yaml:
   - name: allow fail in call
     target: AllowedFailCall
     res: "okay"
+
 # FIX this
   # - name: silent all step
   #   target: SilentAll
   #   res: ""
+
+testfiles/03-capture-output.yaml:
+  - name: stdout
+    target: ShellOut
+    res: "welcome hello world"
+
+  - name: stderr
+    target: ShellErr
+    resErr: "hello std error"
+
+  - name: status kept
+    target: ShellStatus
+    resRc: 42
+
+  - name: combined
+    target: Combined
+    res: "hello out hello err"
+
+  - name: combined status
+    target: CombinedStatus
+    res: |
+      hello
+      hello and 42
+
+  - name: combined all
+    target: CombinedAll
+    res: |
+      hello out
+      hello out and hello err and 66
+    resErr: hello err
