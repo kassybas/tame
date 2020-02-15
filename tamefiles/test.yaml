@@ -12,13 +12,12 @@ BlackBoxTest:
     - $passed: []
     - $countFail: 0
 
-    - name: "Run all tests"
-      for: { $path: $tests }
+    - for: { $path: $tests }
       do:
         - for: { $tc: "$tests[$path]" }
           do:
             - $name: ($path+"::"+$tc.name)
-            - runBlackBoxTest: { $tc: $tc, $path: $path }
+            - runTestCase: { $tc: $tc, $path: $path }
               =: [$pass, $msg]
             - if: $pass
               then:
@@ -34,12 +33,15 @@ BlackBoxTest:
         - print: "Failed Tests"
         - print: "$failed"
 
+runTestsForFile:
+  args: {$tc: ""}
+
 $errorMsgFormat: |
   Failure type [%v]: %v::%v
     Expected: %v
     Got: %v
 
-runBlackBoxTest:
+runTestCase:
   args: { $tc, $path }
   run:
     - if: "'args' not in $tc"

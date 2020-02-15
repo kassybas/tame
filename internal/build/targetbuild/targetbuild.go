@@ -56,9 +56,11 @@ func BuildTarget(targetKey string, targetDef schema.TargetSchema, ctx *tcontext.
 		Ctx:  ctx,
 	}
 
-	newTarget.Opts, err = helpers.BuildOpts(targetDef.OptsDefinition)
-	if err != nil {
-		return newTarget, fmt.Errorf("failed to parse opts for '%s'\n\t%s", targetKey, err)
+	if targetDef.OptsDefinition != nil {
+		newTarget.Opts, err = helpers.BuildOpts(*targetDef.OptsDefinition)
+		if err != nil {
+			return newTarget, fmt.Errorf("failed to parse opts for '%s'\n\t%s", targetKey, err)
+		}
 	}
 
 	// Parameters

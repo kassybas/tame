@@ -1,4 +1,4 @@
-"testfiles/01-hello.yaml":
+testfiles/01-hello.yaml:
   - name: "default-arg"
     target: Hello
     res: Hello world Foo!
@@ -21,6 +21,35 @@
     target: IndexAList
     res: line is friend
 
-  - name: "owerwrite global"
+  - name: "owerwrite-global"
     target: OverwriteGlobal
-    res: "it is changed XXX"
+    res: "it is changed"
+
+  - name: "unchanged global"
+    target: UnchangedGlobal
+    res: "it is bar"
+
+testfiles/02-opts.yaml:
+  - name: silent script
+    target: SilentScript
+    res: ""
+
+  - name: loud script
+    target: LoudScript
+    res: "hello world"
+
+  - name: silent call
+    target: SilentCall
+    res: ""
+
+  - name: allow fail
+    target: AllowedFail
+    res: "ok"
+
+  - name: allow fail in call
+    target: AllowedFailCall
+    res: "okay"
+# FIX this
+  # - name: silent all step
+  #   target: SilentAll
+  #   res: ""

@@ -22,5 +22,6 @@ func NewBaseStep(stepDef schema.MergedStepSchema, stepType steptype.Steptype, na
 		newStep.resultNames = *stepDef.ResultContainers
 	}
 	newStep.name = name
+	newStep.id = stepDef.ID
 	return newStep, err
 }

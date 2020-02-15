@@ -78,7 +78,7 @@ func (s *ForStep) getIterableValues(vt *vartable.VarTable) ([]interface{}, error
 		}
 	default:
 		{
-			return nil, fmt.Errorf("unknown iterable type: %s (type: %T)", resIterable, resIterable)
+			return nil, fmt.Errorf("unknown iterable type: %v (type: %T)", resIterable, resIterable)
 		}
 	}
 	return iterableVal, nil

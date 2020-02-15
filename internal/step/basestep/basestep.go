@@ -8,6 +8,7 @@ import (
 
 type BaseStep struct {
 	name        string
+	id          *string
 	kind        steptype.Steptype
 	resultNames []string
 	opts        opts.ExecutionOpts

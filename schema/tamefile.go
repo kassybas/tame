@@ -23,7 +23,7 @@ type IncludeSchema struct {
 type TargetSchema struct {
 	ArgDefinition  map[string]interface{}   `mapstructure:"args,omitempty"`
 	StepDefinition []map[string]interface{} `mapstructure:"run,omitempty"`
-	OptsDefinition []string                 `mapstructure:"opts,omitempty"`
+	OptsDefinition *[]string                `mapstructure:"opts,omitempty"`
 	Summary        string                   `mapstructure:"summary,omitempty"`
 }
 
@@ -49,6 +49,7 @@ type LoadSchema struct {
 
 // MergedStepSchema is the base format of step
 type MergedStepSchema struct {
+	ID               *string                 `mapstructure:"id"`
 	ForLoop          *map[string]interface{} `mapstructure:"for"`
 	ForRawSteps      []interface{}           `mapstructure:"do"`
 	Return           *[]interface{}          `mapstructure:"return"` // single interface is allowed due to weak decode

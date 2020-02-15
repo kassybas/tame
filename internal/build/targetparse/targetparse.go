@@ -30,7 +30,7 @@ func ParseTargets(dynamicKeys map[string]interface{}) (map[string]schema.TargetS
 		default:
 			{
 				var md mapstructure.Metadata
-				err := mapstructure.DecodeMetadata(v, &newTargetSch, &md)
+				err := mapstructure.WeakDecodeMetadata(v, &newTargetSch, &md)
 				if err != nil {
 					return nil, fmt.Errorf("failed to parse target, incorrect yaml format: %s\n\t%s", k, err.Error())
 				}

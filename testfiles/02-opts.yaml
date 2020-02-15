@@ -1,0 +1,38 @@
+$FOO: "bar"
+
+SilentScript:
+  run:
+  - sh: echo "Hello world"
+    opts: silent
+  - sh: echo "Hello world"
+    opts: [silent, allow-fail]
+
+LoudScript:
+  run:
+  - sh: echo "hello world"
+    opts: "allow-fail"
+
+SilentCall:
+  run:
+  - loudScript: {}
+    opts: silent
+
+AllowedFail:
+  run:
+  - sh: exit 2
+    opts: allow-fail
+  - sh: echo ok
+
+AllowedFailCall:
+  run:
+  - fail: {}
+    opts: allow-fail
+  - sh: echo okay
+
+fail: exit 42
+
+SilentAll:
+  opts: silent
+  run:
+  - sh: echo hey
+  - sh: echo you

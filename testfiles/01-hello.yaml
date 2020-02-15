@@ -23,3 +23,9 @@ IndexAList:
   - $i: 2
   - $line: $myList[$i]
   - sh: echo "line is ${line}"
+
+UnchangedGlobal:
+  run:
+  - OverwriteGlobal: {}
+    opts: silent
+  - sh: echo "it is $FOO"
