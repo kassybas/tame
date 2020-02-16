@@ -33,11 +33,8 @@ BlackBoxTest:
         - print: "Failed Tests"
         - print: "$failed"
 
-runTestsForFile:
-  args: {$tc: ""}
-
 $errorMsgFormat: |
-  Failure type [%v]: %v::%v
+  Fail assert %v: %v::%v
     Expected: %v
     Got: %v
 
